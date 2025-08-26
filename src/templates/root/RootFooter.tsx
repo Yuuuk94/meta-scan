@@ -1,5 +1,5 @@
 import { pageTitle } from "@/app/constans";
-import { ServiceStatus } from "./ServiceStatus";
+import { ServiceStatus } from "../../components/ServiceStatus";
 
 export const RootFooter = () => {
   // TODO: 버전, 업타임, 스캔수 카운팅 로직 필요

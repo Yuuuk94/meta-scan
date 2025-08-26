@@ -1,6 +1,6 @@
 import { pageTitle } from "@/app/constans";
 import { Terminal } from "lucide-react";
-import { ServiceStatus } from "./ServiceStatus";
+import { ServiceStatus } from "../../components/ServiceStatus";
 
 export const RootHeader = () => {
   return (
@@ -10,7 +10,7 @@ export const RootHeader = () => {
           <div className="p-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
             <Terminal className="h-6 w-6 text-cyan-400" />
           </div>
-          <h1 className="text-xl font-mono text-cyan-400">{pageTitle}</h1>
+          <p className="text-xl font-mono text-cyan-400">{pageTitle}</p>
           <div className="ml-auto flex items-center gap-2">
             <ServiceStatus />
           </div>
