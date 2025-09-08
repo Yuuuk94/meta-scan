@@ -1,8 +1,12 @@
 import { getSiteSetting } from "@/utils/cookies";
 
-export const RootBackground = async ({ children }: RootLayoutProps) => {
-  const { theme } = await getSiteSetting();
-
+export const RootBackground = async ({
+  theme,
+  children,
+}: Readonly<{
+  theme: Theme;
+  children: React.ReactNode;
+}>) => {
   return (
     <div
       className={`min-h-screen transition-all duration-300 ${

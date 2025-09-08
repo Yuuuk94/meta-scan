@@ -3,7 +3,7 @@ import { Roboto, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { RootBackground } from "@/templates/root/RootBackground";
 import { RootHeader } from "@/templates/root/RootHeader";
-import { defaultLang, defaultTheme, pageTitle } from "../constans";
+import { pageTitle } from "../constans";
 import { RootFooter } from "@/templates/root/RootFooter";
 import { getSiteSetting } from "@/utils/cookies";
 
@@ -32,17 +32,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   const { theme, lang } = await getSiteSetting();
   return (
     <html lang={lang} data-theme={theme}>
       <body
         className={`${RobotoSans.variable} ${geistMono.variable} antialiased`}
       >
-        <RootBackground>
-          <RootHeader />
+        <RootBackground theme={theme}>
+          <RootHeader theme={theme} lang={lang} />
           <main className="container mx-auto">{children}</main>
-          <RootFooter />
+          <RootFooter theme={theme} lang={lang} />
         </RootBackground>
       </body>
     </html>

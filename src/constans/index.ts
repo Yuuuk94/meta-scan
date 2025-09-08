@@ -1,6 +1,10 @@
 export const pageTitle = "META_SCAN.LAB";
 
-export const allowLocales = ["en", "ko"];
+export const allowLanguages = ["en", "ko"];
+export const allowTheme = ["dark", "light"];
 
 export const defaultTheme: Theme = "dark";
 export const defaultLang: Language = "ko";
+
+export const themeKey = "theme";
+export const langKey = "lang";

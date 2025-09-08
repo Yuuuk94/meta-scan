@@ -1,5 +1,26 @@
 {
-  "products": {
-    "cart": "Add to Cart"
+  "head": {
+    "title": "Meta-Scan",
+    "subtitle": "AI-Friendly SEO Analyzer"
+  },
+  "main": {
+    "title": "Meta-Scan",
+    "subtitle": "AI-Friendly SEO Analyzer",
+    "heroTitle": "AI-Friendly SEO Analyzer",
+    "heroSubtitle": "Check your website's SEO and AI optimization signals",
+    "urlPlaceholder": "Enter your website URL...",
+    "analyzeButton": "Analyze",
+    "howItWorksTitle": "How It Works",
+    "step1Title": "Enter URL",
+    "step1Desc": "Input your website URL for comprehensive analysis",
+    "step2Title": "Get SEO & AI Report",
+    "step2Desc": "Receive detailed insights on SEO and AI preparedness",
+    "step3Title": "Improve Your Site",
+    "step3Desc": "Follow actionable recommendations to optimize",
+    "analyzingText": "Analyzing your site...",
+    "analyzingSubtext": "Fetching meta tags, structured data, AI signals.",
+    "errorTitle": "Analysis failed. Please check your URL.",
+    "errorSubtitle": "분석에 실패했습니다. URL을 확인해주세요.",
+    "retryButton": "Retry"
   }
 }

@@ -1,5 +1,24 @@
 {
-  "products": {
-    "cart": "Toevoegen aan Winkelwagen"
+  "head": {
+    "title": "Meta-Scan",
+    "subtitle": "AI 친화 SEO 분석기"
+  },
+  "main": {
+    "heroTitle": "AI 친화 SEO 분석기",
+    "heroSubtitle": "웹사이트의 SEO와 AI 최적화 신호를 확인하세요",
+    "urlPlaceholder": "웹사이트 URL을 입력하세요...",
+    "analyzeButton": "분석하기",
+    "howItWorksTitle": "작동 방식",
+    "step1Title": "URL 입력",
+    "step1Desc": "종합 분석을 위해 웹사이트 URL을 입력하세요",
+    "step2Title": "SEO & AI 리포트 받기",
+    "step2Desc": "SEO 및 AI 준비도에 대한 상세한 인사이트를 받으세요",
+    "step3Title": "사이트 개선",
+    "step3Desc": "실행 가능한 권장사항을 따라 최적화하세요",
+    "analyzingText": "사이트 분석 중입니다...",
+    "analyzingSubtext": "메타태그, 구조화 데이터, AI 신호를 가져오는 중입니다.",
+    "errorTitle": "분석에 실패했습니다. URL을 확인해주세요.",
+    "errorSubtitle": "Analysis failed. Please check your URL.",
+    "retryButton": "다시 시도"
   }
 }
