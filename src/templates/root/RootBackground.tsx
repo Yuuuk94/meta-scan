@@ -1,8 +1,17 @@
-export const RootBackground = ({ children }: RootLayoutProps) => {
+import { getSiteSetting } from "@/utils/cookies";
+
+export const RootBackground = async ({ children }: RootLayoutProps) => {
+  const { theme } = await getSiteSetting();
+
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <div
+      className={`min-h-screen transition-all duration-300 ${
+        theme === "dark"
+          ? "bg-gradient-to-br from-gray-900 via-black to-purple-900"
+          : "bg-gradient-to-br from-blue-50 via-white to-purple-50"
+      }`}
+    >
       {/* Background Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
       {children}
     </div>
   );

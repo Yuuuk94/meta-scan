@@ -3,8 +3,9 @@ import { Roboto, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { RootBackground } from "@/templates/root/RootBackground";
 import { RootHeader } from "@/templates/root/RootHeader";
-import { pageTitle } from "./constans";
+import { defaultLang, defaultTheme, pageTitle } from "../constans";
 import { RootFooter } from "@/templates/root/RootFooter";
+import { getSiteSetting } from "@/utils/cookies";
 
 const RobotoSans = Roboto({
   variable: "--font-geist-sans",
@@ -31,9 +32,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const { theme, lang } = await getSiteSetting();
   return (
-    <html lang="en">
+    <html lang={lang} data-theme={theme}>
       <body
         className={`${RobotoSans.variable} ${geistMono.variable} antialiased`}
       >
