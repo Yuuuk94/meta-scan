@@ -132,20 +132,19 @@ export const HeroSection = () => {
       <div className="max-w-5xl mx-auto text-center">
         <div className="mb-12">
           <Badge className="mb-6 bg-cyan-500/10 text-cyan-400 border-cyan-500/30 font-mono">
-            PERFORMANCE.ANALYSIS.SYSTEM
+            SEO.PERFORMANCE.CHECKER
           </Badge>
           <h1 className="text-5xl font-mono font-bold mb-6 text-white leading-tight">
-            <span className="text-cyan-400">&gt;_</span> WEBSITE
+            <span className="text-cyan-400">&gt;_</span> FREE WEBSITE
+            <br />
             <span className="text-transparent bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text">
               FORENSICS
             </span>
           </h1>
           <p className="text-xl text-gray-300 font-mono mb-12 leading-relaxed">
-            URL 입력 → 사이트맵 크롤링 → Lighthouse 스캔 → SEO 분석
+            <span className="text-cyan-400">URL 한 번에 즉시 진단</span>
             <br />
-            <span className="text-cyan-400">
-              완전 자동화된 웹사이트 진단 시스템
-            </span>
+            URL 입력 → 웹사이트 스캔 → SEO & 성능 분석
           </p>
         </div>
 
@@ -287,12 +286,12 @@ export const HeroSection = () => {
           </div>
 
           {/* Floating particles effect */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 pointer-events-none">
+          {/* <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 pointer-events-none">
             <div className="absolute top-0 left-0 w-2 h-2 bg-cyan-400 rounded-full animate-bounce [animation-delay:0s] [animation-duration:3s]"></div>
             <div className="absolute top-1/4 right-0 w-1 h-1 bg-purple-400 rounded-full animate-bounce [animation-delay:0.5s] [animation-duration:4s]"></div>
             <div className="absolute bottom-0 left-1/4 w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce [animation-delay:1s] [animation-duration:3.5s]"></div>
             <div className="absolute bottom-1/4 right-1/4 w-1 h-1 bg-cyan-300 rounded-full animate-bounce [animation-delay:1.5s] [animation-duration:2.5s]"></div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
