@@ -1,4 +1,4 @@
-import { ServiceStatus } from "@/components/ServiceStatus";
+import { ServiceStatus } from "./ServiceStatus";
 import { Scan } from "lucide-react";
 
 interface RootFooterProps extends DefautProps {}

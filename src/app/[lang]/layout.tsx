@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { Roboto, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { RootBackground } from "@/templates/root/RootBackground";
+import { pageTitle } from "@/constans";
 import { RootHeader } from "@/templates/root/RootHeader";
-import { pageTitle } from "../constans";
 import { RootFooter } from "@/templates/root/RootFooter";
 import { getSiteSetting } from "@/utils/cookies";
+import "../globals.css";
 
 const RobotoSans = Roboto({
   variable: "--font-geist-sans",
@@ -43,11 +42,17 @@ export default async function RootLayout({
       <body
         className={`${RobotoSans.variable} ${geistMono.variable} antialiased`}
       >
-        <RootBackground theme={theme}>
+        <div
+          className={`min-h-screen transition-all duration-300 ${
+            theme === "dark"
+              ? "bg-gradient-to-br from-gray-900 via-black to-purple-900"
+              : "bg-gradient-to-br from-blue-50 via-white to-purple-50"
+          }`}
+        >
           <RootHeader theme={theme} lang={lang} />
           <main className="container mx-auto">{children}</main>
           <RootFooter theme={theme} lang={lang} />
-        </RootBackground>
+        </div>
       </body>
     </html>
   );

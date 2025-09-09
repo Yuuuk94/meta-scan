@@ -1,26 +1,27 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useRouter, usePathname } from "next/navigation";
 import { Languages, Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { allowLanguages, allowTheme, langKey, themeKey } from "@/constans";
 
 interface ToggleSettingProps extends DefautProps {}
 
 export const ToggleSetting = ({ theme, lang }: ToggleSettingProps) => {
   const router = useRouter();
+  const pathname = usePathname();
 
-  const toggleCallback = (key: string, next: string) => {
-    document.cookie = key + "=" + next;
-    router.refresh();
-  };
   const setTheme = () => {
     const next = allowTheme.filter((a) => a != theme)[0];
     document.documentElement.setAttribute("data-theme", next);
-    toggleCallback(themeKey, next);
+    document.cookie = themeKey + "=" + next;
+    router.refresh();
   };
   const setLang = () => {
     const next = allowLanguages.filter((a) => a != lang)[0];
-    toggleCallback(langKey, next);
+    document.cookie = langKey + "=" + next;
+    const segments = pathname.split("/");
+    segments[1] = next;
+    router.push(segments.join("/"));
   };
   return (
     <>

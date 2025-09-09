@@ -1,7 +1,7 @@
 import { getDictionary } from "@/dictionaries";
 import { Scan } from "lucide-react";
 import { ToggleSetting } from "./ToggleSetting";
-import { ServiceStatus } from "@/components/ServiceStatus";
+import { ServiceStatus } from "./ServiceStatus";
 
 interface RootHeaderProps extends DefautProps {}
 
@@ -19,7 +19,7 @@ export const RootHeader = async ({ theme, lang }: RootHeaderProps) => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {/* Cyberpunk Logo */}
+            {/* LOGO */}
             <div
               className={`relative p-3 rounded-xl transition-all duration-300 ${
                 theme === "dark"
