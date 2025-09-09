@@ -15,6 +15,7 @@ export const ToggleSetting = ({ theme, lang }: ToggleSettingProps) => {
   };
   const setTheme = () => {
     const next = allowTheme.filter((a) => a != theme)[0];
+    document.documentElement.setAttribute("data-theme", next);
     toggleCallback(themeKey, next);
   };
   const setLang = () => {

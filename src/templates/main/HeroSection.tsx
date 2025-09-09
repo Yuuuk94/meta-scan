@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,15 +35,15 @@ export const HeroSection = ({ theme, lang, t }: HeroSectionProps) => {
           <Bot className="h-4 w-4 mr-2" />
           {theme === "dark" ? (
             <span className="text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text">
-              AI-Powered Analysis
+              AIO・AEO・GEO・SEO Analysis
             </span>
           ) : (
-            "AI-Powered Analysis"
+            "AIO・AEO・GEO・SEO Analysis"
           )}
         </Badge>
 
         <h1
-          className={`text-6xl font-bold mb-6 transition-all duration-300 ${
+          className={`h-20 text-6xl font-bold mb-6 transition-all duration-300 ${
             theme === "dark"
               ? "text-transparent bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text"
               : "text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text"
@@ -68,7 +70,6 @@ export const HeroSection = ({ theme, lang, t }: HeroSectionProps) => {
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-400/20 to-pink-400/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
               </>
             )}
-
             <div
               className={`relative rounded-3xl p-3 border-2 transition-all duration-300 ${
                 theme === "dark"

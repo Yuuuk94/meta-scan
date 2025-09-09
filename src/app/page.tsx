@@ -1,4 +1,5 @@
 import { getDictionary } from "@/dictionaries";
+import { HeroSection } from "@/templates/main/HeroSection";
 import { getSiteSetting } from "@/utils/cookies";
 
 export default async function Home() {
@@ -8,6 +9,7 @@ export default async function Home() {
   return (
     <>
       {/* Hero Section */}
+      <HeroSection theme={theme} lang={lang} t={t} />
       {/* Features Section */}
       {/* Process Section */}
     </>
