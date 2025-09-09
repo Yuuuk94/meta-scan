@@ -50,7 +50,7 @@ export default async function RootLayout({
           }`}
         >
           <RootHeader theme={theme} lang={lang} />
-          <main className="container mx-auto">{children}</main>
+          <main>{children}</main>
           <RootFooter theme={theme} lang={lang} />
         </div>
       </body>

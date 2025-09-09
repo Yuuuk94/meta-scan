@@ -7,9 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Globe, Bot, CheckCircle2, AlertCircle, Scan } from "lucide-react";
 
-interface HeroSectionProps extends DefautProps {
-  t: Record<string, string>;
-}
+interface HeroSectionProps extends DefautPageProps {}
+
 export const HeroSection = ({ theme, lang, t }: HeroSectionProps) => {
   const [url, setUrl] = useState("");
   const [isValidUrl, setIsValidUrl] = useState(false);
@@ -43,7 +42,7 @@ export const HeroSection = ({ theme, lang, t }: HeroSectionProps) => {
         </Badge>
 
         <h1
-          className={`h-20 text-6xl font-bold mb-6 transition-all duration-300 ${
+          className={`text-6xl font-bold mb-6 transition-all duration-300 ${
             theme === "dark"
               ? "text-transparent bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text"
               : "text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text"
@@ -95,7 +94,6 @@ export const HeroSection = ({ theme, lang, t }: HeroSectionProps) => {
                     placeholder={t.urlPlaceholder}
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleAnalyze()}
                     className={`flex-1 border-0 bg-transparent text-lg placeholder:opacity-60 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300 ${
                       theme === "dark"
                         ? "text-white placeholder:text-gray-400"
@@ -116,7 +114,6 @@ export const HeroSection = ({ theme, lang, t }: HeroSectionProps) => {
 
                 <Button
                   onClick={handleAnalyze}
-                  disabled={!isValidUrl}
                   className={`px-8 py-6 rounded-2xl font-semibold text-lg transition-all duration-300 relative overflow-hidden group ${
                     theme === "dark"
                       ? "bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"

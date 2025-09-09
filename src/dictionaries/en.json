@@ -21,6 +21,18 @@
     "analyzingSubtext": "Fetching meta tags, structured data, AI signals.",
     "errorTitle": "Analysis failed. Please check your URL.",
     "errorSubtitle": "분석에 실패했습니다. URL을 확인해주세요.",
-    "retryButton": "Retry"
+    "retryButton": "Retry",
+    "faqTitle": "Frequently Asked Questions",
+    "faqSubtitle": "Everything you need to know about AI-friendly SEO analysis",
+    "faq1Q": "What is AI Preparedness Score?",
+    "faq1A": "AI Preparedness Score measures how well your website is optimized for AI assistants and search engines. It analyzes factors like structured data, prompts.txt files, and content organization.",
+    "faq2Q": "How accurate is the analysis?",
+    "faq2A": "Our analysis uses the same metrics as Google Lighthouse and checks for the latest AI optimization signals. Results are based on current web standards and AI assistant requirements.",
+    "faq3Q": "What is prompts.txt and why do I need it?",
+    "faq3A": "prompts.txt is a new standard that helps AI assistants understand your website better. It provides context and instructions for how AI should interpret and present your content.",
+    "faq4Q": "How often should I check my site?",
+    "faq4A": "We recommend checking your site monthly or after major content updates. AI optimization standards evolve rapidly, so regular monitoring ensures you stay current.",
+    "faq5Q": "Is this analysis free?",
+    "faq5A": "Yes! Meta-Scan provides comprehensive AI-friendly SEO analysis completely free. We believe every website should be optimized for the AI-powered future of search."
   }
 }

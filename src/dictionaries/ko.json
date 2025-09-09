@@ -4,6 +4,8 @@
     "subtitle": "AI 친화 SEO 분석기"
   },
   "main": {
+    "title": "Meta-Scan",
+    "subtitle": "AI 친화 SEO 분석기",
     "heroTitle": "AI 친화 SEO 분석기",
     "heroSubtitle": "웹사이트의 SEO와 AI 최적화 신호를 확인하세요",
     "urlPlaceholder": "웹사이트 URL을 입력하세요...",
@@ -19,6 +21,18 @@
     "analyzingSubtext": "메타태그, 구조화 데이터, AI 신호를 가져오는 중입니다.",
     "errorTitle": "분석에 실패했습니다. URL을 확인해주세요.",
     "errorSubtitle": "Analysis failed. Please check your URL.",
-    "retryButton": "다시 시도"
+    "retryButton": "다시 시도",
+    "faqTitle": "자주 묻는 질문",
+    "faqSubtitle": "AI 친화적 SEO 분석에 대해 알아야 할 모든 것",
+    "faq1Q": "AI 준비도 점수란 무엇인가요?",
+    "faq1A": "AI 준비도 점수는 웹사이트가 AI 어시스턴트와 검색 엔진에 얼마나 잘 최적화되어 있는지를 측정합니다. 구조화된 데이터, prompts.txt 파일, 콘텐츠 구성 등의 요소를 분석합니다.",
+    "faq2Q": "분석의 정확도는 어느 정도인가요?",
+    "faq2A": "우리의 분석은 Google Lighthouse와 동일한 지표를 사용하며 최신 AI 최적화 신호를 확인합니다. 결과는 현재 웹 표준과 AI 어시스턴트 요구사항을 기반으로 합니다.",
+    "faq3Q": "prompts.txt란 무엇이며 왜 필요한가요?",
+    "faq3A": "prompts.txt는 AI 어시스턴트가 웹사이트를 더 잘 이해할 수 있도록 돕는 새로운 표준입니다. AI가 콘텐츠를 해석하고 제시하는 방법에 대한 컨텍스트와 지침을 제공합니다.",
+    "faq4Q": "얼마나 자주 사이트를 확인해야 하나요?",
+    "faq4A": "월별 또는 주요 콘텐츠 업데이트 후 사이트를 확인하는 것을 권장합니다. AI 최적화 표준은 빠르게 발전하므로 정기적인 모니터링이 최신 상태를 유지하는 데 도움이 됩니다.",
+    "faq5Q": "이 분석은 무료인가요?",
+    "faq5A": "네! Meta-Scan은 포괄적인 AI 친화적 SEO 분석을 완전 무료로 제공합니다. 모든 웹사이트가 AI 기반 검색의 미래에 최적화되어야 한다고 믿습니다."
   }
 }
