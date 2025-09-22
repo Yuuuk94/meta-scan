@@ -1,14 +1,18 @@
-export const openapiSpec = {
+import swaggerUi from "swagger-ui-express";
+
+export { swaggerUi };
+
+export const swaggerSpec = {
   openapi: "3.0.3",
   info: {
     title: "Lighthouse Runner API",
-    version: "1.1.0",
+    version: "0.1.0",
     description:
       "POST /run 으로 Lighthouse LHR(JSON) 또는 HTML 리포트를 반환합니다.",
   },
   servers: [{ url: process.env.PUBLIC_URL || "http://localhost:8080" }],
   paths: {
-    "/run": {
+    "/v1/lighthouse/run": {
       post: {
         summary: "Lighthouse 실행",
         requestBody: {
@@ -20,7 +24,7 @@ export const openapiSpec = {
                 jsonExample: {
                   summary: "JSON LHR 반환",
                   value: {
-                    url: "https://example.com",
+                    url: "https://naver.com",
                     formFactor: "mobile",
                     onlyCategories: ["seo", "performance"],
                     format: "json",
@@ -29,7 +33,7 @@ export const openapiSpec = {
                 htmlExample: {
                   summary: "HTML 리포트 반환(다운로드)",
                   value: {
-                    url: "https://example.com",
+                    url: "https://naver.com",
                     formFactor: "desktop",
                     onlyCategories: [
                       "seo",
@@ -46,7 +50,7 @@ export const openapiSpec = {
           },
         },
         responses: {
-          "200": {
+          200: {
             description: "성공",
             content: {
               "application/json": {
@@ -60,7 +64,7 @@ export const openapiSpec = {
               },
             },
           },
-          "400": {
+          400: {
             description: "잘못된 요청",
             content: {
               "application/json": {
@@ -68,7 +72,7 @@ export const openapiSpec = {
               },
             },
           },
-          "500": {
+          500: {
             description: "실행 오류",
             content: {
               "application/json": {
@@ -79,10 +83,10 @@ export const openapiSpec = {
         },
       },
     },
-    "/healthz": {
+    "/v1/healthz": {
       get: {
         summary: "헬스체크",
-        responses: { "200": { description: "ok (text/plain)" } },
+        responses: { 200: { description: "ok (text/plain)" } },
       },
     },
   },
