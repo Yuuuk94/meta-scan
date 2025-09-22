@@ -6,13 +6,13 @@ export const swaggerSpec = {
   openapi: "3.0.3",
   info: {
     title: "Lighthouse Runner API",
-    version: "1.1.0",
+    version: "0.1.0",
     description:
       "POST /run 으로 Lighthouse LHR(JSON) 또는 HTML 리포트를 반환합니다.",
   },
   servers: [{ url: process.env.PUBLIC_URL || "http://localhost:8080" }],
   paths: {
-    "/run": {
+    "/v1/lighthouse/run": {
       post: {
         summary: "Lighthouse 실행",
         requestBody: {
@@ -24,7 +24,7 @@ export const swaggerSpec = {
                 jsonExample: {
                   summary: "JSON LHR 반환",
                   value: {
-                    url: "https://example.com",
+                    url: "https://naver.com",
                     formFactor: "mobile",
                     onlyCategories: ["seo", "performance"],
                     format: "json",
@@ -33,7 +33,7 @@ export const swaggerSpec = {
                 htmlExample: {
                   summary: "HTML 리포트 반환(다운로드)",
                   value: {
-                    url: "https://example.com",
+                    url: "https://naver.com",
                     formFactor: "desktop",
                     onlyCategories: [
                       "seo",
@@ -83,7 +83,7 @@ export const swaggerSpec = {
         },
       },
     },
-    "/healthz": {
+    "/v1/healthz": {
       get: {
         summary: "헬스체크",
         responses: { 200: { description: "ok (text/plain)" } },

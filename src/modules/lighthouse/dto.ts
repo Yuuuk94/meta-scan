@@ -7,7 +7,6 @@ export const RunBodySchema = z.object({
     .array(z.enum(["performance", "seo", "best-practices", "accessibility"]))
     .default(["performance", "seo", "best-practices", "accessibility"]),
   format: z.enum(["html", "json"]).default("html"),
-  download: z.boolean().default(false),
 });
 
 export type RunBody = z.infer<typeof RunBodySchema>;

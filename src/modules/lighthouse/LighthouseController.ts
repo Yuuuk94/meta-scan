@@ -16,10 +16,7 @@ export class LighthouseController extends BaseController {
 
       if (result && body.format === "html") {
         const html = result.report as unknown as string;
-        const filename = body.download
-          ? this.service.toSafeFilename(body.url)
-          : undefined;
-        return this.html(res, html, filename);
+        return this.html(res, html);
       }
       return this.ok(res, result?.lhr);
     }

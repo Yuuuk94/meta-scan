@@ -5,12 +5,7 @@ export abstract class BaseController {
     if (payload === undefined) return res.sendStatus(200);
     return res.status(200).json(payload);
   }
-  protected html(res: Response, html: string, filename?: string) {
-    if (filename)
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="${filename}.html"`
-      );
+  protected html(res: Response, html: string) {
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     return res.status(200).send(html);
   }
