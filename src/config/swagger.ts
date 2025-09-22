@@ -1,4 +1,8 @@
-export const openapiSpec = {
+import swaggerUi from "swagger-ui-express";
+
+export { swaggerUi };
+
+export const swaggerSpec = {
   openapi: "3.0.3",
   info: {
     title: "Lighthouse Runner API",
@@ -46,7 +50,7 @@ export const openapiSpec = {
           },
         },
         responses: {
-          "200": {
+          200: {
             description: "성공",
             content: {
               "application/json": {
@@ -60,7 +64,7 @@ export const openapiSpec = {
               },
             },
           },
-          "400": {
+          400: {
             description: "잘못된 요청",
             content: {
               "application/json": {
@@ -68,7 +72,7 @@ export const openapiSpec = {
               },
             },
           },
-          "500": {
+          500: {
             description: "실행 오류",
             content: {
               "application/json": {
@@ -82,7 +86,7 @@ export const openapiSpec = {
     "/healthz": {
       get: {
         summary: "헬스체크",
-        responses: { "200": { description: "ok (text/plain)" } },
+        responses: { 200: { description: "ok (text/plain)" } },
       },
     },
   },
