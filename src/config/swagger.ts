@@ -12,7 +12,7 @@ export const swaggerSpec = {
   },
   servers: [{ url: process.env.PUBLIC_URL || "http://localhost:8080" }],
   paths: {
-    "/v1/lighthouse/run": {
+    "/api/v1/lighthouse/run": {
       post: {
         summary: "Lighthouse 실행",
         requestBody: {
@@ -24,7 +24,7 @@ export const swaggerSpec = {
                 jsonExample: {
                   summary: "JSON LHR 반환",
                   value: {
-                    url: "https://naver.com",
+                    url: "https://dev-portfolio.withmay.com/",
                     formFactor: "mobile",
                     onlyCategories: ["seo", "performance"],
                     format: "json",
@@ -33,7 +33,7 @@ export const swaggerSpec = {
                 htmlExample: {
                   summary: "HTML 리포트 반환(다운로드)",
                   value: {
-                    url: "https://naver.com",
+                    url: "https://dev-portfolio.withmay.com/",
                     formFactor: "desktop",
                     onlyCategories: [
                       "seo",
@@ -83,9 +83,30 @@ export const swaggerSpec = {
         },
       },
     },
-    "/v1/healthz": {
+    "/api/v1/healthz": {
       get: {
         summary: "헬스체크",
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
+    "/api/v1/scan/ping": {
+      post: {
+        summary: "사이트 존재 확인",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              examples: {
+                jsonExample: {
+                  summary: "defalut",
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                  },
+                },
+              },
+            },
+          },
+        },
         responses: { 200: { description: "ok (text/plain)" } },
       },
     },

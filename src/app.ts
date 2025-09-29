@@ -5,25 +5,44 @@ import { errorHandler } from "@core/http/errorHandler.js";
 import { notFound } from "@core/http/notFound.js";
 import { swaggerUi, swaggerSpec } from "@config/swagger.js";
 import healthRouter from "@modules/health/health.router.js";
+import scanRouter from "@modules/scan/scan.router.js";
 import lighthouseRouter from "@modules/lighthouse/lighthouse.router.js";
 
 const app = express();
 
 app.use(express.json({ limit: "1mb" }));
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Authorization", "Content-Type"],
+    credentials: false,
+  })
+);
 app.use(morgan("tiny"));
 
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.get("/openapi.json", (_req, res) => res.json(swaggerSpec));
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/api/openapi.json", (_req, res) => res.json(swaggerSpec));
 
-app.use("/v1/healthz", healthRouter);
-app.use("/v1/lighthouse", lighthouseRouter);
+const routers = {
+  healthz: healthRouter,
+  scan: scanRouter,
+  lighthouse: lighthouseRouter,
+};
+for (let [key, value] of Object.entries(routers)) {
+  app.use("/api/v1/" + key, value);
+}
 
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(process.env.PORT || 8080, () => {
-  console.log("mata-scan-api runner(local) on :8080");
+const port = process.env.PORT || 8080;
+
+app.listen(port, () => {
+  console.log("mata-scan-api runner(local) on " + port);
+  console.log(
+    `mata-scan-api swagger(local) on http://localhost:${port}/api/docs`
+  );
 });
 
 export default app;
