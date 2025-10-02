@@ -18,4 +18,12 @@ export class ScanController extends BaseController {
       return this.ok(res, statusOk);
     }
   );
+
+  robotsTxt = this.handle(
+    async (req: Request, res: Response, _next: NextFunction) => {
+      const body = validate(RunBodySchema, req.body);
+      const result = await this.service.robotsTxt(body as RunBody);
+      return this.ok(res, result);
+    }
+  );
 }

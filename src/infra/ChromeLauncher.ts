@@ -1,12 +1,9 @@
 import * as chromeLauncher from "chrome-launcher";
 
-export interface ChromeProcess {
-  port: number;
-  kill: () => Promise<void>;
-}
+export type ChromeProcess = chromeLauncher.LaunchedChrome;
 
 export class ChromeLauncher {
-  async launch(): Promise<ChromeProcess> {
+  async launch(): Promise<chromeLauncher.LaunchedChrome> {
     const chrome = await chromeLauncher.launch({
       ...(process.env.CHROME_PATH
         ? { chromePath: process.env.CHROME_PATH }
@@ -18,7 +15,7 @@ export class ChromeLauncher {
         "--ignore-certificate-errors",
       ],
     });
-    return chrome as unknown as ChromeProcess;
+    return chrome;
   }
 
   async safeKill(proc?: ChromeProcess) {

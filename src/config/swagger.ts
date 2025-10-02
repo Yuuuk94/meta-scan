@@ -110,6 +110,27 @@ export const swaggerSpec = {
         responses: { 200: { description: "ok (text/plain)" } },
       },
     },
+    "/api/v1/scan/robotsTxt": {
+      post: {
+        summary: "사이트 robot.txt 확인",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              examples: {
+                jsonExample: {
+                  summary: "defalut",
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
   },
   components: {
     schemas: {
