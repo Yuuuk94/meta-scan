@@ -1,5 +1,5 @@
 import { ApiError } from "@core/http/ApiError.js";
-import type { RunBody } from "./dto.js";
+import type { UrlBody, UrlsBody } from "./dto.js";
 import type { ChromeProcess } from "@infra/ChromeLauncher.js";
 import { ChromeLauncher } from "@infra/ChromeLauncher.js";
 
@@ -7,15 +7,18 @@ export class ScanService {
   constructor(private readonly chrome: ChromeLauncher) {}
   private timeOut = 5000;
 
-  async ping({ url }: RunBody) {
+  async ping({ url }: UrlBody) {
     try {
       const result = await fetch(url, {
         method: "HEAD",
-        redirect: "manual", // 원본 응답 확인
         signal: AbortSignal.timeout(this.timeOut),
       });
       if (result.status === 200) {
-        return true;
+        return {
+          status: "ok",
+          redirected: result.redirected,
+          url: result.url,
+        };
       }
       throw Error;
     } catch (e) {
@@ -55,7 +58,6 @@ export class ScanService {
           records.push(current);
           current = null;
         }
-        // 새 그룹 혹은 같은 그룹에 추가
         if (!current) {
           current = {
             userAgents: [],
@@ -102,7 +104,6 @@ export class ScanService {
       for (const ua of record.userAgents) {
         let allowed = true;
 
-        // 규칙 순서대로 검사
         for (const rule of record.rules) {
           if (rule.regex && rule.regex.test(path)) {
             if (rule.type === "disallow") {
@@ -110,8 +111,6 @@ export class ScanService {
             } else if (rule.type === "allow") {
               allowed = true;
             }
-            // robots.txt의 일반적 룰: "가장 구체적인 매칭" 또는 "가장 마지막 매칭" 적용
-            // 구현 상황에 따라 break 여부를 선택
           }
         }
 
@@ -121,9 +120,9 @@ export class ScanService {
 
     return results;
   };
-  async robotsTxt({ url }: RunBody) {
+  async robotsTxt({ url }: UrlBody) {
     try {
-      const parsedUrl = new URL(url); // 상대 URL 안전 처리
+      const parsedUrl = new URL(url);
       const robotsUrl = this.getRobotUrl(parsedUrl);
       const result = await fetch(robotsUrl, {
         method: "GET",
@@ -147,6 +146,8 @@ export class ScanService {
       throw ApiError.internal();
     }
   }
+
+  async siteMap({ urls }: UrlsBody) {}
 
   async crawling() {
     let proc: ChromeProcess | undefined;
