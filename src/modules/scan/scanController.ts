@@ -25,4 +25,11 @@ export class ScanController extends BaseController {
       return this.ok(res, result);
     }
   );
+
+  crawling = this.handle(
+    async (req: Request, res: Response, _next: NextFunction) => {
+      const result = await this.service.crawling();
+      return this.ok(res, result);
+    }
+  );
 }

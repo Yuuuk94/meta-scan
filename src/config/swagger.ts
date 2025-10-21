@@ -5,7 +5,7 @@ export { swaggerUi };
 export const swaggerSpec = {
   openapi: "3.0.3",
   info: {
-    title: "Lighthouse Runner API",
+    title: "Meta Scan API",
     version: "0.1.0",
     description:
       "POST /run 으로 Lighthouse LHR(JSON) 또는 HTML 리포트를 반환합니다.",
@@ -123,6 +123,25 @@ export const swaggerSpec = {
                   value: {
                     url: "https://dev-portfolio.withmay.com/",
                   },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
+    "/api/v1/scan/crawling": {
+      post: {
+        summary: "사이트 crawling",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              examples: {
+                jsonExample: {
+                  summary: "defalut",
+                  value: {},
                 },
               },
             },

@@ -1,10 +1,11 @@
 import { ApiError } from "@core/http/ApiError.js";
 import type { UrlBody, UrlsBody } from "./dto.js";
-import type { ChromeProcess } from "@infra/ChromeLauncher.js";
-import { ChromeLauncher } from "@infra/ChromeLauncher.js";
+import type { PuppeteerProcess } from "@infra/Puppeteer.js";
+import { Puppeteer } from "@infra/Puppeteer.js";
+import { statusOk } from "@constant/status.js";
 
 export class ScanService {
-  constructor(private readonly chrome: ChromeLauncher) {}
+  constructor(private readonly chrome: Puppeteer) {}
   private timeOut = 5000;
 
   async ping({ url }: UrlBody) {
@@ -15,7 +16,7 @@ export class ScanService {
       });
       if (result.status === 200) {
         return {
-          status: "ok",
+          ...statusOk,
           redirected: result.redirected,
           url: result.url,
         };
@@ -150,13 +151,13 @@ export class ScanService {
   async siteMap({ urls }: UrlsBody) {}
 
   async crawling() {
-    let proc: ChromeProcess | undefined;
+    let proc: PuppeteerProcess | undefined;
     try {
       proc = await this.chrome.launch();
     } catch (e) {
       throw ApiError.internal();
     } finally {
-      await this.chrome.safeKill(proc);
+      await this.chrome.close(proc);
     }
   }
 }

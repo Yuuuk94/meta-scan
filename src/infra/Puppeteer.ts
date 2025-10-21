@@ -1,5 +1,7 @@
 import puppeteer from "puppeteer";
 
+export type PuppeteerProcess = puppeteer.Browser;
+
 export class Puppeteer {
   async launch(): Promise<puppeteer.Browser> {
     const browser = await puppeteer.launch({
