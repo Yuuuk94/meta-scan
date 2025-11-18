@@ -21,8 +21,8 @@ export function middleware(req: NextRequest) {
     return;
   }
 
-  let theme = req.cookies.get(themeKey)?.value;
-  let lang = req.cookies.get(langKey)?.value;
+  const theme = req.cookies.get(themeKey)?.value;
+  const lang = req.cookies.get(langKey)?.value;
 
   const response = NextResponse.next();
 

@@ -4,9 +4,7 @@ import { Languages, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { allowLanguages, allowTheme, langKey, themeKey } from "@/constans";
 
-interface ToggleSettingProps extends DefautProps {}
-
-export const ToggleSetting = ({ theme, lang }: ToggleSettingProps) => {
+export const ToggleSetting = ({ theme, lang }: DefautProps) => {
   const router = useRouter();
   const pathname = usePathname();
 

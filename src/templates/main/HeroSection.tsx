@@ -7,9 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Globe, Bot, CheckCircle2, AlertCircle, Scan } from "lucide-react";
 
-interface HeroSectionProps extends DefautPageProps {}
-
-export const HeroSection = ({ theme, lang, t }: HeroSectionProps) => {
+export const HeroSection = ({ theme, lang, t }: DefautPageProps) => {
   const [url, setUrl] = useState("");
   const [isValidUrl, setIsValidUrl] = useState(false);
   // URL validation

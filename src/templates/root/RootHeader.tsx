@@ -3,9 +3,7 @@ import { Scan } from "lucide-react";
 import { ToggleSetting } from "./ToggleSetting";
 import { ServiceStatus } from "./ServiceStatus";
 
-interface RootHeaderProps extends DefautProps {}
-
-export const RootHeader = async ({ theme, lang }: RootHeaderProps) => {
+export const RootHeader = async ({ theme, lang }: DefautProps) => {
   const t = (await getDictionary(lang)).head;
 
   return (

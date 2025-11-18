@@ -1,9 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Globe, Search, Zap } from "lucide-react";
 
-interface ProcessSectionProps extends DefautPageProps {}
-
-export const ProcessSection = ({ theme, lang, t }: ProcessSectionProps) => {
+export const ProcessSection = ({ theme, t }: DefautPageProps) => {
   return (
     <section
       className={`relative pt-20 pb-40 transition-all duration-300 overflow-hidden`}

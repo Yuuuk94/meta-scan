@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bot, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 
-interface FAQSectionProps extends DefautPageProps {}
-
-export const FAQSection = ({ theme, lang, t }: FAQSectionProps) => {
+export const FAQSection = ({ theme, lang, t }: DefautPageProps) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (

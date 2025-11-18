@@ -1,9 +1,7 @@
 import { ServiceStatus } from "./ServiceStatus";
 import { Scan } from "lucide-react";
 
-interface RootFooterProps extends DefautProps {}
-
-export const RootFooter = ({ theme }: RootFooterProps) => {
+export const RootFooter = ({ theme }: DefautProps) => {
   return (
     <footer
       className={`border-t py-8 transition-all duration-300 ${
