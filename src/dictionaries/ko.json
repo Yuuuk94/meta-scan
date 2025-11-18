@@ -1,12 +1,12 @@
 {
   "head": {
     "title": "Meta-Scan",
-    "subtitle": "AI 친화 SEO 분석기"
+    "subtitle": "AI 친화 AEO & SEO 분석기"
   },
   "main": {
     "title": "Meta-Scan",
-    "subtitle": "AI 친화 SEO 분석기",
-    "heroTitle": "AI 친화 SEO 분석기",
+    "subtitle": "AI 친화 AEO & SEO 분석기",
+    "heroTitle": "AI 친화 AEO & SEO 분석기",
     "heroSubtitle": "웹사이트의 SEO와 AI 최적화 신호를 확인하세요",
     "urlPlaceholder": "웹사이트 URL을 입력하세요...",
     "analyzeButton": "분석하기",

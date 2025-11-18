@@ -5,16 +5,9 @@ interface ProcessSectionProps extends DefautPageProps {}
 
 export const ProcessSection = ({ theme, lang, t }: ProcessSectionProps) => {
   return (
-    <section className={`py-20 transition-all duration-300`}>
-      {/* Background Effects */}
-      {theme === "dark" && (
-        <>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(120,119,198,0.1),transparent_50%)]"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(6,182,212,0.1),transparent_50%)]"></div>
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent"></div>
-        </>
-      )}
-
+    <section
+      className={`relative pt-20 pb-40 transition-all duration-300 overflow-hidden`}
+    >
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
