@@ -8,17 +8,17 @@ const statusOptions = {
 };
 
 interface ServiceStatusProps {
-  status?: "online";
+  ready: boolean;
   fullLabel?: boolean;
 }
 
 export const ServiceStatus = ({
-  status = "online",
+  ready,
   fullLabel = false,
 }: ServiceStatusProps) => {
-  // TODO: status 가져오기
+  const status = ready ? "online" : "online";
 
-  const currentStatus = statusOptions[status];
+  const currentStatus = statusOptions[status!];
   return (
     <div className="flex items-center gap-2">
       <div

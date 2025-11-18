@@ -1,0 +1,3 @@
+interface OkStatus {
+  status: "ok";
+}

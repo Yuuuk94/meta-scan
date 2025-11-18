@@ -5,6 +5,7 @@ import { RootHeader } from "@/templates/root/RootHeader";
 import { RootFooter } from "@/templates/root/RootFooter";
 import { getSiteSetting } from "@/utils/cookies";
 import "../globals.css";
+import { pingApi } from "@/apis/status";
 
 const RobotoSans = Roboto({
   variable: "--font-geist-sans",
@@ -36,7 +37,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const ready = await pingApi.then((res) => res.data.status === "ok");
   const { theme, lang } = await getSiteSetting();
+
   return (
     <html lang={lang} data-theme={theme}>
       <body
@@ -49,9 +52,9 @@ export default async function RootLayout({
               : "bg-gradient-to-br from-blue-50 via-white to-purple-50"
           }`}
         >
-          <RootHeader theme={theme} lang={lang} />
+          <RootHeader theme={theme} lang={lang} ready={ready} />
           <main>{children}</main>
-          <RootFooter theme={theme} lang={lang} />
+          <RootFooter theme={theme} lang={lang} ready={ready} />
         </div>
       </body>
     </html>

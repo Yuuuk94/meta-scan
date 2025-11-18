@@ -3,7 +3,11 @@ import { Scan } from "lucide-react";
 import { ToggleSetting } from "./ToggleSetting";
 import { ServiceStatus } from "./ServiceStatus";
 
-export const RootHeader = async ({ theme, lang }: DefautProps) => {
+interface RootHeaderProps extends DefautProps {
+  ready: boolean;
+}
+
+export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
   const t = (await getDictionary(lang)).head;
 
   return (
@@ -55,7 +59,7 @@ export const RootHeader = async ({ theme, lang }: DefautProps) => {
           </div>
           <div className="flex items-center gap-2">
             <ToggleSetting theme={theme} lang={lang} />
-            <ServiceStatus />
+            <ServiceStatus ready={ready} />
           </div>
         </div>
       </div>

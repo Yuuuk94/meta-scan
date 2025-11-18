@@ -1,7 +1,11 @@
 import { ServiceStatus } from "./ServiceStatus";
 import { Scan } from "lucide-react";
 
-export const RootFooter = ({ theme }: DefautProps) => {
+interface RootFooterProps extends DefautProps {
+  ready: boolean;
+}
+
+export const RootFooter = ({ theme, ready }: RootFooterProps) => {
   return (
     <footer
       className={`border-t py-8 transition-all duration-300 ${
@@ -27,13 +31,13 @@ export const RootFooter = ({ theme }: DefautProps) => {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <ServiceStatus fullLabel />
+            <ServiceStatus fullLabel ready={ready} />
             <div
               className={`${
                 theme === "dark" ? "text-gray-500" : "text-gray-400"
               } font-mono text-xs`}
             >
-              v2.4.1 | UPTIME: 99.9% | SCANS: 247,891
+              v0.1.0 | UPTIME: 99.9% | SCANS: 247,891
             </div>
           </div>
         </div>
