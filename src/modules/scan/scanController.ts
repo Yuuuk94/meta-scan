@@ -26,6 +26,14 @@ export class ScanController extends BaseController {
     }
   );
 
+  siteMap = this.handle(
+    async (req: Request, res: Response, _next: NextFunction) => {
+      const body = validate(UrlBodySchema, req.body);
+      const result = await this.service.siteMap(body as UrlBody);
+      return this.ok(res, result);
+    }
+  );
+
   crawling = this.handle(
     async (req: Request, res: Response, _next: NextFunction) => {
       const result = await this.service.crawling();

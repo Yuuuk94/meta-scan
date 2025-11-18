@@ -12,6 +12,7 @@ const controller = new ScanController(service);
 
 router.post("/ping", controller.ping);
 router.post("/robotsTxt", controller.robotsTxt);
+router.post("/siteMap", controller.siteMap);
 router.post("/crawling", controller.crawling);
 
 export default router;

@@ -148,7 +148,34 @@ export class ScanService {
     }
   }
 
-  async siteMap({ urls }: UrlsBody) {}
+  private getSiteMapUrl = (url: URL) => {
+    const scheme =
+      url.protocol && url.protocol !== ":" ? url.protocol : "http:";
+    const host = url.hostname;
+    const port = url.port ? `:${url.port}` : "";
+    return `${scheme}//${host}${port}/sitemap.xml`;
+  };
+
+  async siteMap({ url }: UrlBody) {
+    try {
+      const parsedUrl = new URL(url);
+      const siteMapUrl = this.getSiteMapUrl(parsedUrl);
+      const result = await fetch(siteMapUrl, {
+        method: "HEAD",
+        signal: AbortSignal.timeout(this.timeOut),
+      });
+      if (result.status === 200) {
+        return {
+          ...statusOk,
+          redirected: result.redirected,
+          url: result.url,
+        };
+      }
+      throw Error;
+    } catch (e) {
+      throw ApiError.internal();
+    }
+  }
 
   async crawling() {
     let proc: PuppeteerProcess | undefined;

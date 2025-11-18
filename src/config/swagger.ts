@@ -131,6 +131,27 @@ export const swaggerSpec = {
         responses: { 200: { description: "ok (text/plain)" } },
       },
     },
+    "/api/v1/scan/siteMap": {
+      post: {
+        summary: "사이트 sitemap 확인",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              examples: {
+                jsonExample: {
+                  summary: "defalut",
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
     "/api/v1/scan/crawling": {
       post: {
         summary: "사이트 crawling",
