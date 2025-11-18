@@ -41,7 +41,7 @@ export function middleware(req: NextRequest) {
   );
 
   if (!hasLocalePrefix) {
-    req.nextUrl.pathname = `/${lang}${pathname}`;
+    req.nextUrl.pathname = `/${lang}/${pathname}`;
     const redirectResponse = NextResponse.redirect(req.nextUrl);
     for (const c of response.cookies.getAll()) {
       redirectResponse.cookies.set(c);
