@@ -36,7 +36,8 @@ export class ScanController extends BaseController {
 
   crawling = this.handle(
     async (req: Request, res: Response, _next: NextFunction) => {
-      const result = await this.service.crawling();
+      const body = validate(UrlBodySchema, req.body);
+      const result = await this.service.crawling(body as UrlBody);
       return this.ok(res, result);
     }
   );

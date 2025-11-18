@@ -162,7 +162,9 @@ export const swaggerSpec = {
               examples: {
                 jsonExample: {
                   summary: "defalut",
-                  value: {},
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                  },
                 },
               },
             },
