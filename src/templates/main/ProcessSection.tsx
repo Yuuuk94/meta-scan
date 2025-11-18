@@ -5,13 +5,7 @@ interface ProcessSectionProps extends DefautPageProps {}
 
 export const ProcessSection = ({ theme, lang, t }: ProcessSectionProps) => {
   return (
-    <section
-      className={`relative py-20 transition-all duration-300 overflow-hidden ${
-        theme === "dark"
-          ? "bg-gradient-to-br from-gray-900 via-black to-purple-900/50"
-          : "bg-gradient-to-br from-white via-blue-50/30 to-purple-50/50"
-      }`}
-    >
+    <section className={`py-20 transition-all duration-300`}>
       {/* Background Effects */}
       {theme === "dark" && (
         <>
@@ -24,71 +18,27 @@ export const ProcessSection = ({ theme, lang, t }: ProcessSectionProps) => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            {/* Enhanced Title with Cyberpunk Effects */}
-            <div className="relative mb-8">
-              {theme === "dark" && (
-                <>
-                  <div className="absolute inset-0 blur-2xl bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 animate-pulse"></div>
-                  <div className="absolute -top-2 -left-2 w-6 h-6 border-l-2 border-t-2 border-cyan-400/50"></div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 border-r-2 border-t-2 border-purple-400/50"></div>
-                  <div className="absolute -bottom-2 -left-2 w-6 h-6 border-l-2 border-b-2 border-purple-400/50"></div>
-                  <div className="absolute -bottom-2 -right-2 w-6 h-6 border-r-2 border-b-2 border-pink-400/50"></div>
-                </>
-              )}
-
-              <h2
-                className={`relative text-5xl md:text-6xl font-black mb-4 transition-all duration-500 ${
-                  theme === "dark"
-                    ? "text-cyan-300 drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]"
-                    : "text-gray-900"
-                }`}
-              >
-                <span
-                  className={`relative ${
-                    theme === "dark"
-                      ? "bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent"
-                      : "bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
-                  }`}
-                >
-                  {t.howItWorksTitle}
-                </span>
-                {theme === "dark" && (
-                  <span className="absolute inset-0 bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent animate-pulse opacity-30 pointer-events-none">
-                    {t.howItWorksTitle}
-                  </span>
-                )}
-              </h2>
-
-              {/* Animated Underline */}
-              <div className="relative mx-auto w-48 h-2">
-                <div
-                  className={`absolute inset-0 rounded-full transition-all duration-300 ${
-                    theme === "dark"
-                      ? "bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400"
-                      : "bg-gradient-to-r from-blue-500 via-purple-600 to-indigo-700"
-                  }`}
-                ></div>
-                {theme === "dark" && (
-                  <>
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 rounded-full blur-md opacity-50 animate-pulse"></div>
-                    <div className="absolute -left-1 -right-1 -top-1 -bottom-1 bg-gradient-to-r from-cyan-400/20 via-purple-400/20 to-pink-400/20 rounded-full blur-lg animate-pulse"></div>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Subtext */}
-            <p
-              className={`text-lg md:text-xl max-w-2xl mx-auto transition-colors duration-300 ${
+            <h2
+              className={`text-4xl font-bold mb-6 transition-colors duration-300 ${
                 theme === "dark"
-                  ? "text-gray-300 drop-shadow-[0_0_10px_rgba(6,182,212,0.3)]"
-                  : "text-gray-600"
+                  ? "text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text"
+                  : "text-gray-900"
               }`}
             >
-              {lang === "en"
-                ? "Discover how our AI-powered analysis transforms your website's SEO potential"
-                : "AI 기반 분석으로 웹사이트의 SEO 잠재력을 발견하는 방법"}
-            </p>
+              {t.howItWorksTitle}
+            </h2>
+            <div className="relative mx-auto w-32 h-1.5">
+              <div
+                className={`absolute inset-0 rounded-full transition-all duration-300 ${
+                  theme === "dark"
+                    ? "bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400"
+                    : "bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-600"
+                }`}
+              ></div>
+              {theme === "dark" && (
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 rounded-full blur-sm opacity-50 animate-pulse"></div>
+              )}
+            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
