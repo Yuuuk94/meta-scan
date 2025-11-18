@@ -29,7 +29,7 @@ export const ToggleSetting = ({ theme, lang }: DefautProps) => {
         onClick={setTheme}
         className={`flex items-center gap-2 transition-all duration-300 ${
           theme === "dark"
-            ? "text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300"
+            ? "text-gray-200 hover:bg-cyan-500/10 hover:text-white"
             : "text-gray-600 hover:bg-gray-100"
         }`}
       >
