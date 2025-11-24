@@ -5,6 +5,18 @@ const statusOptions = {
     label: "ONLINE",
     fullLabel: "SYSTEM_ONLINE",
   },
+  warn: {
+    bgColor: "bg-orange-400",
+    color: "text-orange-400",
+    label: "WARNING",
+    fullLabel: "SYSTEM_WARNING",
+  },
+  off: {
+    bgColor: "bg-red-400",
+    color: "text-red-400",
+    label: "OFFLINE",
+    fullLabel: "SYSTEM_OFFLINE",
+  },
 };
 
 interface ServiceStatusProps {
@@ -16,7 +28,7 @@ export const ServiceStatus = ({
   ready,
   fullLabel = false,
 }: ServiceStatusProps) => {
-  const status = ready ? "online" : "online";
+  const status = ready ? "online" : "warn";
 
   const currentStatus = statusOptions[status!];
   return (
