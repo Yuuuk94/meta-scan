@@ -3,6 +3,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Languages, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { allowLanguages, allowTheme, langKey, themeKey } from "@/constans";
+import { setDocumentCookies } from "@/utils/cookies";
 
 export const ToggleSetting = ({ theme, lang }: DefautProps) => {
   const router = useRouter();
@@ -11,12 +12,12 @@ export const ToggleSetting = ({ theme, lang }: DefautProps) => {
   const setTheme = () => {
     const next = allowTheme.filter((a) => a != theme)[0];
     document.documentElement.setAttribute("data-theme", next);
-    document.cookie = themeKey + "=" + next + "; path=/;";
+    setDocumentCookies(themeKey, next);
     router.refresh();
   };
   const setLang = () => {
     const next = allowLanguages.filter((a) => a != lang)[0];
-    document.cookie = langKey + "=" + next + "; path=/;";
+    setDocumentCookies(langKey, next);
     const segments = pathname.split("/");
     segments[1] = next;
     router.push(segments.join("/"));

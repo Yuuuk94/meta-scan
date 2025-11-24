@@ -12,46 +12,47 @@ const steps = [
   { id: "analysis", icon: Zap, duration: 800 },
 ];
 
-export function LoadingScreen({ theme, lang, t }: DefautPageProps) {
-  const [progress, setProgress] = useState(0);
+interface LoadingScreenProps extends DefautPageProps {
+  siteStatus: SiteStatus;
+}
+export function LoadingScreen({ theme, t, siteStatus }: LoadingScreenProps) {
+  const [progress, setProgress] = useState(10);
   const [currentStep, setCurrentStep] = useState(0);
 
-  useEffect(() => {
-    let totalDuration = 0;
-    const totalTime = steps.reduce((sum, step) => sum + step.duration, 0);
+  // useEffect(() => {
+  //   let totalDuration = 0;
+  //   const totalTime = steps.reduce((sum, step) => sum + step.duration, 0);
 
-    steps.forEach((step, index) => {
-      setTimeout(() => {
-        setCurrentStep(index);
+  //   steps.forEach((step, index) => {
+  //     setTimeout(() => {
+  //       setCurrentStep(index);
 
-        // Animate progress during this step
-        const startProgress = (totalDuration / totalTime) * 100;
-        const endProgress = ((totalDuration + step.duration) / totalTime) * 100;
+  //       // Animate progress during this step
+  //       const startProgress = (totalDuration / totalTime) * 100;
+  //       const endProgress = ((totalDuration + step.duration) / totalTime) * 100;
 
-        let stepProgress = startProgress;
-        const increment = (endProgress - startProgress) / (step.duration / 50);
+  //       let stepProgress = startProgress;
+  //       const increment = (endProgress - startProgress) / (step.duration / 50);
 
-        const progressInterval = setInterval(() => {
-          stepProgress += increment;
-          if (stepProgress >= endProgress) {
-            stepProgress = endProgress;
-            clearInterval(progressInterval);
-          }
-          setProgress(stepProgress);
-        }, 50);
+  //       const progressInterval = setInterval(() => {
+  //         stepProgress += increment;
+  //         if (stepProgress >= endProgress) {
+  //           stepProgress = endProgress;
+  //           clearInterval(progressInterval);
+  //         }
+  //         setProgress(stepProgress);
+  //       }, 50);
 
-        totalDuration += step.duration;
-      }, totalDuration);
-    });
-  }, []);
+  //       totalDuration += step.duration;
+  //     }, totalDuration);
+  //   });
+  // }, []);
 
   return (
     <div
       className={`flex items-center justify-center transition-all duration-300`}
     >
-      {/* Main Loading Content */}
       <div className="max-w-2xl mx-auto text-center px-4">
-        {/* Animated Robot Icon */}
         <div className="relative mb-8">
           {theme === "dark" ? (
             <>

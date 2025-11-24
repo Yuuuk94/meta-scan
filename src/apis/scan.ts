@@ -1,6 +1,6 @@
 import { instance } from ".";
 
 export const sitePingApi = async (data: UrlData) =>
-  await instance.post<any>("/scan/ping", data, {
+  await instance.post<SiteStatus>("/scan/ping", data, {
     adapter: "fetch",
   });

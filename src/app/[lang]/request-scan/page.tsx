@@ -2,7 +2,7 @@ import { sitePingApi } from "@/apis/scan";
 import { getDictionary } from "@/dictionaries";
 import { ErrorScreen } from "@/templates/request-scan/ErrorScreen";
 import { LoadingScreen } from "@/templates/request-scan/LoadingScreen";
-import { getSiteSetting } from "@/utils/cookies";
+import { getSiteSetting } from "@/utils/siteSetting";
 
 export default async function ScanPage({
   searchParams,
@@ -13,12 +13,13 @@ export default async function ScanPage({
   const t = (await getDictionary(lang)).scan;
   try {
     const requestUrl = (await searchParams).url;
-    console.log(requestUrl);
-    const sitePingStatus = await sitePingApi({
+    const siteStatus = await sitePingApi({
       url: decodeURI(requestUrl as string),
-    }).then((res) => console.log(res.data));
+    }).then((res) => res.data);
 
-    return <LoadingScreen theme={theme} lang={lang} t={t} />;
+    return (
+      <LoadingScreen theme={theme} lang={lang} t={t} siteStatus={siteStatus} />
+    );
   } catch (error) {
     return <ErrorScreen theme={theme} lang={lang} t={t} />;
   }

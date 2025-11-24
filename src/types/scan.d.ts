@@ -2,6 +2,6 @@ interface UrlData {
   url: string;
 }
 
-interface SitePingData extends OkStatus, UrlData {
+interface SiteStatus extends OkStatus, UrlData {
   redirected: boolean;
 }

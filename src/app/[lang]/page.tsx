@@ -2,7 +2,7 @@ import { getDictionary } from "@/dictionaries";
 import { FAQSection } from "@/templates/main/FAQSection";
 import { HeroSection } from "@/templates/main/HeroSection";
 import { ProcessSection } from "@/templates/main/ProcessSection";
-import { getSiteSetting } from "@/utils/cookies";
+import { getSiteSetting } from "@/utils/siteSetting";
 
 export default async function HomePage() {
   const { theme, lang } = await getSiteSetting();
