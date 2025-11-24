@@ -4,7 +4,7 @@ import { pageTitle } from "@/constans";
 import { RootHeader } from "@/templates/root/RootHeader";
 import { RootFooter } from "@/templates/root/RootFooter";
 import { getSiteSetting } from "@/utils/siteSetting";
-import "../globals.css";
+import "@/css/globals.css";
 import { pingApi } from "@/apis/status";
 
 const RobotoSans = Roboto({
