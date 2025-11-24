@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Languages, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { allowLanguages, allowTheme, langKey, themeKey } from "@/constans";
@@ -8,6 +8,7 @@ import { setDocumentCookies } from "@/utils/cookies";
 export const ToggleSetting = ({ theme, lang }: DefautProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const setTheme = () => {
     const next = allowTheme.filter((a) => a != theme)[0];
@@ -15,12 +16,13 @@ export const ToggleSetting = ({ theme, lang }: DefautProps) => {
     setDocumentCookies(themeKey, next);
     router.refresh();
   };
+
   const setLang = () => {
     const next = allowLanguages.filter((a) => a != lang)[0];
     setDocumentCookies(langKey, next);
     const segments = pathname.split("/");
     segments[1] = next;
-    router.push(segments.join("/"));
+    router.push(segments.join("/") + `?${searchParams}`);
   };
   return (
     <>
