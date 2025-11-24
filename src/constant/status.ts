@@ -1,3 +1,3 @@
 export const statusOk = {
-  statue: "ok",
+  status: "ok",
 };

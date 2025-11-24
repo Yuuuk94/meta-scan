@@ -2,7 +2,6 @@ import type { Request, Response, NextFunction } from "express";
 import { BaseController } from "@core/http/BaseController.js";
 import { validate } from "@core/validation/validator.js";
 import { UrlBody, UrlBodySchema } from "./dto.js";
-
 import { ScanService } from "./scanService.js";
 
 export class ScanController extends BaseController {

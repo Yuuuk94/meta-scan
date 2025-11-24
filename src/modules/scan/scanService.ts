@@ -201,19 +201,12 @@ export class ScanService {
     const t0 = Date.now();
     const page = await browser.newPage();
 
-    // await page.setUserAgent(
-    //   "MetaScanBot/1.0 (+https://example.com/bot) Mozilla/5.0"
-    // );
-
     const resp = await page.goto(url, {
       waitUntil: "load", // 필요하면 "networkidle2"로 변경
       timeout: 45_000,
     });
 
     const finalUrl = resp?.url() || url;
-
-    // DOM 안정화용 약간의 대기
-    // await page.waitForTimeout(800);
 
     const html = await page.content();
     const fs = () => {
@@ -424,7 +417,6 @@ export class ScanService {
 
       // 2) onload 이후 HTML + 메타 추출
       const onload = await this.getOnloadHtml(first.finalUrl, proc);
-      console.log("hi\n", onload);
 
       const firstLen = first.html.length;
       const onloadLen = onload.html.length;
