@@ -34,5 +34,17 @@
     "faq4A": "We recommend checking your site monthly or after major content updates. AI optimization standards evolve rapidly, so regular monitoring ensures you stay current.",
     "faq5Q": "Is this analysis free?",
     "faq5A": "Yes! Meta-Scan provides comprehensive AI-friendly SEO analysis completely free. We believe every website should be optimized for the AI-powered future of search."
+  },
+  "scan": {
+    "title": "Meta-Scan",
+    "subtitle": "AI-Friendly SEO Analyzer",
+    "steps": [
+      "Fetching meta tags...",
+      "Analyzing structured data...",
+      "Checking AI signals...",
+      "Generating report..."
+    ],
+    "analyzingText": "Analyzing your site...",
+    "analyzingSubtext": "Fetching meta tags, structured data, AI signals."
   }
 }

@@ -9,11 +9,7 @@ export const FAQSection = ({ theme, lang, t }: DefautPageProps) => {
 
   return (
     <section
-      className={`relative py-20 transition-all duration-300 overflow-hidden ${
-        theme === "dark"
-          ? "bg-gradient-to-br from-black via-gray-900 to-purple-900/30"
-          : "bg-gradient-to-br from-gray-50 via-white to-blue-50/30"
-      }`}
+      className={`relative py-60 transition-all duration-300 overflow-hidden`}
     >
       {/* Background Effects */}
       {theme === "dark" && (

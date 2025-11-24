@@ -8,3 +8,5 @@ export const defaultLang: Language = "ko";
 
 export const themeKey = "theme";
 export const langKey = "lang";
+
+export const urlPattern = /^https?:\/\/.+\..+/;

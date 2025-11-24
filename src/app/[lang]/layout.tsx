@@ -37,7 +37,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const ready = await pingApi.then((res) => res.data.status === "ok");
+  const ready = await pingApi().then((res) => res.data.status === "ok");
   const { theme, lang } = await getSiteSetting();
 
   return (

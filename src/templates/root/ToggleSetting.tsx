@@ -11,12 +11,12 @@ export const ToggleSetting = ({ theme, lang }: DefautProps) => {
   const setTheme = () => {
     const next = allowTheme.filter((a) => a != theme)[0];
     document.documentElement.setAttribute("data-theme", next);
-    document.cookie = themeKey + "=" + next;
+    document.cookie = themeKey + "=" + next + "; path=/;";
     router.refresh();
   };
   const setLang = () => {
     const next = allowLanguages.filter((a) => a != lang)[0];
-    document.cookie = langKey + "=" + next;
+    document.cookie = langKey + "=" + next + "; path=/;";
     const segments = pathname.split("/");
     segments[1] = next;
     router.push(segments.join("/"));
@@ -30,7 +30,7 @@ export const ToggleSetting = ({ theme, lang }: DefautProps) => {
         className={`flex items-center gap-2 transition-all duration-300 ${
           theme === "dark"
             ? "text-gray-200 hover:bg-cyan-500/10 hover:text-white"
-            : "text-gray-600 hover:bg-gray-100"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-600"
         }`}
       >
         {theme === "dark" ? (
@@ -46,7 +46,7 @@ export const ToggleSetting = ({ theme, lang }: DefautProps) => {
         className={`flex items-center gap-2 transition-all duration-300 ${
           theme === "dark"
             ? "text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300"
-            : "text-gray-600 hover:bg-gray-100"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-600"
         }`}
       >
         <Languages className="h-4 w-4" />

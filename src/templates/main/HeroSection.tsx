@@ -1,23 +1,34 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { Badge } from "@/components/ui/badge";
 import { Globe, Bot, CheckCircle2, AlertCircle, Scan } from "lucide-react";
+import { urlPattern } from "@/constans";
 
 export const HeroSection = ({ theme, lang, t }: DefautPageProps) => {
+  const router = useRouter();
   const [url, setUrl] = useState("");
-  const [isValidUrl, setIsValidUrl] = useState(false);
+  const [isValidUrl, setIsValidUrl] = useState(true);
+
   // URL validation
   useEffect(() => {
-    const urlPattern = /^https?:\/\/.+\..+/;
-    setIsValidUrl(url.length > 0 && urlPattern.test(url));
-  }, [url]);
+    if (!isValidUrl) {
+      setIsValidUrl(url.length > 1 && urlPattern.test(url));
+    }
+  }, [url, isValidUrl]);
 
   const handleAnalyze = () => {
-    if (!isValidUrl) return;
+    const checkUrl = url.length > 1 && urlPattern.test(url);
+
+    if (!checkUrl) {
+      setIsValidUrl(checkUrl);
+      return;
+    }
+    router.push("/request-scan?url=" + encodeURIComponent(url));
   };
   return (
     <section className="container mx-auto px-4 py-20">
@@ -89,7 +100,7 @@ export const HeroSection = ({ theme, lang, t }: DefautPageProps) => {
                   />
                   <Input
                     type="url"
-                    placeholder={t.urlPlaceholder}
+                    placeholder={t.urlPlaceholder as string}
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     className={`flex-1 border-0 bg-transparent text-lg placeholder:opacity-60 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300 ${
@@ -97,22 +108,20 @@ export const HeroSection = ({ theme, lang, t }: DefautPageProps) => {
                         ? "text-white placeholder:text-gray-400"
                         : "text-gray-900 placeholder:text-gray-500"
                     } ${
-                      url.length > 0
-                        ? isValidUrl
-                          ? theme === "dark"
-                            ? "text-cyan-300"
-                            : "text-green-600"
-                          : theme === "dark"
-                          ? "text-red-400"
-                          : "text-red-500"
-                        : ""
+                      isValidUrl
+                        ? theme === "dark"
+                          ? "text-cyan-300"
+                          : "text-gray-900"
+                        : theme === "dark"
+                        ? "text-red-400"
+                        : "text-red-500"
                     }`}
                   />
                 </div>
 
                 <Button
                   onClick={handleAnalyze}
-                  className={`px-8 py-6 rounded-2xl font-semibold text-lg transition-all duration-300 relative overflow-hidden group ${
+                  className={`cursor-pointer p-8 rounded-2xl font-semibold text-lg transition-all duration-300 relative overflow-hidden group ${
                     theme === "dark"
                       ? "bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
                       : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
@@ -132,24 +141,7 @@ export const HeroSection = ({ theme, lang, t }: DefautPageProps) => {
             {/* Enhanced validation feedback */}
             {url.length > 0 && (
               <div className="mt-4 flex items-center justify-center gap-2">
-                {isValidUrl ? (
-                  <>
-                    <CheckCircle2
-                      className={`h-5 w-5 ${
-                        theme === "dark" ? "text-cyan-400" : "text-green-500"
-                      }`}
-                    />
-                    <span
-                      className={`${
-                        theme === "dark" ? "text-cyan-300" : "text-green-600"
-                      }`}
-                    >
-                      {lang === "en"
-                        ? "Valid URL detected"
-                        : "유효한 URL이 감지되었습니다"}
-                    </span>
-                  </>
-                ) : (
+                {!isValidUrl && (
                   <>
                     <AlertCircle
                       className={`h-5 w-5 ${
