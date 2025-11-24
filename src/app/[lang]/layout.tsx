@@ -53,7 +53,7 @@ export default async function RootLayout({
           }`}
         >
           <RootHeader theme={theme} lang={lang} ready={ready} />
-          <main>{children}</main>
+          <main className="min-h-screen p-20">{children}</main>
           <RootFooter theme={theme} lang={lang} ready={ready} />
         </div>
       </body>

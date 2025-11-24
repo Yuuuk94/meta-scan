@@ -15,23 +15,13 @@ export function ErrorScreen({ theme, lang, t }: DefautPageProps) {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center transition-all duration-300`}
+      className={`flex items-center justify-center transition-all duration-300`}
     >
       <div className="max-w-2xl mx-auto text-center px-4">
         <div className="relative mb-8">
-          {theme === "dark" ? (
-            <>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-full blur-2xl animate-pulse"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-400/20 to-pink-400/20 rounded-full blur-xl animate-pulse [animation-delay:0.5s]"></div>
-            </>
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
-          )}
           <div
             className={`relative w-28 h-28 mx-auto rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-              theme === "dark"
-                ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-red-400/40"
-                : "bg-gradient-to-r from-blue-500/10 to-purple-600/10 border-red-500"
+              theme === "dark" ? "border-red-400" : "border-red-500"
             }`}
           >
             <MessageCircleWarning

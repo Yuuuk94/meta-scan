@@ -47,7 +47,7 @@ export function LoadingScreen({ theme, lang, t }: DefautPageProps) {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center transition-all duration-300`}
+      className={`flex items-center justify-center transition-all duration-300`}
     >
       {/* Main Loading Content */}
       <div className="max-w-2xl mx-auto text-center px-4">
