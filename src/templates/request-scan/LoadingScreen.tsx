@@ -1,15 +1,27 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Bot, Loader2, Search, Globe, Zap, Scan } from "lucide-react";
+import {
+  Bot,
+  DoorOpen,
+  Map,
+  Loader2,
+  Search,
+  Globe,
+  Zap,
+  Scan,
+  Check,
+} from "lucide-react";
 
+// ping, robot, sitemap, meta, lighthouse
 const steps = [
-  { id: "meta", icon: Search, duration: 1000 },
-  { id: "structure", icon: Globe, duration: 1500 },
-  { id: "ai", icon: Bot, duration: 1200 },
-  { id: "analysis", icon: Zap, duration: 800 },
+  { id: "ping", icon: Search },
+  { id: "robot", icon: DoorOpen },
+  { id: "sitemap", icon: Map },
+  { id: "meta", icon: Globe },
+  { id: "analysis", icon: Zap },
+  { id: "ai", icon: Bot },
+  { id: "gen", icon: Check },
 ];
 
 interface LoadingScreenProps extends DefautPageProps {
@@ -17,36 +29,9 @@ interface LoadingScreenProps extends DefautPageProps {
 }
 export function LoadingScreen({ theme, t, siteStatus }: LoadingScreenProps) {
   const [progress, setProgress] = useState(10);
-  const [currentStep, setCurrentStep] = useState(0);
-
-  // useEffect(() => {
-  //   let totalDuration = 0;
-  //   const totalTime = steps.reduce((sum, step) => sum + step.duration, 0);
-
-  //   steps.forEach((step, index) => {
-  //     setTimeout(() => {
-  //       setCurrentStep(index);
-
-  //       // Animate progress during this step
-  //       const startProgress = (totalDuration / totalTime) * 100;
-  //       const endProgress = ((totalDuration + step.duration) / totalTime) * 100;
-
-  //       let stepProgress = startProgress;
-  //       const increment = (endProgress - startProgress) / (step.duration / 50);
-
-  //       const progressInterval = setInterval(() => {
-  //         stepProgress += increment;
-  //         if (stepProgress >= endProgress) {
-  //           stepProgress = endProgress;
-  //           clearInterval(progressInterval);
-  //         }
-  //         setProgress(stepProgress);
-  //       }, 50);
-
-  //       totalDuration += step.duration;
-  //     }, totalDuration);
-  //   });
-  // }, []);
+  const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>(
+    Array(steps.length).fill(true).fill(null, 1)
+  );
 
   return (
     <div
@@ -132,8 +117,8 @@ export function LoadingScreen({ theme, t, siteStatus }: LoadingScreenProps) {
         <div className="space-y-4">
           {steps.map((step, index) => {
             const IconComponent = step.icon;
-            const isActive = index === currentStep;
-            const isCompleted = index < currentStep;
+            const isActive = currentProcess[index] === null;
+            const isCompleted = currentProcess[index] === true;
 
             return (
               <div
@@ -193,6 +178,7 @@ export function LoadingScreen({ theme, t, siteStatus }: LoadingScreenProps) {
                   }`}
                 >
                   {t.steps[index]}
+                  {isActive ? " 중..." : isCompleted ? " 완료" : " 실패"}
                 </span>
               </div>
             );

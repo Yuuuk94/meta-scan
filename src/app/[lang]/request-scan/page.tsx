@@ -4,11 +4,10 @@ import { ErrorScreen } from "@/templates/request-scan/ErrorScreen";
 import { LoadingScreen } from "@/templates/request-scan/LoadingScreen";
 import { getSiteSetting } from "@/utils/siteSetting";
 
-export default async function ScanPage({
-  searchParams,
-}: {
+interface ScanPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
+}
+export default async function ScanPage({ searchParams }: ScanPageProps) {
   const { theme, lang } = await getSiteSetting();
   const t = (await getDictionary(lang)).scan;
   try {
