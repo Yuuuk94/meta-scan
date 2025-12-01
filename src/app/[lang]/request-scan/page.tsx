@@ -7,7 +7,7 @@ import { getSiteSetting } from "@/utils/siteSetting";
 interface ScanPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
-export default async function ScanPage({ searchParams }: ScanPageProps) {
+export default async function RequestScanPage({ searchParams }: ScanPageProps) {
   const { theme, lang } = await getSiteSetting();
   const t = (await getDictionary(lang)).scan;
   try {

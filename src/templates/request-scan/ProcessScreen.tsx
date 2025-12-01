@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Bot, Search, Globe, Zap, Scan, Check } from "lucide-react";
 import { okStatus } from "@/constans";
 import {
@@ -10,6 +11,13 @@ import {
   scanSiteMapApi,
 } from "@/apis/scan";
 import { ProcessStep } from "./ProcessStep";
+
+const promistList = [
+  scanRobotsTxtApi,
+  scanSiteMapApi,
+  scanCrawlingApi,
+  lsRunApi,
+];
 
 const steps = [
   { id: "ping", icon: Search },
@@ -28,18 +36,13 @@ export function ProcessScreen({
   t,
   siteStatus,
 }: ProcessScreenProps) {
+  const router = useRouter();
+
   const [progress, setProgress] = useState(10);
   const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>([
     siteStatus.status === okStatus,
     ...Array(steps.length - 1).fill(null),
   ]);
-
-  const promistList = [
-    scanRobotsTxtApi,
-    scanSiteMapApi,
-    scanCrawlingApi,
-    lsRunApi,
-  ];
 
   const processFinished = () => {
     setProgress((state) => (state < 100 ? state + 20 : state));
@@ -56,18 +59,21 @@ export function ProcessScreen({
       await Promise.allSettled(
         promistList.map((promise, idx) =>
           promise(data)
-            .then((res) => {
+            .then(() => {
               processCallback(true, idx + 1);
             })
             .catch((e) => {
+              console.error(e);
               processFinished();
             })
         )
       ).then((result) => {
+        console.log(result);
         setProgress(100);
         setCurrentProcess((state) =>
           state.map((v) => (v === null ? false : v))
         );
+        router.replace("/scan?url=" + "");
       });
 
     process();

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Globe, Bot, CheckCircle2, AlertCircle, Scan } from "lucide-react";
+import { Globe, Bot, AlertCircle, Scan } from "lucide-react";
 import { urlPattern } from "@/constans";
 
 export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
