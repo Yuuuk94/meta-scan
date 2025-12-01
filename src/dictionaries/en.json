@@ -40,12 +40,10 @@
     "subtitle": "AI-Friendly SEO Analyzer",
     "steps": [
       "사이트 유효성 확인",
-      "Robot 허용 여부 확인",
-      "sitemap 확인",
-      "메타태그 수집",
-      "구조화 데이터 분석",
-      "AI 신호 확인",
-      "리포트 생성"
+      "Fetching meta tags...",
+      "Analyzing structured data...",
+      "Checking AI signals...",
+      "Generating report..."
     ],
     "analyzingText": "Analyzing your site...",
     "analyzingSubtext": "Fetching meta tags, structured data, AI signals."

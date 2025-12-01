@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto, Geist_Mono } from "next/font/google";
-import { pageTitle } from "@/constans";
+import { okStatus, pageTitle } from "@/constans";
 import { RootHeader } from "@/templates/root/RootHeader";
 import { RootFooter } from "@/templates/root/RootFooter";
 import { getSiteSetting } from "@/utils/siteSetting";
@@ -39,7 +39,7 @@ export default async function RootLayout({
 }>) {
   const { theme, lang } = await getSiteSetting();
   const ready = await pingApi()
-    .then((res) => res.data.status === "ok")
+    .then((res) => res.data.status === okStatus)
     .catch(() => false);
 
   return (
@@ -55,7 +55,7 @@ export default async function RootLayout({
           }`}
         >
           <RootHeader theme={theme} lang={lang} ready={ready} />
-          <main className="min-h-screen p-20">{children}</main>
+          <main className="min-h-screen">{children}</main>
           <RootFooter theme={theme} lang={lang} ready={ready} />
         </div>
       </body>

@@ -1,23 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Bot,
-  DoorOpen,
-  Map,
-  Loader2,
-  Search,
-  Globe,
-  Zap,
-  Scan,
-  Check,
-} from "lucide-react";
+import { Bot, Loader2, Search, Globe, Zap, Scan, Check } from "lucide-react";
+import { okStatus } from "@/constans";
 
-// ping, robot, sitemap, meta, lighthouse
 const steps = [
   { id: "ping", icon: Search },
-  { id: "robot", icon: DoorOpen },
-  { id: "sitemap", icon: Map },
   { id: "meta", icon: Globe },
   { id: "analysis", icon: Zap },
   { id: "ai", icon: Bot },
@@ -29,13 +17,14 @@ interface LoadingScreenProps extends DefautPageProps {
 }
 export function LoadingScreen({ theme, t, siteStatus }: LoadingScreenProps) {
   const [progress, setProgress] = useState(10);
-  const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>(
-    Array(steps.length).fill(true).fill(null, 1)
-  );
-
+  const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>([
+    siteStatus.status === okStatus,
+    ...Array(steps.length - 1).fill(null),
+  ]);
+  console.log(siteStatus);
   return (
     <div
-      className={`flex items-center justify-center transition-all duration-300`}
+      className={`py-20 flex items-center justify-center transition-all duration-300`}
     >
       <div className="max-w-2xl mx-auto text-center px-4">
         <div className="relative mb-8">
@@ -126,12 +115,12 @@ export function LoadingScreen({ theme, t, siteStatus }: LoadingScreenProps) {
                 className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 border ${
                   theme === "dark"
                     ? isActive
-                      ? "bg-cyan-500/10 border-cyan-400/30 scale-105 shadow-lg shadow-cyan-500/10"
+                      ? "bg-cyan-500/10 border-cyan-400/30 shadow-lg shadow-cyan-500/10"
                       : isCompleted
                       ? "bg-green-500/10 border-green-400/30"
                       : "bg-gray-800/30 border-gray-700/30"
                     : isActive
-                    ? "bg-blue-50 border-blue-200 scale-105"
+                    ? "bg-blue-50 border-blue-200"
                     : isCompleted
                     ? "bg-green-50 border-green-200"
                     : "bg-gray-50 border-gray-200"
