@@ -4,8 +4,8 @@ import { okStatus, pageTitle } from "@/constans";
 import { RootHeader } from "@/templates/root/RootHeader";
 import { RootFooter } from "@/templates/root/RootFooter";
 import { getSiteSetting } from "@/utils/siteSetting";
-import "@/css/globals.css";
 import { pingApi } from "@/apis/status";
+import "@/css/globals.css";
 
 const RobotoSans = Roboto({
   variable: "--font-geist-sans",

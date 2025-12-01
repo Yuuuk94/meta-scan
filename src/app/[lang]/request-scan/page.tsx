@@ -1,7 +1,7 @@
 import { sitePingApi } from "@/apis/scan";
 import { getDictionary } from "@/dictionaries";
 import { ErrorScreen } from "@/templates/request-scan/ErrorScreen";
-import { LoadingScreen } from "@/templates/request-scan/LoadingScreen";
+import { ProcessScreen } from "@/templates/request-scan/ProcessScreen";
 import { getSiteSetting } from "@/utils/siteSetting";
 
 interface ScanPageProps {
@@ -17,7 +17,7 @@ export default async function ScanPage({ searchParams }: ScanPageProps) {
     }).then((res) => res.data);
 
     return (
-      <LoadingScreen theme={theme} lang={lang} t={t} siteStatus={siteStatus} />
+      <ProcessScreen theme={theme} lang={lang} t={t} siteStatus={siteStatus} />
     );
   } catch (error) {
     return <ErrorScreen theme={theme} lang={lang} t={t} />;

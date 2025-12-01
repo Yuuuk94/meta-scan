@@ -1,7 +1,7 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
-import { Bot, Loader2, Search, Globe, Zap, Scan, Check } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Bot, Search, Globe, Zap, Scan, Check } from "lucide-react";
 import { okStatus } from "@/constans";
 import {
   lsRunApi,
@@ -19,24 +19,59 @@ const steps = [
   { id: "gen", icon: Check },
 ];
 
-interface LoadingScreenProps extends DefaultPageProps {
+interface ProcessScreenProps extends DefaultPageProps {
   siteStatus: SiteStatus;
 }
-export function LoadingScreen({
+export function ProcessScreen({
   lang,
   theme,
   t,
   siteStatus,
-}: LoadingScreenProps) {
+}: ProcessScreenProps) {
   const [progress, setProgress] = useState(10);
   const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>([
     siteStatus.status === okStatus,
     ...Array(steps.length - 1).fill(null),
   ]);
 
+  const promistList = [
+    scanRobotsTxtApi,
+    scanSiteMapApi,
+    scanCrawlingApi,
+    lsRunApi,
+  ];
+
+  const processFinished = () => {
+    setProgress((state) => (state < 100 ? state + 20 : state));
+  };
+  const processCallback = (value: boolean, idx: number) => {
+    processFinished();
+    setCurrentProcess((state) => state.map((v, i) => (i === idx ? value : v)));
+  };
+
   useEffect(() => {
-    scanSiteMapApi({ url: siteStatus.url });
-  }, []);
+    if (siteStatus.status !== okStatus) return;
+    const data = { url: siteStatus.url };
+    const process = async () =>
+      await Promise.allSettled(
+        promistList.map((promise, idx) =>
+          promise(data)
+            .then((res) => {
+              processCallback(true, idx + 1);
+            })
+            .catch((e) => {
+              processFinished();
+            })
+        )
+      ).then((result) => {
+        setProgress(100);
+        setCurrentProcess((state) =>
+          state.map((v) => (v === null ? false : v))
+        );
+      });
+
+    process();
+  }, [siteStatus]);
   return (
     <div
       className={`py-20 flex items-center justify-center transition-all duration-300`}
@@ -125,56 +160,17 @@ export function LoadingScreen({
             const isCompleted = currentProcess[index] === true;
 
             return (
-              <Suspense
+              <ProcessStep
                 key={step.id}
-                fallback={
-                  <ProcessStep
-                    key={step.id}
-                    isCompleted={isCompleted}
-                    isActive={isActive}
-                    IconComponent={IconComponent}
-                    txt={t.steps[index]}
-                    lang={lang}
-                    theme={theme}
-                  />
-                }
-              >
-                <ProcessStep
-                  isCompleted={isCompleted}
-                  isActive={isActive}
-                  IconComponent={IconComponent}
-                  txt={t.steps[index]}
-                  lang={lang}
-                  theme={theme}
-                />
-              </Suspense>
+                isCompleted={isCompleted}
+                isActive={isActive}
+                IconComponent={IconComponent}
+                txt={t.steps[index]}
+                lang={lang}
+                theme={theme}
+              />
             );
           })}
-        </div>
-
-        {/* Loading Animation */}
-        <div className="mt-12 flex justify-center space-x-3">
-          <div
-            className={`w-3 h-3 rounded-full animate-bounce ${
-              theme === "dark"
-                ? "bg-cyan-400 shadow-lg shadow-cyan-400/50"
-                : "bg-blue-500"
-            }`}
-          ></div>
-          <div
-            className={`w-3 h-3 rounded-full animate-bounce [animation-delay:0.1s] ${
-              theme === "dark"
-                ? "bg-purple-400 shadow-lg shadow-purple-400/50"
-                : "bg-purple-500"
-            }`}
-          ></div>
-          <div
-            className={`w-3 h-3 rounded-full animate-bounce [animation-delay:0.2s] ${
-              theme === "dark"
-                ? "bg-pink-400 shadow-lg shadow-pink-400/50"
-                : "bg-blue-500"
-            }`}
-          ></div>
         </div>
       </div>
     </div>
