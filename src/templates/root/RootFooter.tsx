@@ -1,7 +1,7 @@
 import { ServiceStatus } from "./ServiceStatus";
 import { Scan } from "lucide-react";
 
-interface RootFooterProps extends DefautProps {
+interface RootFooterProps extends DefaultProps {
   ready: boolean;
 }
 

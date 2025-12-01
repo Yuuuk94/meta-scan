@@ -41,7 +41,6 @@ export default async function RootLayout({
   const ready = await pingApi()
     .then((res) => res.data.status === okStatus)
     .catch(() => false);
-
   return (
     <html lang={lang} data-theme={theme}>
       <body

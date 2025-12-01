@@ -11,9 +11,9 @@ export default async function ScanPage({ searchParams }: ScanPageProps) {
   const { theme, lang } = await getSiteSetting();
   const t = (await getDictionary(lang)).scan;
   try {
-    const requestUrl = (await searchParams).url;
+    const requestUrl = (await searchParams).url as string;
     const siteStatus = await sitePingApi({
-      url: decodeURI(requestUrl as string),
+      url: decodeURI(requestUrl),
     }).then((res) => res.data);
 
     return (

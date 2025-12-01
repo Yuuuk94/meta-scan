@@ -12,7 +12,6 @@ const PUBLIC_FILE = /\.(.*)$/;
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-
   if (
     pathname.startsWith("/_next") ||
     pathname.includes("/api/") ||
@@ -51,3 +50,16 @@ export function middleware(req: NextRequest) {
 
   return response;
 }
+
+export const config = {
+  matcher: [
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      // Prefetch 요청을 미들웨어에서 제외!
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
+  ],
+};

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { allowLanguages, allowTheme, langKey, themeKey } from "@/constans";
 import { setDocumentCookies } from "@/utils/cookies";
 
-export const ToggleSetting = ({ theme, lang }: DefautProps) => {
+export const ToggleSetting = ({ theme, lang }: DefaultProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

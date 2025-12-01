@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MessageCircleWarning } from "lucide-react";
 
-export function ErrorScreen({ theme, lang, t }: DefautPageProps) {
+export function ErrorScreen({ theme, lang, t }: DefaultPageProps) {
   const router = useRouter();
 
   const goBack = () => {

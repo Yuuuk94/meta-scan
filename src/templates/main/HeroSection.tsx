@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Globe, Bot, CheckCircle2, AlertCircle, Scan } from "lucide-react";
 import { urlPattern } from "@/constans";
 
-export const HeroSection = ({ theme, lang, t }: DefautPageProps) => {
+export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [isValidUrl, setIsValidUrl] = useState(true);

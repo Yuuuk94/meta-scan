@@ -1,10 +1,10 @@
 type Language = "en" | "ko";
 type Theme = "dark" | "light";
 
-interface DefautPageProps extends DefautProps {
+interface DefaultPageProps extends DefaultProps {
   t: Record<string, string | string[]>;
 }
-interface DefautProps {
+interface DefaultProps {
   theme: Theme;
   lang: Language;
 }

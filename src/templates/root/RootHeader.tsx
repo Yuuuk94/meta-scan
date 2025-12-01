@@ -4,7 +4,7 @@ import { ToggleSetting } from "./ToggleSetting";
 import { ServiceStatus } from "./ServiceStatus";
 import Link from "next/link";
 
-interface RootHeaderProps extends DefautProps {
+interface RootHeaderProps extends DefaultProps {
   ready: boolean;
 }
 

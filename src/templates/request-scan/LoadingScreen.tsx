@@ -1,27 +1,42 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Bot, Loader2, Search, Globe, Zap, Scan, Check } from "lucide-react";
 import { okStatus } from "@/constans";
+import {
+  lsRunApi,
+  scanCrawlingApi,
+  scanRobotsTxtApi,
+  scanSiteMapApi,
+} from "@/apis/scan";
+import { ProcessStep } from "./ProcessStep";
 
 const steps = [
   { id: "ping", icon: Search },
+  { id: "ai", icon: Bot },
   { id: "meta", icon: Globe },
   { id: "analysis", icon: Zap },
-  { id: "ai", icon: Bot },
   { id: "gen", icon: Check },
 ];
 
-interface LoadingScreenProps extends DefautPageProps {
+interface LoadingScreenProps extends DefaultPageProps {
   siteStatus: SiteStatus;
 }
-export function LoadingScreen({ theme, t, siteStatus }: LoadingScreenProps) {
+export function LoadingScreen({
+  lang,
+  theme,
+  t,
+  siteStatus,
+}: LoadingScreenProps) {
   const [progress, setProgress] = useState(10);
   const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>([
     siteStatus.status === okStatus,
     ...Array(steps.length - 1).fill(null),
   ]);
-  console.log(siteStatus);
+
+  useEffect(() => {
+    scanSiteMapApi({ url: siteStatus.url });
+  }, []);
   return (
     <div
       className={`py-20 flex items-center justify-center transition-all duration-300`}
@@ -110,66 +125,29 @@ export function LoadingScreen({ theme, t, siteStatus }: LoadingScreenProps) {
             const isCompleted = currentProcess[index] === true;
 
             return (
-              <div
+              <Suspense
                 key={step.id}
-                className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 border ${
-                  theme === "dark"
-                    ? isActive
-                      ? "bg-cyan-500/10 border-cyan-400/30 shadow-lg shadow-cyan-500/10"
-                      : isCompleted
-                      ? "bg-green-500/10 border-green-400/30"
-                      : "bg-gray-800/30 border-gray-700/30"
-                    : isActive
-                    ? "bg-blue-50 border-blue-200"
-                    : isCompleted
-                    ? "bg-green-50 border-green-200"
-                    : "bg-gray-50 border-gray-200"
-                }`}
+                fallback={
+                  <ProcessStep
+                    key={step.id}
+                    isCompleted={isCompleted}
+                    isActive={isActive}
+                    IconComponent={IconComponent}
+                    txt={t.steps[index]}
+                    lang={lang}
+                    theme={theme}
+                  />
+                }
               >
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative ${
-                    theme === "dark"
-                      ? isActive
-                        ? "bg-cyan-500/20 text-cyan-400 border border-cyan-400/40"
-                        : isCompleted
-                        ? "bg-green-500/20 text-green-400 border border-green-400/40"
-                        : "bg-gray-700/50 text-gray-500 border border-gray-600/40"
-                      : isActive
-                      ? "bg-blue-500 text-white"
-                      : isCompleted
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-300 text-gray-600"
-                  }`}
-                >
-                  {theme === "dark" && isActive && (
-                    <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur animate-pulse"></div>
-                  )}
-                  {isActive ? (
-                    <Loader2 className="h-6 w-6 animate-spin relative z-10" />
-                  ) : (
-                    <IconComponent className="h-6 w-6 relative z-10" />
-                  )}
-                </div>
-
-                <span
-                  className={`font-medium transition-all duration-300 ${
-                    theme === "dark"
-                      ? isActive
-                        ? "text-cyan-300"
-                        : isCompleted
-                        ? "text-green-400"
-                        : "text-gray-400"
-                      : isActive
-                      ? "text-blue-700"
-                      : isCompleted
-                      ? "text-green-700"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {t.steps[index]}
-                  {isActive ? " 중..." : isCompleted ? " 완료" : " 실패"}
-                </span>
-              </div>
+                <ProcessStep
+                  isCompleted={isCompleted}
+                  isActive={isActive}
+                  IconComponent={IconComponent}
+                  txt={t.steps[index]}
+                  lang={lang}
+                  theme={theme}
+                />
+              </Suspense>
             );
           })}
         </div>

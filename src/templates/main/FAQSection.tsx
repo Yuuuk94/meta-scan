@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bot, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 
-export const FAQSection = ({ theme, lang, t }: DefautPageProps) => {
+export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
