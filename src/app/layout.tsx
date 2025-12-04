@@ -6,6 +6,8 @@ import { RootFooter } from "@/templates/root/RootFooter";
 import { getSiteSetting } from "@/utils/siteSetting";
 import { pingApi } from "@/apis/status";
 import "@/css/globals.css";
+import { Suspense } from "react";
+import { Loading } from "@/components/Loading";
 
 const RobotoSans = Roboto({
   variable: "--font-geist-sans",
@@ -54,7 +56,11 @@ export default async function RootLayout({
           }`}
         >
           <RootHeader theme={theme} lang={lang} ready={ready} />
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen">
+            <Suspense fallback={<Loading theme={theme} lang={lang} />}>
+              {children}
+            </Suspense>
+          </main>
           <RootFooter theme={theme} lang={lang} ready={ready} />
         </div>
       </body>
