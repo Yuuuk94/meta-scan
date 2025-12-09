@@ -35,7 +35,7 @@
     "faq5Q": "이 분석은 무료인가요?",
     "faq5A": "네! Meta-Scan은 포괄적인 AI 친화적 SEO 분석을 완전 무료로 제공합니다. 모든 웹사이트가 AI 기반 검색의 미래에 최적화되어야 한다고 믿습니다."
   },
-  "scan": {
+  "requestScan": {
     "title": "Meta-Scan",
     "subtitle": "AI 친화 SEO 분석기",
     "steps": [
@@ -47,5 +47,47 @@
     ],
     "analyzingText": "사이트 분석 중입니다...",
     "analyzingSubtext": "메타태그, 구조화 데이터, AI 신호를 가져오는 중입니다."
+  },
+  "scan": {
+    "title": "Meta-Scan",
+    "subtitle": "AI 친화 SEO 분석기",
+    "aiPreparednessScore": "AI 준비도 점수",
+    "lighthouseScores": "Lighthouse 점수",
+    "performance": "성능",
+    "seo": "SEO",
+    "accessibility": "접근성",
+    "aiSignals": "AI 신호",
+    "indexing": "인덱싱",
+    "previews": "미리보기",
+    "contentStats": "콘텐츠 통계",
+    "improvements": "개선사항",
+    "overview": "개요",
+    "details": "상세",
+    "rawData": "원시 JSON",
+    "analyzedAt": "분석 시간",
+    "newAnalysis": "새 분석",
+    "exportReport": "리포트 내보내기",
+    "promptsTxt": "prompts.txt 파일",
+    "promptObject": "프롬프트 객체",
+    "faqPage": "FAQ 페이지",
+    "structuredData": "구조화 데이터",
+    "robotsTxt": "robots.txt",
+    "canonical": "정규 URL",
+    "noIndexFlags": "인덱스 제외 플래그",
+    "ogImage": "오픈 그래프 이미지",
+    "favicon": "파비콘",
+    "sitemap": "사이트맵",
+    "wordCount": "단어 수",
+    "headings": "제목",
+    "tldr": "TL;DR 존재",
+    "detected": "감지됨",
+    "notDetected": "감지되지 않음",
+    "present": "존재",
+    "missing": "누락",
+    "good": "양호",
+    "needsImprovement": "개선 필요",
+    "h1": "H1",
+    "h2": "H2",
+    "h3": "H3"
   }
 }

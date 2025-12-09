@@ -8,12 +8,12 @@ interface ScanPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 export default async function RequestScanPage({ searchParams }: ScanPageProps) {
-  const { theme, lang } = await getSiteSetting();
-  const t = (await getDictionary(lang)).scan;
+  const { theme, lang, crrUrl } = await getSiteSetting();
+  const t = (await getDictionary(lang)).requestScan;
   try {
-    const requestUrl = (await searchParams).url as string;
+    if (!crrUrl) throw Error;
     const siteStatus = await sitePingApi({
-      url: decodeURI(requestUrl),
+      url: decodeURI(crrUrl),
     }).then((res) => res.data);
 
     return (

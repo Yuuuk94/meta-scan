@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Globe, Bot, AlertCircle, Scan } from "lucide-react";
-import { urlPattern } from "@/constans";
+import { crrUrlKey, urlPattern } from "@/constans";
+import { setDocumentCookies } from "@/utils/cookies";
 
 export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
   const router = useRouter();
@@ -28,7 +29,8 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
       setIsValidUrl(checkUrl);
       return;
     }
-    router.push("/request-scan?url=" + encodeURIComponent(url));
+    setDocumentCookies(crrUrlKey, encodeURI(url));
+    router.push("/request-scan");
   };
   return (
     <section className="container mx-auto px-4 py-20">

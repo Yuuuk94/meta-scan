@@ -7,6 +7,7 @@ import { getSiteSetting } from "@/utils/siteSetting";
 export default async function HomePage() {
   const { theme, lang } = await getSiteSetting();
   const t = (await getDictionary(lang)).main;
+
   return (
     <>
       {/* Hero Section */}

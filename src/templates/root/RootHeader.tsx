@@ -23,7 +23,7 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
         <div className="flex items-center justify-between">
           {/* LOGO */}
           <Link href={`/${lang}`}>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer">
               <div
                 className={`relative p-3 rounded-xl transition-all duration-300 ${
                   theme === "dark"

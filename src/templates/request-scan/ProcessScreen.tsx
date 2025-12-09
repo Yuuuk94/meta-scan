@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bot, Search, Globe, Zap, Scan, Check } from "lucide-react";
 import { okStatus } from "@/constans";
@@ -28,7 +28,7 @@ const steps = [
 ];
 
 interface ProcessScreenProps extends DefaultPageProps {
-  siteStatus: SiteStatus;
+  siteStatus: SiteStatusData;
 }
 export function ProcessScreen({
   lang,
@@ -43,24 +43,31 @@ export function ProcessScreen({
     siteStatus.status === okStatus,
     ...Array(steps.length - 1).fill(null),
   ]);
-
-  const processFinished = () => {
-    setProgress((state) => (state < 100 ? state + 20 : state));
-  };
-  const processCallback = (value: boolean, idx: number) => {
-    processFinished();
-    setCurrentProcess((state) => state.map((v, i) => (i === idx ? value : v)));
-  };
+  const didRunRef = useRef(false);
 
   useEffect(() => {
+    if (didRunRef.current) return; // 두 번째 실행 막기
+    didRunRef.current = true;
+
     if (siteStatus.status !== okStatus) return;
+
     const data = { url: siteStatus.url };
+    const processFinished = () => {
+      setProgress((state) => (state < 100 ? state + 20 : state));
+    };
+    const processCallback = (value: boolean, idx: number) => {
+      processFinished();
+      setCurrentProcess((state) =>
+        state.map((v, i) => (i === idx ? value : v))
+      );
+    };
     const process = async () =>
       await Promise.allSettled(
         promistList.map((promise, idx) =>
           promise(data)
-            .then(() => {
+            .then((res) => {
               processCallback(true, idx + 1);
+              return res;
             })
             .catch((e) => {
               console.error(e);
@@ -73,11 +80,12 @@ export function ProcessScreen({
         setCurrentProcess((state) =>
           state.map((v) => (v === null ? false : v))
         );
-        router.replace("/scan?url=" + "");
+        router.replace("/scan");
       });
 
     process();
-  }, [siteStatus]);
+  }, []);
+
   return (
     <div
       className={`py-20 flex items-center justify-center transition-all duration-300`}

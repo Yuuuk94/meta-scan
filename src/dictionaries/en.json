@@ -35,7 +35,7 @@
     "faq5Q": "Is this analysis free?",
     "faq5A": "Yes! Meta-Scan provides comprehensive AI-friendly SEO analysis completely free. We believe every website should be optimized for the AI-powered future of search."
   },
-  "scan": {
+  "requestScan": {
     "title": "Meta-Scan",
     "subtitle": "AI-Friendly SEO Analyzer",
     "steps": [
@@ -47,5 +47,47 @@
     ],
     "analyzingText": "Analyzing your site...",
     "analyzingSubtext": "Fetching meta tags, structured data, AI signals."
+  },
+  "scan": {
+    "title": "Meta-Scan",
+    "subtitle": "AI-Friendly SEO Analyzer",
+    "aiPreparednessScore": "AI Preparedness Score",
+    "lighthouseScores": "Lighthouse Scores",
+    "performance": "Performance",
+    "seo": "SEO",
+    "accessibility": "Accessibility",
+    "aiSignals": "AI Signals",
+    "indexing": "Indexing",
+    "previews": "Previews",
+    "contentStats": "Content Stats",
+    "improvements": "Improvements",
+    "overview": "Overview",
+    "details": "Details",
+    "rawData": "Raw JSON",
+    "analyzedAt": "Analyzed at",
+    "newAnalysis": "New Analysis",
+    "exportReport": "Export Report",
+    "promptsTxt": "prompts.txt file",
+    "promptObject": "Prompt Object",
+    "faqPage": "FAQ Page",
+    "structuredData": "Structured Data",
+    "robotsTxt": "robots.txt",
+    "canonical": "Canonical URLs",
+    "noIndexFlags": "No-Index Flags",
+    "ogImage": "Open Graph Image",
+    "favicon": "Favicon",
+    "sitemap": "Sitemap",
+    "wordCount": "Word Count",
+    "headings": "Headings",
+    "tldr": "TL;DR Present",
+    "detected": "Detected",
+    "notDetected": "Not Detected",
+    "present": "Present",
+    "missing": "Missing",
+    "good": "Good",
+    "needsImprovement": "Needs Improvement",
+    "h1": "H1",
+    "h2": "H2",
+    "h3": "H3"
   }
 }
