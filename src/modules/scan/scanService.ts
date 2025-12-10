@@ -1,7 +1,6 @@
 import { ApiError } from "@core/http/ApiError.js";
 import type { UrlBody } from "./dto.js";
 import type { PuppeteerProcess, Puppeteer } from "@infra/Puppeteer.js";
-import { statusOk } from "@constant/status.js";
 import crypto from "node:crypto";
 import { DESC_MAX, DESC_MIN, TITLE_MAX, TITLE_MIN } from "@constant/meta.js";
 
@@ -17,7 +16,6 @@ export class ScanService {
       });
       if (result.status === 200) {
         return {
-          ...statusOk,
           redirected: result.redirected,
           url: result.url,
         };
@@ -28,12 +26,12 @@ export class ScanService {
     }
   }
 
-  private getRobotUrl = (url: URL) => {
+  private getUrl = (url: URL, path = "/") => {
     const scheme =
       url.protocol && url.protocol !== ":" ? url.protocol : "http:";
     const host = url.hostname;
     const port = url.port ? `:${url.port}` : "";
-    return `${scheme}//${host}${port}/robots.txt`;
+    return `${scheme}//${host}${port}${path}`;
   };
 
   private parseRobotsTxt = (text: string): ParsedRobots => {
@@ -125,54 +123,54 @@ export class ScanService {
   async robotsTxt({ url }: UrlBody) {
     try {
       const parsedUrl = new URL(url);
-      const robotsUrl = this.getRobotUrl(parsedUrl);
+      const robotsUrl = this.getUrl(parsedUrl, "/robots.txt");
       const result = await fetch(robotsUrl, {
         method: "GET",
         signal: AbortSignal.timeout(this.timeOut),
       });
 
       let has = false;
-      let allow: Record<string, boolean> = { "*": true };
-      let sitemap: string[] = [];
-      let contents = "";
 
       if (result.status === 200) {
         has = true;
-        contents = await result.text();
+        const contents = await result.text();
         const t = this.parseRobotsTxt(contents);
-        sitemap = t.sitemaps;
-        allow = this.isAllowed(t.records, parsedUrl.pathname);
+        const sitemap = t.sitemaps;
+        const allow = this.isAllowed(t.records, parsedUrl.pathname);
+        return {
+          url: result.url,
+          redirected: result.redirected,
+          has,
+          allow,
+          contents,
+          sitemap,
+        };
       }
-      return { has, allow, contents, sitemap };
+      return { has };
     } catch (e) {
       throw ApiError.internal();
     }
   }
 
-  private getSiteMapUrl = (url: URL) => {
-    const scheme =
-      url.protocol && url.protocol !== ":" ? url.protocol : "http:";
-    const host = url.hostname;
-    const port = url.port ? `:${url.port}` : "";
-    return `${scheme}//${host}${port}/sitemap.xml`;
-  };
-
   async siteMap({ url }: UrlBody) {
     try {
       const parsedUrl = new URL(url);
-      const siteMapUrl = this.getSiteMapUrl(parsedUrl);
+      const siteMapUrl = this.getUrl(parsedUrl, "/sitemap.xml");
       const result = await fetch(siteMapUrl, {
         method: "HEAD",
         signal: AbortSignal.timeout(this.timeOut),
       });
+      let has = false;
+
       if (result.status === 200) {
+        has = true;
         return {
-          ...statusOk,
+          has,
           redirected: result.redirected,
           url: result.url,
         };
       }
-      throw Error;
+      return { has };
     } catch (e) {
       throw ApiError.internal();
     }
