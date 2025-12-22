@@ -14,10 +14,10 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (
     pathname.startsWith("/_next") ||
-    pathname.includes("/api/") ||
+    pathname.startsWith("/api") ||
     PUBLIC_FILE.test(pathname)
   ) {
-    return;
+    return NextResponse.next();
   }
 
   let theme = req.cookies.get(themeKey)?.value;
