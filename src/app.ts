@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json({ limit: "5mb" }));
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://*.vercel.app"],
     methods: ["GET", "POST", "PUT", "OPTIONS"],
     allowedHeaders: ["Authorization", "Content-Type"],
     credentials: false,
