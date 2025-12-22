@@ -6,8 +6,8 @@ import { LighthouseController } from "./LighthouseController.js";
 const router = Router();
 
 // 간단한 수동 DI
-const launcher = new ChromeLauncher();
-const service = new LighthouseService(launcher);
+const chromeLauncher = new ChromeLauncher();
+const service = new LighthouseService(chromeLauncher);
 const controller = new LighthouseController(service);
 
 router.post("/run", controller.run);

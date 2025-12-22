@@ -2,6 +2,7 @@ import lighthouse from "lighthouse";
 import type { RunBody } from "./dto.js";
 import type { ChromeProcess } from "@infra/ChromeLauncher.js";
 import { ChromeLauncher } from "@infra/ChromeLauncher.js";
+import { ApiError } from "@core/http/ApiError.js";
 
 export class LighthouseService {
   constructor(private readonly chrome: ChromeLauncher) {}
@@ -19,6 +20,8 @@ export class LighthouseService {
       };
       const result = await lighthouse(url, flags);
       return result;
+    } catch (e) {
+      throw ApiError.internal();
     } finally {
       await this.chrome.safeKill(proc);
     }

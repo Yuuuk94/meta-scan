@@ -3,16 +3,105 @@ import swaggerUi from "swagger-ui-express";
 export { swaggerUi };
 
 export const swaggerSpec = {
-  openapi: "3.0.3",
+  openapi: "3.1.0",
   info: {
-    title: "Lighthouse Runner API",
+    title: "Meta Scan API",
     version: "0.1.0",
-    description:
-      "POST /run 으로 Lighthouse LHR(JSON) 또는 HTML 리포트를 반환합니다.",
+    description: "Meta Scan API",
   },
   servers: [{ url: process.env.PUBLIC_URL || "http://localhost:8080" }],
   paths: {
-    "/v1/lighthouse/run": {
+    "/api/v1/healthz": {
+      get: {
+        summary: "헬스체크",
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
+    "/api/v1/scan/ping": {
+      post: {
+        summary: "사이트 존재 확인",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              examples: {
+                jsonExample: {
+                  summary: "defalut",
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
+    "/api/v1/scan/robotsTxt": {
+      post: {
+        summary: "사이트 robot.txt 확인",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              examples: {
+                jsonExample: {
+                  summary: "defalut",
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
+    "/api/v1/scan/siteMap": {
+      post: {
+        summary: "사이트 sitemap 확인",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              examples: {
+                jsonExample: {
+                  summary: "defalut",
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
+    "/api/v1/scan/crawling": {
+      post: {
+        summary: "사이트 crawling",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              examples: {
+                jsonExample: {
+                  summary: "defalut",
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "ok (text/plain)" } },
+      },
+    },
+    "/api/v1/lighthouse/run": {
       post: {
         summary: "Lighthouse 실행",
         requestBody: {
@@ -24,7 +113,7 @@ export const swaggerSpec = {
                 jsonExample: {
                   summary: "JSON LHR 반환",
                   value: {
-                    url: "https://naver.com",
+                    url: "https://dev-portfolio.withmay.com/",
                     formFactor: "mobile",
                     onlyCategories: ["seo", "performance"],
                     format: "json",
@@ -33,7 +122,7 @@ export const swaggerSpec = {
                 htmlExample: {
                   summary: "HTML 리포트 반환(다운로드)",
                   value: {
-                    url: "https://naver.com",
+                    url: "https://dev-portfolio.withmay.com/",
                     formFactor: "desktop",
                     onlyCategories: [
                       "seo",
@@ -81,12 +170,6 @@ export const swaggerSpec = {
             },
           },
         },
-      },
-    },
-    "/v1/healthz": {
-      get: {
-        summary: "헬스체크",
-        responses: { 200: { description: "ok (text/plain)" } },
       },
     },
   },
