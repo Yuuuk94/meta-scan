@@ -8,9 +8,11 @@ import healthRouter from "@modules/health/health.router.js";
 import scanRouter from "@modules/scan/scan.router.js";
 import lighthouseRouter from "@modules/lighthouse/lighthouse.router.js";
 
+const port = process.env.PORT || 8080;
+
 const app = express();
 
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "5mb" }));
 app.use(
   cors({
     origin: ["http://localhost:3000"],
@@ -35,8 +37,6 @@ for (let [key, value] of Object.entries(routers)) {
 
 app.use(notFound);
 app.use(errorHandler);
-
-const port = process.env.PORT || 8080;
 
 app.listen(port, () => {
   console.log("mata-scan-api runner(local) on " + port);
