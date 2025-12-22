@@ -20,17 +20,20 @@ export function middleware(req: NextRequest) {
     return;
   }
 
-  const theme = req.cookies.get(themeKey)?.value;
-  const lang = req.cookies.get(langKey)?.value;
+  let theme = req.cookies.get(themeKey)?.value;
+  let lang = req.cookies.get(langKey)?.value;
 
   const response = NextResponse.next();
 
-  if (!theme) response.cookies.set(themeKey, defaultTheme, { httpOnly: false });
+  if (!theme) {
+    theme = defaultTheme;
+    response.cookies.set(themeKey, theme, { httpOnly: false });
+  }
 
   if (!lang) {
     const acceptLang = req.headers.get("accept-language");
     const userLang = acceptLang?.split(",")?.[0] || "";
-    let lang = defaultLang;
+    lang = defaultLang;
     if (allowLanguages.includes(userLang)) lang = userLang as Language;
     response.cookies.set(langKey, lang, { httpOnly: false });
   }
