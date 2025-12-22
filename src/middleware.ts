@@ -53,3 +53,7 @@ export function middleware(req: NextRequest) {
 
   return response;
 }
+
+export const config = {
+  matcher: ["/((?!_next|api|.*\\..*).*)"],
+};

@@ -141,7 +141,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
             </div>
 
             {/* Enhanced validation feedback */}
-            {url.length > 0 && (
+            {
               <div className="mt-4 flex items-center justify-center gap-2">
                 {!isValidUrl && (
                   <>
@@ -162,7 +162,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
                   </>
                 )}
               </div>
-            )}
+            }
           </div>
         </div>
       </div>

@@ -66,7 +66,11 @@ export function ProcessScreen({
         promistList.map((promise, idx) =>
           promise(data)
             .then((res) => {
-              processCallback(true, idx + 1);
+              processCallback(
+                (res.data as OkStatus)?.status &&
+                  (res.data as OkStatus).status === okStatus,
+                idx + 1
+              );
               return res;
             })
             .catch((e) => {
@@ -85,6 +89,7 @@ export function ProcessScreen({
 
     process();
   }, []);
+  console.log(currentProcess);
 
   return (
     <div
@@ -172,7 +177,7 @@ export function ProcessScreen({
             const IconComponent = step.icon;
             const isActive = currentProcess[index] === null;
             const isCompleted = currentProcess[index] === true;
-
+            console.log(index, currentProcess[index]);
             return (
               <ProcessStep
                 key={step.id}

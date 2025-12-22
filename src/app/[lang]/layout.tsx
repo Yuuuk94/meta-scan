@@ -1,13 +1,14 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Roboto, Geist_Mono } from "next/font/google";
 import { okStatus, pageTitle } from "@/constans";
 import { RootHeader } from "@/templates/root/RootHeader";
 import { RootFooter } from "@/templates/root/RootFooter";
+import { Loading } from "@/components/Loading";
 import { getSiteSetting } from "@/utils/siteSetting";
 import { pingApi } from "@/apis/status";
+
 import "@/css/globals.css";
-import { Suspense } from "react";
-import { Loading } from "@/components/Loading";
 
 const RobotoSans = Roboto({
   variable: "--font-geist-sans",
@@ -47,7 +48,7 @@ export default async function RootLayout({
       return false;
     });
   return (
-    <html lang={lang} data-theme={theme}>
+    <html lang={lang} data-theme={theme} suppressHydrationWarning>
       <body
         className={`${RobotoSans.variable} ${geistMono.variable} antialiased`}
       >
