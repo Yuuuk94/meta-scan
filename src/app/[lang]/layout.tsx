@@ -1,0 +1,73 @@
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import { Roboto, Geist_Mono } from "next/font/google";
+import { okStatus, pageTitle } from "@/constans";
+import { RootHeader } from "@/templates/root/RootHeader";
+import { RootFooter } from "@/templates/root/RootFooter";
+import { Loading } from "@/components/Loading";
+import { getSiteSetting } from "@/utils/siteSetting";
+import { pingApi } from "@/apis/status";
+
+import "@/css/globals.css";
+
+const RobotoSans = Roboto({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const meta = {
+  title: pageTitle,
+  description: "Based url, meta tag scanner, seo checker",
+};
+
+export const metadata: Metadata = {
+  ...meta,
+  openGraph: {
+    ...meta,
+    url: "https://example.com",
+    siteName: "meta scan lab",
+    images: [{ url: "https://example.com/og.png" }],
+  },
+};
+
+export default async function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const { theme, lang } = await getSiteSetting();
+  const ready = await pingApi()
+    .then((res) => res.data.status === okStatus)
+    .catch((e) => {
+      console.log(e);
+      return false;
+    });
+  return (
+    <html lang={lang} data-theme={theme} suppressHydrationWarning>
+      <body
+        className={`${RobotoSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <div
+          className={`min-h-screen   ${
+            theme === "dark"
+              ? "bg-gradient-to-br from-gray-900 via-black to-purple-900"
+              : "bg-gradient-to-br from-blue-50 via-white to-purple-50"
+          }`}
+        >
+          <RootHeader theme={theme} lang={lang} ready={ready} />
+          <main className="min-h-screen">
+            <Suspense fallback={<Loading theme={theme} lang={lang} />}>
+              {children}
+            </Suspense>
+          </main>
+          <RootFooter theme={theme} lang={lang} ready={ready} />
+        </div>
+      </body>
+    </html>
+  );
+}
