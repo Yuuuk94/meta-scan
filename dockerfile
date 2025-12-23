@@ -38,8 +38,8 @@ COPY --from=build /app/dist ./dist
 ENV PORT=8080
 ENV NODE_ENV=production
 ENV PUBLIC_URL=https://meta-scan-api-752797429874.us-central1.run.app
-ENV FRONT_URL=https://*.vercel.app
-ENV FRONT_TEST_URL=https://*.vercel.app
+ENV FRONT_URL=https://meta-scan.vercel.app
+ENV FRONT_TEST_URL=https://meta-scan.vercel.app
 # chrome-launcher가 사용할 경로 지정 (배포 이미지 내 Chromium 경로)
 ENV CHROME_PATH=/usr/bin/chromium
 
