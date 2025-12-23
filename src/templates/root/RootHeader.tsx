@@ -42,7 +42,7 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
               </div>
               <div>
                 <p
-                  className={`text-xl font-bold transition-colors  ${
+                  className={`text-xl font-bold   ${
                     theme === "dark"
                       ? "text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text"
                       : "text-gray-900"
@@ -51,7 +51,7 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
                   {t.title}
                 </p>
                 <p
-                  className={`text-sm transition-colors  font-mono ${
+                  className={`text-sm   font-mono ${
                     theme === "dark" ? "text-gray-400" : "text-gray-600"
                   }`}
                 >

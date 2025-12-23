@@ -23,7 +23,7 @@ export function ErrorScreen({ theme, lang, t }: DefaultPageProps) {
             }`}
           >
             <MessageCircleWarning
-              className={`h-14 w-14 transition-colors  ${
+              className={`h-14 w-14   ${
                 theme === "dark" ? "text-red-400" : "text-red-500"
               }`}
             />
@@ -31,14 +31,14 @@ export function ErrorScreen({ theme, lang, t }: DefaultPageProps) {
         </div>
 
         <h2
-          className={`text-4xl font-bold mb-4 transition-colors  ${
+          className={`text-4xl font-bold mb-4   ${
             theme === "dark" ? "text-red-400" : "text-red-500"
           }`}
         >
           {t.analyzingText}
         </h2>
         <p
-          className={`text-lg mb-12 transition-colors  ${
+          className={`text-lg mb-12   ${
             theme === "dark" ? "text-gray-300" : "text-gray-600"
           }`}
         >
@@ -53,7 +53,7 @@ export function ErrorScreen({ theme, lang, t }: DefaultPageProps) {
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {theme === "dark" && (
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity "></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100  "></div>
           )}
           <span className="relative z-10 flex items-center gap-2">GO BACK</span>
         </Button>

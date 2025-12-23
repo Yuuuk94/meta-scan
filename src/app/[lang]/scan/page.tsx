@@ -165,7 +165,7 @@ export default async function ScanPage() {
     >;
   }) => (
     <Card
-      className={`relative group  duration-500 border overflow-hidden ${
+      className={`relative group border overflow-hidden ${
         theme === "dark"
           ? `bg-gradient-to-br from-gray-900/80 to-black/60 backdrop-blur-md hover:shadow-2xl ${getScoreBg(
               score
@@ -174,7 +174,7 @@ export default async function ScanPage() {
       }`}
     >
       {theme === "dark" && (
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100  "></div>
       )}
       <CardHeader className="pb-3 relative z-10">
         <div className="flex items-center justify-between">
@@ -184,9 +184,7 @@ export default async function ScanPage() {
           </div>
         </div>
         <CardTitle
-          className={`transition-colors  ${
-            theme === "dark" ? "text-white" : "text-gray-900"
-          }`}
+          className={`  ${theme === "dark" ? "text-white" : "text-gray-900"}`}
         >
           {title}
         </CardTitle>
@@ -194,7 +192,7 @@ export default async function ScanPage() {
       <CardContent className="pt-0 relative z-10">
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
           <div
-            className={`h-2 rounded-full  duration-1000 ${
+            className={`h-2 rounded-full   ${
               theme === "dark"
                 ? score >= 80
                   ? "bg-gradient-to-r from-cyan-400 to-cyan-500"
@@ -306,7 +304,7 @@ export default async function ScanPage() {
       {/* AI Preparedness Score Hero */}
       <div className="mb-8">
         <Card
-          className={`relative overflow-hidden border-2  duration-500 ${
+          className={`relative overflow-hidden border-2   ${
             theme === "dark"
               ? "bg-gradient-to-br from-gray-900/80 to-black/60 backdrop-blur-md border-cyan-500/30 hover:border-cyan-400/50 shadow-2xl shadow-cyan-500/10"
               : "bg-gradient-to-br from-white to-blue-50 border-blue-200 hover:border-blue-300 shadow-xl"
@@ -337,7 +335,7 @@ export default async function ScanPage() {
                 />
               </div>
               <CardTitle
-                className={`text-3xl transition-colors  ${
+                className={`text-3xl   ${
                   theme === "dark"
                     ? "text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text"
                     : "text-gray-900"
@@ -356,7 +354,7 @@ export default async function ScanPage() {
             <div className="max-w-md mx-auto">
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
                 <div
-                  className={`h-4 rounded-full  duration-1000 ${
+                  className={`h-4 rounded-full   ${
                     theme === "dark"
                       ? "bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 shadow-lg shadow-cyan-500/20"
                       : "bg-gradient-to-r from-blue-500 to-purple-600"

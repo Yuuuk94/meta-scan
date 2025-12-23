@@ -63,7 +63,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
         </h1>
 
         <p
-          className={`text-xl mb-16 max-w-2xl mx-auto transition-colors  ${
+          className={`text-xl mb-16 max-w-2xl mx-auto   ${
             theme === "dark" ? "text-gray-300" : "text-gray-600"
           }`}
         >
@@ -76,7 +76,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
             {/* Multiple glow layers for cyberpunk effect */}
             {theme === "dark" && (
               <>
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-3xl blur-2xl group-hover:blur-3xl  duration-500 "></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-3xl blur-2xl group-hover:blur-3xl   "></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-400/20 to-pink-400/20 rounded-3xl blur-xl group-hover:blur-2xl  "></div>
               </>
             )}
@@ -130,7 +130,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {theme === "dark" && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity "></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100  "></div>
                   )}
                   <span className="relative z-10 flex items-center gap-2">
                     {t.analyzeButton}

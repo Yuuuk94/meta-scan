@@ -112,7 +112,7 @@ export function ProcessScreen({
             }`}
           >
             <Scan
-              className={`h-14 w-14 animate-spin transition-colors  ${
+              className={`h-14 w-14 animate-spin   ${
                 theme === "dark" ? "text-cyan-400" : "text-white"
               }`}
             />
@@ -120,7 +120,7 @@ export function ProcessScreen({
         </div>
 
         <h2
-          className={`text-4xl font-bold mb-4 transition-colors  ${
+          className={`text-4xl font-bold mb-4   ${
             theme === "dark"
               ? "text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text"
               : "text-gray-900"
@@ -129,7 +129,7 @@ export function ProcessScreen({
           {t.analyzingText}
         </h2>
         <p
-          className={`text-lg mb-12 transition-colors  ${
+          className={`text-lg mb-12   ${
             theme === "dark" ? "text-gray-300" : "text-gray-600"
           }`}
         >
@@ -140,14 +140,14 @@ export function ProcessScreen({
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <span
-              className={`text-sm transition-colors  ${
+              className={`text-sm   ${
                 theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >
               Progress
             </span>
             <span
-              className={`text-sm font-medium transition-colors  ${
+              className={`text-sm font-medium   ${
                 theme === "dark" ? "text-cyan-400" : "text-blue-600"
               }`}
             >
@@ -155,7 +155,7 @@ export function ProcessScreen({
             </span>
           </div>
           <div
-            className={`h-3 rounded-full overflow-hidden transition-colors  ${
+            className={`h-3 rounded-full overflow-hidden   ${
               theme === "dark" ? "bg-gray-800/50" : "bg-gray-200"
             }`}
           >

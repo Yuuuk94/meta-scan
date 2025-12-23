@@ -34,7 +34,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
               )}
 
               <h2
-                className={`relative text-4xl md:text-5xl font-bold mb-4  duration-500 ${
+                className={`relative text-4xl md:text-5xl font-bold mb-4   ${
                   theme === "dark" ? "text-purple-300" : "text-gray-900"
                 }`}
               >
@@ -65,7 +65,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
             </div>
 
             <p
-              className={`text-lg max-w-2xl mx-auto transition-colors  ${
+              className={`text-lg max-w-2xl mx-auto   ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >
@@ -121,7 +121,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                           <div className="absolute inset-0 bg-purple-400/10 rounded-xl blur "></div>
                         )}
                         <HelpCircle
-                          className={`h-5 w-5 relative z-10 transition-colors  ${
+                          className={`h-5 w-5 relative z-10   ${
                             theme === "dark"
                               ? openFaq === index
                                 ? "text-purple-400"
@@ -133,7 +133,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                         />
                       </div>
                       <CardTitle
-                        className={`transition-colors  ${
+                        className={`${
                           theme === "dark"
                             ? openFaq === index
                               ? "text-purple-300"
@@ -156,7 +156,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                     >
                       {openFaq === index ? (
                         <ChevronDown
-                          className={`h-4 w-4 transition-colors  ${
+                          className={`h-4 w-4   ${
                             theme === "dark"
                               ? "text-purple-400"
                               : "text-purple-600"
@@ -164,7 +164,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                         />
                       ) : (
                         <ChevronUp
-                          className={`h-4 w-4 transition-colors  ${
+                          className={`h-4 w-4   ${
                             theme === "dark" ? "text-gray-400" : "text-gray-500"
                           }`}
                         />
@@ -176,7 +176,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                 {openFaq === index && (
                   <CardContent className="pt-0 pb-6 relative z-10">
                     <div
-                      className={`transition-colors  ${
+                      className={`  ${
                         theme === "dark" ? "text-gray-300" : "text-gray-600"
                       }`}
                     >
@@ -207,7 +207,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
             >
               <CardContent className="p-6">
                 <p
-                  className={`mb-4 transition-colors  ${
+                  className={`mb-4   ${
                     theme === "dark" ? "text-gray-300" : "text-gray-600"
                   }`}
                 >

@@ -8,7 +8,7 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2
-              className={`text-4xl font-bold mb-6 transition-colors  ${
+              className={`text-4xl font-bold mb-6   ${
                 theme === "dark"
                   ? "text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text"
                   : "text-gray-900"
@@ -33,14 +33,14 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <Card
-              className={`relative group  duration-500 border overflow-hidden ${
+              className={`relative group   border overflow-hidden ${
                 theme === "dark"
                   ? "bg-gradient-to-br from-gray-900/80 to-black/60 border-cyan-500/20 hover:border-cyan-400/40 backdrop-blur-md hover:shadow-2xl hover:shadow-cyan-500/20"
                   : "bg-gradient-to-br from-blue-50 to-white border-0 hover:shadow-xl"
               }`}
             >
               {theme === "dark" && (
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100  "></div>
               )}
               <CardHeader className="text-center pb-4 relative z-10">
                 <div
@@ -61,7 +61,7 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
                 </div>
 
                 <CardTitle
-                  className={`transition-colors  ${
+                  className={`  ${
                     theme === "dark" ? "text-cyan-300" : "text-blue-700"
                   }`}
                 >
@@ -70,7 +70,7 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
               </CardHeader>
               <CardContent className="text-center relative z-10">
                 <p
-                  className={`transition-colors  ${
+                  className={`  ${
                     theme === "dark" ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
@@ -81,14 +81,14 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
 
             {/* Step 2 */}
             <Card
-              className={`relative group  duration-500 border overflow-hidden ${
+              className={`relative group   border overflow-hidden ${
                 theme === "dark"
                   ? "bg-gradient-to-br from-gray-900/80 to-black/60 border-purple-500/20 hover:border-purple-400/40 backdrop-blur-md hover:shadow-2xl hover:shadow-purple-500/20"
                   : "bg-gradient-to-br from-purple-50 to-white border-0 hover:shadow-xl"
               }`}
             >
               {theme === "dark" && (
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100  "></div>
               )}
               <CardHeader className="text-center pb-4 relative z-10">
                 <div
@@ -109,7 +109,7 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
                 </div>
 
                 <CardTitle
-                  className={`transition-colors  ${
+                  className={`  ${
                     theme === "dark" ? "text-purple-300" : "text-purple-700"
                   }`}
                 >
@@ -118,7 +118,7 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
               </CardHeader>
               <CardContent className="text-center relative z-10">
                 <p
-                  className={`transition-colors  ${
+                  className={`  ${
                     theme === "dark" ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
@@ -129,14 +129,14 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
 
             {/* Step 3 */}
             <Card
-              className={`relative group  duration-500 border overflow-hidden ${
+              className={`relative group   border overflow-hidden ${
                 theme === "dark"
                   ? "bg-gradient-to-br from-gray-900/80 to-black/60 border-pink-500/20 hover:border-pink-400/40 backdrop-blur-md hover:shadow-2xl hover:shadow-pink-500/20"
                   : "bg-gradient-to-br from-green-50 to-white border-0 hover:shadow-xl"
               }`}
             >
               {theme === "dark" && (
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent opacity-0 group-hover:opacity-100  "></div>
               )}
               <CardHeader className="text-center pb-4 relative z-10">
                 <div
@@ -157,7 +157,7 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
                 </div>
 
                 <CardTitle
-                  className={`transition-colors  ${
+                  className={`  ${
                     theme === "dark" ? "text-pink-300" : "text-green-700"
                   }`}
                 >
@@ -166,7 +166,7 @@ export const ProcessSection = ({ theme, t }: DefaultPageProps) => {
               </CardHeader>
               <CardContent className="text-center relative z-10">
                 <p
-                  className={`transition-colors  ${
+                  className={`  ${
                     theme === "dark" ? "text-gray-300" : "text-gray-600"
                   }`}
                 >

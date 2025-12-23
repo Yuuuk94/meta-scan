@@ -23,7 +23,7 @@ export const RootFooter = ({ theme, ready }: RootFooterProps) => {
               }`}
             />
             <span
-              className={`transition-colors  ${
+              className={`  ${
                 theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >
