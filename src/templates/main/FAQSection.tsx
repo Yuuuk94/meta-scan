@@ -8,9 +8,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <section
-      className={`relative py-60 transition-all duration-300 overflow-hidden`}
-    >
+    <section className={`relative py-60   overflow-hidden`}>
       {/* Background Effects */}
       {theme === "dark" && (
         <>
@@ -27,7 +25,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
             <div className="relative mb-8">
               {theme === "dark" && (
                 <>
-                  <div className="absolute inset-0 blur-xl bg-gradient-to-r from-purple-500/30 via-cyan-500/20 to-pink-500/30 animate-pulse"></div>
+                  <div className="absolute inset-0 blur-xl bg-gradient-to-r from-purple-500/30 via-cyan-500/20 to-pink-500/30 "></div>
                   <div className="absolute -top-1 -left-1 w-4 h-4 border-l border-t border-purple-400/60"></div>
                   <div className="absolute -top-1 -right-1 w-4 h-4 border-r border-t border-cyan-400/60"></div>
                   <div className="absolute -bottom-1 -left-1 w-4 h-4 border-l border-b border-cyan-400/60"></div>
@@ -36,7 +34,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
               )}
 
               <h2
-                className={`relative text-4xl md:text-5xl font-bold mb-4 transition-all duration-500 ${
+                className={`relative text-4xl md:text-5xl font-bold mb-4  duration-500 ${
                   theme === "dark" ? "text-purple-300" : "text-gray-900"
                 }`}
               >
@@ -54,20 +52,20 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
               {/* Animated Underline */}
               <div className="relative mx-auto w-32 h-1.5">
                 <div
-                  className={`absolute inset-0 rounded-full transition-all duration-300 ${
+                  className={`absolute inset-0 rounded-full   ${
                     theme === "dark"
                       ? "bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400"
                       : "bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-600"
                   }`}
                 ></div>
                 {theme === "dark" && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 rounded-full blur-sm opacity-50 animate-pulse"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 rounded-full blur-sm opacity-50 "></div>
                 )}
               </div>
             </div>
 
             <p
-              className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${
+              className={`text-lg max-w-2xl mx-auto transition-colors  ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >
@@ -86,7 +84,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
             ].map((faq, index) => (
               <Card
                 key={faq.id}
-                className={`group transition-all duration-300 border overflow-hidden ${
+                className={`group   border overflow-hidden ${
                   theme === "dark"
                     ? "bg-gradient-to-br from-gray-900/80 to-black/60 backdrop-blur-md border-gray-700/50 hover:border-purple-400/30"
                     : "bg-gradient-to-br from-white to-gray-50/50 border-gray-200 hover:border-purple-300/50"
@@ -103,13 +101,13 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                 )}
 
                 <CardHeader
-                  className="cursor-pointer transition-all duration-300 relative z-10"
+                  className="cursor-pointer   relative z-10"
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center   ${
                           theme === "dark"
                             ? openFaq === index
                               ? "bg-purple-500/20 border border-purple-400/30"
@@ -120,10 +118,10 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                         }`}
                       >
                         {theme === "dark" && openFaq === index && (
-                          <div className="absolute inset-0 bg-purple-400/10 rounded-xl blur animate-pulse"></div>
+                          <div className="absolute inset-0 bg-purple-400/10 rounded-xl blur "></div>
                         )}
                         <HelpCircle
-                          className={`h-5 w-5 relative z-10 transition-colors duration-300 ${
+                          className={`h-5 w-5 relative z-10 transition-colors  ${
                             theme === "dark"
                               ? openFaq === index
                                 ? "text-purple-400"
@@ -135,7 +133,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                         />
                       </div>
                       <CardTitle
-                        className={`transition-colors duration-300 ${
+                        className={`transition-colors  ${
                           theme === "dark"
                             ? openFaq === index
                               ? "text-purple-300"
@@ -150,7 +148,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                     </div>
 
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      className={`w-8 h-8 rounded-full flex items-center justify-center   ${
                         theme === "dark"
                           ? "bg-gray-800/50 hover:bg-purple-500/20"
                           : "bg-gray-100 hover:bg-purple-100"
@@ -158,7 +156,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                     >
                       {openFaq === index ? (
                         <ChevronDown
-                          className={`h-4 w-4 transition-colors duration-300 ${
+                          className={`h-4 w-4 transition-colors  ${
                             theme === "dark"
                               ? "text-purple-400"
                               : "text-purple-600"
@@ -166,7 +164,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                         />
                       ) : (
                         <ChevronUp
-                          className={`h-4 w-4 transition-colors duration-300 ${
+                          className={`h-4 w-4 transition-colors  ${
                             theme === "dark" ? "text-gray-400" : "text-gray-500"
                           }`}
                         />
@@ -178,12 +176,12 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                 {openFaq === index && (
                   <CardContent className="pt-0 pb-6 relative z-10">
                     <div
-                      className={`transition-colors duration-300 ${
+                      className={`transition-colors  ${
                         theme === "dark" ? "text-gray-300" : "text-gray-600"
                       }`}
                     >
                       <div
-                        className={`p-4 rounded-xl border-l-4 transition-all duration-300 ${
+                        className={`p-4 rounded-xl border-l-4   ${
                           theme === "dark"
                             ? "bg-purple-500/10 border-purple-400/50"
                             : "bg-purple-50 border-purple-300"
@@ -201,7 +199,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
           {/* Contact CTA */}
           <div className="mt-12 text-center">
             <Card
-              className={`w-full inline-block transition-all duration-300 border ${
+              className={`w-full inline-block   border ${
                 theme === "dark"
                   ? "bg-gradient-to-r from-purple-500/10 to-cyan-500/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/50"
                   : "bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:border-purple-300"
@@ -209,7 +207,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
             >
               <CardContent className="p-6">
                 <p
-                  className={`mb-4 transition-colors duration-300 ${
+                  className={`mb-4 transition-colors  ${
                     theme === "dark" ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
@@ -218,7 +216,7 @@ export const FAQSection = ({ theme, lang, t }: DefaultPageProps) => {
                     : "여전히 질문이 있으신가요? AI 미래를 위한 웹사이트 최적화를 도와드리겠습니다."}
                 </p>
                 <Button
-                  className={`transition-all duration-300 ${
+                  className={`  ${
                     theme === "dark"
                       ? "bg-gradient-to-r from-purple-500 to-cyan-600 hover:from-purple-400 hover:to-cyan-500 text-white shadow-lg shadow-purple-500/20"
                       : "bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"

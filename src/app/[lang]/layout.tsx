@@ -53,7 +53,7 @@ export default async function RootLayout({
         className={`${RobotoSans.variable} ${geistMono.variable} antialiased`}
       >
         <div
-          className={`min-h-screen transition-all duration-300 ${
+          className={`min-h-screen   ${
             theme === "dark"
               ? "bg-gradient-to-br from-gray-900 via-black to-purple-900"
               : "bg-gradient-to-br from-blue-50 via-white to-purple-50"

@@ -18,7 +18,7 @@ export const ProcessStep = ({
 }: ProcessStep) => {
   return (
     <div
-      className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 border ${
+      className={`flex items-center gap-4 p-4 rounded-xl   border ${
         theme === "dark"
           ? isActive
             ? "bg-cyan-500/10 border-cyan-400/30 shadow-lg shadow-cyan-500/10"
@@ -33,7 +33,7 @@ export const ProcessStep = ({
       }`}
     >
       <div
-        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative ${
+        className={`w-12 h-12 rounded-full flex items-center justify-center   relative ${
           theme === "dark"
             ? isActive
               ? "bg-cyan-500/20 text-cyan-400 border border-cyan-400/40"
@@ -48,7 +48,7 @@ export const ProcessStep = ({
         }`}
       >
         {theme === "dark" && isActive && (
-          <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur animate-pulse"></div>
+          <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur "></div>
         )}
         {isActive ? (
           <Loader2 className="h-6 w-6 animate-spin relative z-10" />
@@ -58,7 +58,7 @@ export const ProcessStep = ({
       </div>
 
       <span
-        className={`font-medium transition-all duration-300 ${
+        className={`font-medium   ${
           theme === "dark"
             ? isActive
               ? "text-cyan-300"

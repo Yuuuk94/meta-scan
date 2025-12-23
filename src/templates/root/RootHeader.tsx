@@ -13,7 +13,7 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
 
   return (
     <header
-      className={`border-b sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${
+      className={`border-b sticky top-0 z-50 backdrop-blur-md   ${
         theme === "dark"
           ? "bg-black/50 border-cyan-500/20"
           : "bg-white/80 border-gray-200"
@@ -25,14 +25,14 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
           <Link href={`/${lang}`}>
             <div className="flex items-center gap-3 cursor-pointer">
               <div
-                className={`relative p-3 rounded-xl transition-all duration-300 ${
+                className={`relative p-3 rounded-xl   ${
                   theme === "dark"
                     ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30"
                     : "bg-gradient-to-r from-blue-500 to-purple-600"
                 }`}
               >
                 {theme === "dark" && (
-                  <div className="absolute inset-0 bg-cyan-400/10 rounded-xl blur animate-pulse"></div>
+                  <div className="absolute inset-0 bg-cyan-400/10 rounded-xl blur "></div>
                 )}
                 <Scan
                   className={`h-6 w-6 relative z-10 ${
@@ -42,7 +42,7 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
               </div>
               <div>
                 <p
-                  className={`text-xl font-bold transition-colors duration-300 ${
+                  className={`text-xl font-bold transition-colors  ${
                     theme === "dark"
                       ? "text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text"
                       : "text-gray-900"
@@ -51,7 +51,7 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
                   {t.title}
                 </p>
                 <p
-                  className={`text-sm transition-colors duration-300 font-mono ${
+                  className={`text-sm transition-colors  font-mono ${
                     theme === "dark" ? "text-gray-400" : "text-gray-600"
                   }`}
                 >

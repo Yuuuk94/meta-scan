@@ -8,7 +8,7 @@ interface RootFooterProps extends DefaultProps {
 export const RootFooter = ({ theme, ready }: RootFooterProps) => {
   return (
     <footer
-      className={`border-t py-8 transition-all duration-300 ${
+      className={`border-t py-8   ${
         theme === "dark"
           ? "bg-black/50 border-gray-800"
           : "bg-gray-50 border-gray-200"
@@ -23,7 +23,7 @@ export const RootFooter = ({ theme, ready }: RootFooterProps) => {
               }`}
             />
             <span
-              className={`transition-colors duration-300 ${
+              className={`transition-colors  ${
                 theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >

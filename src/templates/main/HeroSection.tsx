@@ -36,7 +36,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
     <section className="container mx-auto px-4 py-20">
       <div className="max-w-4xl mx-auto text-center">
         <Badge
-          className={`mb-6 border transition-all duration-300 ${
+          className={`mb-6 border   ${
             theme === "dark"
               ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-300 border-cyan-400/30"
               : "bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200"
@@ -53,7 +53,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
         </Badge>
 
         <h1
-          className={`text-6xl font-bold mb-6 transition-all duration-300 ${
+          className={`text-6xl font-bold mb-6   ${
             theme === "dark"
               ? "text-transparent bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text"
               : "text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text"
@@ -63,7 +63,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
         </h1>
 
         <p
-          className={`text-xl mb-16 max-w-2xl mx-auto transition-colors duration-300 ${
+          className={`text-xl mb-16 max-w-2xl mx-auto transition-colors  ${
             theme === "dark" ? "text-gray-300" : "text-gray-600"
           }`}
         >
@@ -76,12 +76,12 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
             {/* Multiple glow layers for cyberpunk effect */}
             {theme === "dark" && (
               <>
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500 animate-pulse"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-400/20 to-pink-400/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-3xl blur-2xl group-hover:blur-3xl  duration-500 "></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-400/20 to-pink-400/20 rounded-3xl blur-xl group-hover:blur-2xl  "></div>
               </>
             )}
             <div
-              className={`relative rounded-3xl p-3 border-2 transition-all duration-300 ${
+              className={`relative rounded-3xl p-3 border-2   ${
                 theme === "dark"
                   ? "bg-black/40 backdrop-blur-md border-cyan-500/30 group-hover:border-cyan-400/50 shadow-2xl shadow-cyan-500/10"
                   : "bg-white border-gray-200 group-hover:border-blue-300 shadow-lg"
@@ -89,7 +89,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
             >
               <div className="flex items-center gap-4">
                 <div
-                  className={`flex items-center gap-3 flex-1 p-4 rounded-2xl transition-all duration-300 ${
+                  className={`flex items-center gap-3 flex-1 p-4 rounded-2xl   ${
                     theme === "dark"
                       ? "bg-gray-900/50 border border-gray-700/50"
                       : "bg-gray-50 border border-gray-200"
@@ -105,7 +105,7 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
                     placeholder={t.urlPlaceholder as string}
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    className={`flex-1 border-0 bg-transparent text-lg placeholder:opacity-60 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300 ${
+                    className={`flex-1 border-0 bg-transparent text-lg placeholder:opacity-60 focus-visible:ring-0 focus-visible:ring-offset-0   ${
                       theme === "dark"
                         ? "text-white placeholder:text-gray-400"
                         : "text-gray-900 placeholder:text-gray-500"
@@ -123,14 +123,14 @@ export const HeroSection = ({ theme, lang, t }: DefaultPageProps) => {
 
                 <Button
                   onClick={handleAnalyze}
-                  className={`cursor-pointer p-8 rounded-2xl font-semibold text-lg transition-all duration-300 relative overflow-hidden group ${
+                  className={`cursor-pointer p-8 rounded-2xl font-semibold text-lg   relative overflow-hidden group ${
                     theme === "dark"
                       ? "bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
                       : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {theme === "dark" && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity "></div>
                   )}
                   <span className="relative z-10 flex items-center gap-2">
                     {t.analyzeButton}

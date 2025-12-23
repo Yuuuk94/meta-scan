@@ -165,7 +165,7 @@ export default async function ScanPage() {
     >;
   }) => (
     <Card
-      className={`relative group transition-all duration-500 border overflow-hidden ${
+      className={`relative group  duration-500 border overflow-hidden ${
         theme === "dark"
           ? `bg-gradient-to-br from-gray-900/80 to-black/60 backdrop-blur-md hover:shadow-2xl ${getScoreBg(
               score
@@ -184,7 +184,7 @@ export default async function ScanPage() {
           </div>
         </div>
         <CardTitle
-          className={`transition-colors duration-300 ${
+          className={`transition-colors  ${
             theme === "dark" ? "text-white" : "text-gray-900"
           }`}
         >
@@ -194,7 +194,7 @@ export default async function ScanPage() {
       <CardContent className="pt-0 relative z-10">
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
           <div
-            className={`h-2 rounded-full transition-all duration-1000 ${
+            className={`h-2 rounded-full  duration-1000 ${
               theme === "dark"
                 ? score >= 80
                   ? "bg-gradient-to-r from-cyan-400 to-cyan-500"
@@ -224,7 +224,7 @@ export default async function ScanPage() {
     falseText: string;
   }) => (
     <Badge
-      className={`transition-all duration-300 ${
+      className={`  ${
         condition
           ? theme === "dark"
             ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/30"
@@ -241,7 +241,7 @@ export default async function ScanPage() {
     <div className="container mx-auto px-4 py-8">
       {/* URL and Actions Bar */}
       <div
-        className={`mb-8 p-6 rounded-2xl border transition-all duration-300 ${
+        className={`mb-8 p-6 rounded-2xl border   ${
           theme === "dark"
             ? "bg-gray-900/50 backdrop-blur-md border-gray-700/50"
             : "bg-white/80 backdrop-blur-sm border-gray-200"
@@ -280,7 +280,7 @@ export default async function ScanPage() {
             <Button
               variant="outline"
               // onClick={onNewAnalysis}
-              className={`transition-all duration-300 ${
+              className={`  ${
                 theme === "dark"
                   ? "border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
                   : "border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -290,7 +290,7 @@ export default async function ScanPage() {
               {t.newAnalysis}
             </Button>
             <Button
-              className={`transition-all duration-300 ${
+              className={`  ${
                 theme === "dark"
                   ? "bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-lg shadow-cyan-500/20"
                   : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
@@ -306,7 +306,7 @@ export default async function ScanPage() {
       {/* AI Preparedness Score Hero */}
       <div className="mb-8">
         <Card
-          className={`relative overflow-hidden border-2 transition-all duration-500 ${
+          className={`relative overflow-hidden border-2  duration-500 ${
             theme === "dark"
               ? "bg-gradient-to-br from-gray-900/80 to-black/60 backdrop-blur-md border-cyan-500/30 hover:border-cyan-400/50 shadow-2xl shadow-cyan-500/10"
               : "bg-gradient-to-br from-white to-blue-50 border-blue-200 hover:border-blue-300 shadow-xl"
@@ -314,7 +314,7 @@ export default async function ScanPage() {
         >
           {theme === "dark" && (
             <>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 "></div>
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400"></div>
             </>
           )}
@@ -328,7 +328,7 @@ export default async function ScanPage() {
                 }`}
               >
                 {theme === "dark" && (
-                  <div className="absolute inset-0 bg-cyan-400/10 rounded-2xl blur animate-pulse"></div>
+                  <div className="absolute inset-0 bg-cyan-400/10 rounded-2xl blur "></div>
                 )}
                 <Sparkles
                   className={`h-8 w-8 relative z-10 ${
@@ -337,7 +337,7 @@ export default async function ScanPage() {
                 />
               </div>
               <CardTitle
-                className={`text-3xl transition-colors duration-300 ${
+                className={`text-3xl transition-colors  ${
                   theme === "dark"
                     ? "text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text"
                     : "text-gray-900"
@@ -356,7 +356,7 @@ export default async function ScanPage() {
             <div className="max-w-md mx-auto">
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
                 <div
-                  className={`h-4 rounded-full transition-all duration-1000 ${
+                  className={`h-4 rounded-full  duration-1000 ${
                     theme === "dark"
                       ? "bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 shadow-lg shadow-cyan-500/20"
                       : "bg-gradient-to-r from-blue-500 to-purple-600"
@@ -384,7 +384,7 @@ export default async function ScanPage() {
         >
           <TabsTrigger
             value="overview"
-            className={`transition-all duration-300 ${
+            className={`  ${
               theme === "dark"
                 ? "data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 data-[state=active]:border-cyan-400/30"
                 : "data-[state=active]:bg-white data-[state=active]:text-blue-700"
@@ -395,7 +395,7 @@ export default async function ScanPage() {
           </TabsTrigger>
           <TabsTrigger
             value="details"
-            className={`transition-all duration-300 ${
+            className={`  ${
               theme === "dark"
                 ? "data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 data-[state=active]:border-purple-400/30"
                 : "data-[state=active]:bg-white data-[state=active]:text-purple-700"
@@ -406,7 +406,7 @@ export default async function ScanPage() {
           </TabsTrigger>
           <TabsTrigger
             value="raw"
-            className={`transition-all duration-300 ${
+            className={`  ${
               theme === "dark"
                 ? "data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-300 data-[state=active]:border-pink-400/30"
                 : "data-[state=active]:bg-white data-[state=active]:text-pink-700"
@@ -450,7 +450,7 @@ export default async function ScanPage() {
 
           {/* AI Signals */}
           <Card
-            className={`transition-all duration-300 border ${
+            className={`  border ${
               theme === "dark"
                 ? "bg-gray-900/50 backdrop-blur-md border-gray-700/50"
                 : "bg-white/80 border-gray-200"
@@ -558,7 +558,7 @@ export default async function ScanPage() {
           {/* Improvements */}
           {result.improvements.length > 0 && (
             <Card
-              className={`transition-all duration-300 border ${
+              className={`  border ${
                 theme === "dark"
                   ? "bg-gray-900/50 backdrop-blur-md border-gray-700/50"
                   : "bg-white/80 border-gray-200"
@@ -607,7 +607,7 @@ export default async function ScanPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Indexing */}
             <Card
-              className={`transition-all duration-300 border ${
+              className={`  border ${
                 theme === "dark"
                   ? "bg-gray-900/50 backdrop-blur-md border-gray-700/50"
                   : "bg-white/80 border-gray-200"
@@ -683,7 +683,7 @@ export default async function ScanPage() {
 
             {/* Content Stats */}
             <Card
-              className={`transition-all duration-300 border ${
+              className={`  border ${
                 theme === "dark"
                   ? "bg-gray-900/50 backdrop-blur-md border-gray-700/50"
                   : "bg-white/80 border-gray-200"
@@ -763,7 +763,7 @@ export default async function ScanPage() {
 
         <TabsContent value="raw">
           <Card
-            className={`transition-all duration-300 border ${
+            className={`  border ${
               theme === "dark"
                 ? "bg-gray-900/50 backdrop-blur-md border-gray-700/50"
                 : "bg-white/80 border-gray-200"
