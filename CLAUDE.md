@@ -131,3 +131,13 @@ Next.js App Router with locale-prefixed routing under `src/app/[lang]/`.
   allow-list + Swagger server URL), `CHROME_PATH` (Chromium binary for `chrome-launcher`,
   set in `dockerfile` for the container image).
 - `meta-scan-front`: `NEXT_PUBLIC_META_SCAN_API` (base URL of `meta-scan-api`).
+
+For local dev, `meta-scan-front` needs `packages/meta-scan-front/.env.local` with
+`NEXT_PUBLIC_META_SCAN_API=http://localhost:8080` to reach a locally-running `meta-scan-api`
+(`pnpm dev:api`). This file is gitignored and not created automatically.
+
+## Per-package guidance
+
+`packages/meta-scan-api/CLAUDE.md` and `packages/meta-scan-front/CLAUDE.md` hold
+package-scoped detail (loaded automatically when working inside that directory); this file
+is the monorepo-wide entry point — prefer it for cross-package/workspace commands.
