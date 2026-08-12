@@ -1,0 +1,22 @@
+{
+  "name": "meta-scan",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "dev:api": "pnpm --filter meta-scan-api dev",
+    "dev:front": "pnpm --filter meta-scan-front dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r --if-present typecheck"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@scarf/scarf",
+      "esbuild",
+      "puppeteer",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}

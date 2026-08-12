@@ -5,9 +5,13 @@
 node_modules/
 dist/
 build/
+.next/
 .env
 .env.*
 !.env.example
 
 # Logs
 *.log
+
+# pnpm
+.pnpm-store/
