@@ -1,19 +1,32 @@
+# Build context must be the monorepo ROOT (not this package dir) so pnpm can see the
+# workspace lockfile. See the `build:docker` script in this package's package.json.
+#
+#   docker build -f packages/meta-scan-api/dockerfile -t meta-scan-api .   # from repo root
+
 # ---- build stage ----
 FROM node:20-slim AS build
 WORKDIR /app
 
-# 빌드에 필요한 OS 패키지 (선택: openssl 등)
 RUN apt-get update && apt-get install -y --no-install-recommends \
   ca-certificates git && \
   rm -rf /var/lib/apt/lists/*
 
-COPY package*.json ./
-# devDependencies 포함 설치(빌드용)
-RUN npm ci
+RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
 
-COPY tsconfig.json ./
-COPY src ./src
-RUN npm run build
+# Workspace manifests first for better layer caching
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY packages/meta-scan-api/package.json ./packages/meta-scan-api/package.json
+COPY packages/meta-scan-front/package.json ./packages/meta-scan-front/package.json
+
+RUN pnpm install --frozen-lockfile
+
+COPY packages/meta-scan-api ./packages/meta-scan-api
+
+RUN pnpm --filter meta-scan-api build
+
+# Produce a self-contained, production-only copy of just this package
+# (resolves pnpm's symlinked node_modules into real files, safe to copy standalone)
+RUN pnpm --filter meta-scan-api deploy --prod --legacy /deploy/meta-scan-api
 
 # ---- runtime stage ----
 FROM node:20-slim
@@ -27,12 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   ca-certificates && \
   rm -rf /var/lib/apt/lists/*
 
-# 런타임 의존성만 설치
-COPY package*.json ./
-RUN npm ci --omit=dev
-
-# 빌드 산출물 복사
-COPY --from=build /app/dist ./dist
+COPY --from=build /deploy/meta-scan-api ./
 
 # Cloud Run 기본 포트
 ENV PORT=8080

@@ -37,15 +37,10 @@ pnpm --filter meta-scan-api typecheck     # tsc --noEmit
 
 There are no test scripts in either package — do not assume a test runner exists.
 
-**Known gap:** `meta-scan-api`'s `lint` script (`eslint .`) currently fails — the package
-has ESLint deps/config in `package.json` but no `eslint.config.js` file exists. Add one
-before relying on that script.
-
-**Known gap:** `packages/meta-scan-api/dockerfile` still runs `npm ci` against a
-`package*.json` it copies in, but the package no longer has its own lockfile (it lives at
-the workspace root as `pnpm-lock.yaml`). The Docker build needs to be updated to a pnpm
-workspace-aware build (e.g. copy the root `pnpm-lock.yaml`/`pnpm-workspace.yaml` and use
-`pnpm deploy` or `pnpm install --filter`) before it will work again.
+```bash
+pnpm --filter meta-scan-api build:docker  # build the Docker image (context = repo root,
+                                           # see "Docker build" below)
+```
 
 Native/build-script deps (`puppeteer`, `esbuild`, `sharp`, etc.) are explicitly allow-listed
 in root `package.json` under `pnpm.onlyBuiltDependencies` — pnpm blocks install scripts by
@@ -90,6 +85,21 @@ build time — always import via the alias, not relative paths across module bou
   `CHROME_PATH` in the runtime image (installed via `apt-get install chromium` in the
   Dockerfile) since `lighthouse`'s `chrome-launcher` needs a browser binary, distinct from
   Puppeteer's own bundled Chromium.
+
+#### Docker build
+
+`dockerfile` is workspace-aware: its **build context must be the repo root**, not the
+package dir (it needs `pnpm-workspace.yaml`/`pnpm-lock.yaml`), so always build via
+`pnpm --filter meta-scan-api build:docker` (which passes `../..` as context) or
+`pnpm docker:build:api` from the root — not a bare `docker build .` inside the package.
+Internally it runs `pnpm --filter meta-scan-api build` then
+`pnpm --filter meta-scan-api deploy --prod --legacy /deploy/meta-scan-api` to produce a
+standalone `node_modules` (pnpm's workspace `node_modules` is symlink-based and not
+copy-safe on its own) and copies only that into the runtime stage. This relies on
+`package.json`'s `"files": ["dist"]` — without it, `pnpm deploy` follows git-tracked-files
+rules and silently drops `dist/` (which is gitignored). `--legacy` is required because
+`meta-scan-api` has no in-workspace dependencies to inject (plain `pnpm deploy` on pnpm 10
+refuses non-injected workspaces).
 
 ### meta-scan-front
 

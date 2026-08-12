@@ -8,7 +8,8 @@
     "dev:front": "pnpm --filter meta-scan-front dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r --if-present typecheck"
+    "typecheck": "pnpm -r --if-present typecheck",
+    "docker:build:api": "docker build -f packages/meta-scan-api/dockerfile -t meta-scan-api ."
   },
   "pnpm": {
     "onlyBuiltDependencies": [

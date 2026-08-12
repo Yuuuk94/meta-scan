@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "description": "",
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build:docker": "docker build -t meta-scan-api .",
+    "build:docker": "docker build -f dockerfile -t meta-scan-api ../..",
     "start:docker": "docker run -d -p 8080:8080 meta-scan-api",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "start": "node dist/app.js",
