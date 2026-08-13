@@ -2,6 +2,25 @@
 
 이 파일은 이 저장소에서 작업할 때 Claude Code(claude.ai/code)에게 제공하는 가이드입니다.
 
+## 프로젝트 목적과 현재 상태
+
+**제품 의도**: URL 하나를 입력받아 메타 태그/robots.txt/sitemap/Lighthouse(성능·SEO·접근성·모범사례)를
+스캔해 결과를 보여주는 사이트 진단 서비스. 여기서 한 걸음 더 나아가 "Lighthouse가 다루지 않는 AI 시대의
+발견 가능성"(구조화 데이터, `prompts.txt` 같은 AI 신호, 인용 친화성/GEO, AEO 준비도 등)까지 0–100점
+스코어로 합산해 보여주는 **"Lighthouse+/AI Preparedness"** 제품으로 확장하는 중입니다. 기획 배경/스코어링
+규칙/무엇이 이미 있고 무엇이 없는지는 `docs/meta-scan-plus-prd.md`에 정리되어 있습니다 — 스캔/스코어링
+관련 작업을 시작하기 전에 먼저 읽으세요.
+
+**현재 상태(중요, 착각하기 쉬운 지점)**: 백엔드의 개별 스캔 엔드포인트(`ping`/`robotsTxt`/`siteMap`/
+`crawling`/`lighthouse run`)는 각각 정상 동작하지만, 이를 합산해 하나의 점수로 반환하는
+`/api/v1/scan/analyze` 같은 통합 엔드포인트는 아직 없습니다. 프런트의 `/scan` 결과 페이지 UI(배지, AI
+Signals 카드, Indexing 카드, 탭 등)는 이미 다 그려져 있지만, 그 화면이 렌더링하는 데이터는 서버 컴포넌트
+안에서 `Math.random()`으로 만든 목업이고(`packages/meta-scan-front/src/app/[lang]/scan/page.tsx`),
+직전 단계인 `ProcessScreen`은 4개 스캔 API를 병렬 호출하긴 하지만 응답 바디를 저장하지 않고
+성공 여부(`status === "ok"`)만 확인한 뒤 버립니다. 즉 "새 UI를 만드는 일"이 아니라
+**"이미 있는 UI/API 사이에 파이프를 연결하고, 그 사이에서 점수를 계산하는 로직을 채우는 일"**이 현재
+남은 작업의 본질입니다.
+
 ## 저장소 구조
 
 두 패키지를 `git subtree`로 합친 pnpm workspace 모노레포입니다 (각 패키지는 원본 커밋 히스토리를
