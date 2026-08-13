@@ -172,6 +172,28 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
 `packages/meta-scan-front/.env.local`에 `NEXT_PUBLIC_META_SCAN_API=http://localhost:8080`이
 필요합니다. 이 파일은 gitignore 대상이며 자동으로 생성되지 않습니다.
 
+## 참고 문서
+
+`docs/index.html`이 허브입니다 — 아래 4개 시각화 페이지(주제별 폴더 + 상단 공통 탭 네비게이션)로
+연결됩니다. 원본 마크다운 문서는 `docs/` 루트에 그대로 있고, 각 시각화 페이지에서 원문 링크로
+참조합니다:
+
+- `docs/index.html` — 문서 허브. 아래 4개 페이지로 가는 카드 + 원본 md 링크.
+- `docs/prd/index.html` — 제품 컨셉·기획 의도, PRD 요약(현재 구현 상태/스코어링 규칙/스코프 제외),
+  유저 플로우(AS-IS/TO-BE). 원문은 `docs/meta-scan-plus-prd.md`.
+- `docs/design/index.html` — 저장소 구조, 프론트/백엔드 스택·구현 패턴, 공통 영역(테스트/Git/
+  CI-CD 현황).
+- `docs/adr/index.html` — 설계 결정 기록(ADR). ADR-001(모노레포 도구 선택, 원문은
+  `docs/monorepo-dependency-management.md`), ADR-002(Git 훅 기반 린트·커밋 컨벤션). 새 결정이
+  생기면 여기 계속 추가.
+- `docs/architecture/index.html` — `src/` 기준 모듈/컴포넌트 의존성 mermaid 그래프
+  (`/mermaid-diagram` 스킬로 생성, 코드가 바뀌면 재실행해서 갱신 — 스킬이 이 경로에 고정 출력하므로
+  옮기지 마세요).
+
+위 4개 시각화 페이지는 모두 실제 코드/커밋을 스캔해 확인한 사실 기준으로 작성됐고, 빌드 도구 없이
+정적 HTML을 그대로 서빙합니다(CSS/상단 네비는 페이지마다 인라인 복붙 — 네비 구조를 바꾸면 4개 파일
+모두 고쳐야 합니다).
+
 ## 패키지별 가이드
 
 `packages/meta-scan-api/CLAUDE.md`와 `packages/meta-scan-front/CLAUDE.md`에는 패키지 범위의
