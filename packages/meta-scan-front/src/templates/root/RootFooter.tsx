@@ -1,45 +1,33 @@
-import { ServiceStatus } from "./ServiceStatus";
+import Link from "next/link";
 import { Scan } from "lucide-react";
+import { getDictionary } from "@/dictionaries";
+import { ServiceStatus } from "./ServiceStatus";
 
 interface RootFooterProps extends DefaultProps {
   ready: boolean;
 }
 
-export const RootFooter = ({ theme, ready }: RootFooterProps) => {
+export const RootFooter = async ({ lang, ready }: RootFooterProps) => {
+  const t = (await getDictionary(lang)).footer;
+
   return (
-    <footer
-      className={`border-t py-8   ${
-        theme === "dark"
-          ? "bg-black/50 border-gray-800"
-          : "bg-gray-50 border-gray-200"
-      }`}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Scan
-              className={`h-5 w-5 ${
-                theme === "dark" ? "text-cyan-400" : "text-blue-600"
-              }`}
-            />
-            <span
-              className={`  ${
-                theme === "dark" ? "text-gray-400" : "text-gray-600"
-              }`}
-            >
-              &copy; 2025 Meta-Scan. All rights reserved.
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <ServiceStatus fullLabel ready={ready} />
-            <div
-              className={`${
-                theme === "dark" ? "text-gray-500" : "text-gray-400"
-              } font-mono text-xs`}
-            >
-              v0.1.0 | UPTIME: 99.9% | SCANS: 247,891
-            </div>
-          </div>
+    <footer className="border-t border-border bg-muted/40">
+      <div className="container mx-auto flex flex-col items-center gap-4 px-4 py-8 sm:flex-row sm:justify-between">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Scan className="h-4 w-4" />
+          <span className="text-sm">{t.copyright}</span>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <nav className="flex items-center gap-4 text-sm text-muted-foreground">
+            <Link href={`/${lang}/privacy`} className="hover:text-foreground">
+              {t.privacy}
+            </Link>
+            <Link href={`/${lang}/terms`} className="hover:text-foreground">
+              {t.terms}
+            </Link>
+          </nav>
+          <ServiceStatus fullLabel ready={ready} />
         </div>
       </div>
     </footer>

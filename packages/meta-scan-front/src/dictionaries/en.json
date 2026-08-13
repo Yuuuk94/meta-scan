@@ -3,6 +3,27 @@
     "title": "Meta-Scan",
     "subtitle": "AI-Friendly AEO & SEO Analyzer"
   },
+  "footer": {
+    "copyright": "© 2026 Meta-Scan. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The address is incorrect or the page has moved.",
+    "action": "Back to home"
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "description": "An error occurred while processing your request. Please try again in a moment.",
+    "retry": "Try again",
+    "home": "Back to home"
+  },
+  "legal": {
+    "privacyTitle": "Privacy Policy",
+    "termsTitle": "Terms of Service",
+    "updated": "Last updated"
+  },
   "main": {
     "title": "Meta-Scan",
     "subtitle": "AI-Friendly SEO Analyzer",
@@ -46,7 +67,10 @@
       "Generating report"
     ],
     "analyzingText": "Analyzing your site...",
-    "analyzingSubtext": "Fetching meta tags, structured data, AI signals."
+    "analyzingSubtext": "Fetching meta tags, structured data, AI signals.",
+    "errorTitle": "Analysis failed",
+    "errorSubtitle": "Please check the URL and try again.",
+    "goBack": "Back to home"
   },
   "scan": {
     "title": "Meta-Scan",

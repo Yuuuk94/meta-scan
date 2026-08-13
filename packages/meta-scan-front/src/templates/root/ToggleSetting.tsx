@@ -32,11 +32,7 @@ export const ToggleSetting = ({ theme, lang }: DefaultProps) => {
         variant="ghost"
         size="sm"
         onClick={setTheme}
-        className={`flex items-center gap-2   ${
-          theme === "dark"
-            ? "text-gray-200 hover:bg-cyan-500/10 hover:text-white"
-            : "text-gray-600 hover:bg-gray-100 hover:text-gray-600"
-        }`}
+        className="text-muted-foreground hover:text-foreground"
       >
         {theme === "dark" ? (
           <Sun className="h-4 w-4" />
@@ -48,11 +44,7 @@ export const ToggleSetting = ({ theme, lang }: DefaultProps) => {
         variant="ghost"
         size="sm"
         onClick={setLang}
-        className={`flex items-center gap-2   ${
-          theme === "dark"
-            ? "text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300"
-            : "text-gray-600 hover:bg-gray-100 hover:text-gray-600"
-        }`}
+        className="text-muted-foreground hover:text-foreground"
       >
         <Languages className="h-4 w-4" />
         {lang === "en" ? "한국어" : "English"}

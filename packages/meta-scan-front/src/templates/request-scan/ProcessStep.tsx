@@ -9,69 +9,45 @@ interface ProcessStep extends DefaultProps {
   >;
 }
 export const ProcessStep = ({
-  theme,
   lang,
   txt,
   isCompleted,
   isActive,
   IconComponent,
 }: ProcessStep) => {
+  const state = isActive ? "active" : isCompleted ? "done" : "idle";
+
+  const rowClass = {
+    active: "border-primary/30 bg-primary/5",
+    done: "border-success/30 bg-success/5",
+    idle: "border-border bg-muted/30",
+  }[state];
+
+  const badgeClass = {
+    active: "border border-primary/40 bg-primary/10 text-primary",
+    done: "border border-success/40 bg-success/10 text-success",
+    idle: "border border-border bg-muted text-muted-foreground",
+  }[state];
+
+  const textClass = {
+    active: "text-primary",
+    done: "text-success",
+    idle: "text-muted-foreground",
+  }[state];
+
   return (
-    <div
-      className={`flex items-center gap-4 p-4 rounded-xl   border ${
-        theme === "dark"
-          ? isActive
-            ? "bg-cyan-500/10 border-cyan-400/30 shadow-lg shadow-cyan-500/10"
-            : isCompleted
-            ? "bg-green-500/10 border-green-400/30"
-            : "bg-gray-800/30 border-gray-700/30"
-          : isActive
-          ? "bg-blue-50 border-blue-200"
-          : isCompleted
-          ? "bg-green-50 border-green-200"
-          : "bg-gray-50 border-gray-200"
-      }`}
-    >
+    <div className={`flex items-center gap-4 rounded-xl border p-4 ${rowClass}`}>
       <div
-        className={`w-12 h-12 rounded-full flex items-center justify-center   relative ${
-          theme === "dark"
-            ? isActive
-              ? "bg-cyan-500/20 text-cyan-400 border border-cyan-400/40"
-              : isCompleted
-              ? "bg-green-500/20 text-green-400 border border-green-400/40"
-              : "bg-gray-700/50 text-gray-500 border border-gray-600/40"
-            : isActive
-            ? "bg-blue-500 text-white"
-            : isCompleted
-            ? "bg-green-500 text-white"
-            : "bg-gray-300 text-gray-600"
-        }`}
+        className={`flex h-12 w-12 items-center justify-center rounded-full ${badgeClass}`}
       >
-        {theme === "dark" && isActive && (
-          <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur "></div>
-        )}
         {isActive ? (
-          <Loader2 className="h-6 w-6 animate-spin relative z-10" />
+          <Loader2 className="h-6 w-6 animate-spin" />
         ) : (
-          <IconComponent className="h-6 w-6 relative z-10" />
+          <IconComponent className="h-6 w-6" />
         )}
       </div>
 
-      <span
-        className={`font-medium   ${
-          theme === "dark"
-            ? isActive
-              ? "text-cyan-300"
-              : isCompleted
-              ? "text-green-400"
-              : "text-gray-400"
-            : isActive
-            ? "text-blue-700"
-            : isCompleted
-            ? "text-green-700"
-            : "text-gray-500"
-        }`}
-      >
+      <span className={`font-medium ${textClass}`}>
         {txt}
         {lang === "ko"
           ? isActive
@@ -82,7 +58,7 @@ export const ProcessStep = ({
           : isActive
           ? "..."
           : isCompleted
-          ? " complite"
+          ? " complete"
           : " failed"}
       </span>
     </div>

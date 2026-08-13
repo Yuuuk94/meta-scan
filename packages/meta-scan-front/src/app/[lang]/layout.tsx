@@ -52,18 +52,10 @@ export default async function RootLayout({
       <body
         className={`${RobotoSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div
-          className={`min-h-screen   ${
-            theme === "dark"
-              ? "bg-gradient-to-br from-gray-900 via-black to-purple-900"
-              : "bg-gradient-to-br from-blue-50 via-white to-purple-50"
-          }`}
-        >
+        <div className="min-h-screen bg-background">
           <RootHeader theme={theme} lang={lang} ready={ready} />
           <main className="min-h-screen">
-            <Suspense fallback={<Loading theme={theme} lang={lang} />}>
-              {children}
-            </Suspense>
+            <Suspense fallback={<Loading />}>{children}</Suspense>
           </main>
           <RootFooter theme={theme} lang={lang} ready={ready} />
         </div>

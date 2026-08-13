@@ -1,19 +1,19 @@
 const statusOptions = {
   online: {
-    bgColor: "bg-green-400",
-    color: "text-green-400",
+    dot: "bg-success",
+    text: "text-success",
     label: "ONLINE",
     fullLabel: "SYSTEM_ONLINE",
   },
   warn: {
-    bgColor: "bg-orange-400",
-    color: "text-orange-400",
+    dot: "bg-warning",
+    text: "text-warning",
     label: "WARNING",
     fullLabel: "SYSTEM_WARNING",
   },
   off: {
-    bgColor: "bg-red-400",
-    color: "text-red-400",
+    dot: "bg-destructive",
+    text: "text-destructive",
     label: "OFFLINE",
     fullLabel: "SYSTEM_OFFLINE",
   },
@@ -30,11 +30,11 @@ export const ServiceStatus = ({
 }: ServiceStatusProps) => {
   const status = ready ? "online" : "warn";
 
-  const currentStatus = statusOptions[status!];
+  const currentStatus = statusOptions[status];
   return (
     <div className="flex items-center gap-2">
-      <div className={`w-2 h-2 ${currentStatus.bgColor} rounded-full `} />
-      <span className={`text-xs font-mono ${currentStatus.color}`}>
+      <div className={`h-2 w-2 rounded-full ${currentStatus.dot}`} />
+      <span className={`font-mono text-xs ${currentStatus.text}`}>
         {fullLabel ? currentStatus.fullLabel : currentStatus.label}
       </span>
     </div>

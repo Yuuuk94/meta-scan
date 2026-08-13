@@ -1,85 +1,121 @@
 @import "tailwindcss";
 
-/* @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *)); */
+/* Sync Tailwind's `dark:` variant with the app's cookie-driven theme
+ * (`<html data-theme="dark|light">`, set in layout.tsx / ToggleSetting.tsx)
+ * instead of the OS `prefers-color-scheme`. This was previously commented
+ * out, which left components/ui/* (button, badge, tabs) responding to the
+ * OS setting while the rest of the app followed the theme cookie. */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 :root {
-  --font-size: 14px;
+  --font-size: 15px;
+
+  /* Neutral scale (cool gray, single family) */
   --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
+  --foreground: #16181d;
   --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
+  --card-foreground: #16181d;
+  --popover: #ffffff;
+  --popover-foreground: #16181d;
+  --muted: #f4f5f7;
+  --muted-foreground: #686e79;
+  --border: #e6e8ec;
+  --input: #e6e8ec;
+  --input-background: #f7f8fa;
+
+  /* Single accent: indigo */
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #eef0ff;
+  --secondary-foreground: #362f9e;
+  --accent: #eef0ff;
+  --accent-foreground: #362f9e;
+  --ring: #4f46e5;
+
+  /* Status (used for score bands, not decoration) */
+  --success: #16803c;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --destructive: #d1293d;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
+
+  --switch-background: #d5d7dd;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+
+  /* Shadows tinted toward the accent hue instead of flat black */
+  --elevation-sm: 0 1px 2px rgba(30, 27, 75, 0.05);
+  --elevation-md: 0 6px 16px -4px rgba(45, 39, 130, 0.1);
+  --elevation-lg: 0 20px 40px -12px rgba(45, 39, 130, 0.18);
+
+  /* Sequential/qualitative chart scale, one hue family, muted saturation */
+  --chart-1: #4f46e5;
+  --chart-2: #0f9d8b;
+  --chart-3: #6b7280;
+  --chart-4: #b45309;
+  --chart-5: #be185d;
+
+  --sidebar: #f7f8fa;
+  --sidebar-foreground: #16181d;
+  --sidebar-primary: #4f46e5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef0ff;
+  --sidebar-accent-foreground: #362f9e;
+  --sidebar-border: #e6e8ec;
+  --sidebar-ring: #4f46e5;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --font-weight-medium: 500;
-    --font-weight-normal: 400;
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
-  }
+/* Dark mode: tinted charcoal, never pure black — driven by [data-theme=dark] */
+:root[data-theme="dark"] {
+  --background: #0b0c10;
+  --foreground: #eceef1;
+  --card: #131419;
+  --card-foreground: #eceef1;
+  --popover: #131419;
+  --popover-foreground: #eceef1;
+  --muted: #1a1c22;
+  --muted-foreground: #9a9fab;
+  --border: #24262e;
+  --input: #24262e;
+  --input-background: #1a1c22;
+
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --secondary: #1c1b3a;
+  --secondary-foreground: #c7d2fe;
+  --accent: #1c1b3a;
+  --accent-foreground: #c7d2fe;
+  --ring: #6366f1;
+
+  --success: #34a260;
+  --success-foreground: #05170c;
+  --warning: #d69433;
+  --warning-foreground: #1a1103;
+  --destructive: #e35267;
+  --destructive-foreground: #1a0407;
+
+  --switch-background: #33363f;
+
+  --elevation-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --elevation-md: 0 6px 20px -4px rgba(0, 0, 0, 0.45);
+  --elevation-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.55);
+
+  --chart-1: #818cf8;
+  --chart-2: #2dd4bf;
+  --chart-3: #9ca3af;
+  --chart-4: #d69433;
+  --chart-5: #ec4899;
+
+  --sidebar: #131419;
+  --sidebar-foreground: #eceef1;
+  --sidebar-primary: #6366f1;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1c1b3a;
+  --sidebar-accent-foreground: #c7d2fe;
+  --sidebar-border: #24262e;
+  --sidebar-ring: #6366f1;
 }
 
 @theme inline {
@@ -97,6 +133,10 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -121,8 +161,11 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --shadow-sm: var(--elevation-sm);
+  --shadow-md: var(--elevation-md);
+  --shadow-lg: var(--elevation-lg);
 }
-/* 
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -131,63 +174,12 @@
   body {
     @apply bg-background text-foreground;
   }
-} */
-
-/**
- * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
- */
-/* @layer base {
-  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
-    h1 {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    h2 {
-      font-size: var(--text-xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    h3 {
-      font-size: var(--text-lg);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    h4 {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    p {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
-    }
-
-    label {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    button {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    input {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
-    }
-  }
-} */
+}
 
 html {
   font-size: var(--font-size);
+}
+
+body {
+  font-feature-settings: "tnum" 1;
 }
