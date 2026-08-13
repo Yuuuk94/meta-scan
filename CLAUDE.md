@@ -46,6 +46,27 @@ pnpm --filter meta-scan-api build:docker  # Docker 이미지 빌드 (컨텍스�
 script를 차단하므로, 새 네이티브 의존성을 추가할 때는 여기에도 등록해야 postinstall(예: puppeteer의
 Chromium 다운로드)이 조용히 스킵되지 않습니다.
 
+## Git 훅 & 커밋 컨벤션
+
+`pnpm install` 시 루트 `package.json`의 `prepare` 스크립트가 `husky`를 실행해 `.husky/`의 훅을
+활성화합니다 (별도 설정 불필요, 클론 후 `pnpm install`만 하면 적용됩니다).
+
+- **pre-commit** — `lint-staged`가 스테이지된 파일만 골라 패키지별 ESLint를 `--fix`로 실행합니다
+  (`pnpm --filter meta-scan-api exec eslint --fix` / `pnpm --filter meta-scan-front exec eslint
+  --fix`, 대상 glob은 루트 `package.json`의 `lint-staged` 필드에 정의). 두 패키지가 공유하는
+  ESLint 규칙은 `eslint.config.base.mjs`에 있고, 각 패키지 `eslint.config.js`/`.mjs`가 이를
+  import해서 프레임워크별 규칙 위에 합성합니다.
+- **commit-msg** — `commitlint`가 [Conventional Commits](https://www.conventionalcommits.org/)
+  형식(`<type>(<scope>)?: <subject>`)을 강제합니다. 허용 `type`은
+  `build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test`이며 규칙은
+  `commitlint.config.mjs`(`@commitlint/config-conventional` 그대로 사용). `scope`는 필수는
+  아니지만, 모노레포 특성상 어느 패키지를 건드렸는지 표시하고 싶으면 `feat(api): ...`,
+  `fix(front): ...`처럼 패키지명을 scope로 쓰는 걸 권장합니다. 예: `chore: add commitlint`,
+  `fix(api): handle empty robots.txt response`.
+
+이 컨벤션은 이 훅이 도입된 시점(2026-08) 이후 커밋부터 적용됩니다 — 그 이전 히스토리는 형식이
+자유롭습니다.
+
 ## 아키텍처
 
 ### meta-scan-api
