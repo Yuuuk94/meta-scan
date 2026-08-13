@@ -173,6 +173,76 @@
     </div>
   </div>
 
+  <div class="card" id="adr-003">
+    <h3 style="margin-top:0;">ADR-003 — 유저 플로우 통합: 4-API 오케스트레이션 + 프론트 스코어링 유지</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-13 (기획 인터뷰로 확정, 구현 착수 전 — <a href="../prd/index.html#userflow">PRD 페이지 3장</a>에 결과 반영)</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p>PRD가 제안한 TO-BE(단일 <code>POST /api/v1/scan/analyze</code> 엔드포인트로 4개 API 호출을
+      대체)와 실제 코드의 AS-IS(<code>ProcessScreen</code>이 4개 API를 병렬 호출하지만 응답을 버리고
+      <code>/scan</code>은 <code>Math.random()</code> 목업을 렌더) 사이에 다음 충돌/공백이
+      확인됐습니다:</p>
+    <ul>
+      <li><code>/api/v1/scan/analyze</code> 엔드포인트와 스코어링 엔진이 실제로는 존재하지 않음</li>
+      <li>AI 신호 추출 로직(구조화 데이터/prompts.txt/FAQ 등)이 백엔드 어디에도 없음</li>
+      <li>TO-BE가 전제하는 zustand 상태전달과 달리 <code>scanStore.ts</code>는 미사용 죽은 코드이고
+        <code>/scan</code>은 서버 컴포넌트</li>
+      <li>API 호출이 4개→1개로 줄면 <code>ProcessScreen</code>의 5단계 진행 UI가 실제 진행률을
+        반영할 수 없게 됨</li>
+      <li>기존 4개 개별 API 함수가 단일 엔드포인트로 대체되면 사실상 미사용 코드가 될 상황</li>
+    </ul>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li><strong>상태 전달은 PRD대로 zustand 스토어</strong> — <code>/scan</code>을 클라이언트
+        컴포넌트로 전환하고 <code>scanStore.ts</code>를 재구현해 분석 결과(url → 원본 응답 + 점수)를
+        저장·조회</li>
+      <li><strong>단일 <code>scanAnalyzeApi</code>로 교체하지 않고, 기존 4개 API(robots/sitemap/
+        crawling/lighthouse) 호출을 그대로 유지</strong> — <code>ProcessScreen</code>의 5단계 진행
+        애니메이션이 각 API의 실제 완료 시점에 반응하도록 하고 싶다는 요구가 우선했음</li>
+      <li>각 API 완료마다 결과를 버리지 않고 저장, 4개가 다 모이면 <strong>프론트 유틸
+        (<code>computeAiPreparedness</code>)이 클라이언트 사이드에서 점수를 계산</strong></li>
+      <li>단, AI 신호의 원본 필드(구조화 데이터, prompts.txt, hreflang 등)는 DOM 접근이 필요해
+        <strong><code>crawling</code> API 응답 확장(백엔드)이 선행 조건</strong>으로 남음 — "프론트
+        계산"은 가중합산 로직만 프론트로 가져온다는 뜻이지 백엔드 작업이 없어진다는 뜻이 아님</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각 사유</th></tr>
+      <tr><td>PRD 원안: 신규 <code>/analyze</code> 단일 엔드포인트 + 서버 스코어링</td><td>실시간 단계별 피드백(각 API 완료마다 UI 반영)을 유지하고 싶다는 요구와 맞지 않음 — 단일 호출은 완료 시점이 하나뿐이라 5단계 UI를 실제 진행률로 채울 수 없음</td></tr>
+      <tr><td>5단계 UI를 단일 로딩 인디케이터로 단순화</td><td>애니메이션 자체는 유지하고 싶다는 요구가 있었음 — 대신 "가짜"가 아니라 실제 API 완료 이벤트에 반응하도록 개선하는 쪽을 택함</td></tr>
+      <tr><td>AI 신호/점수 계산을 위한 새 5번째 API(<code>scanAiSignalsApi</code>) 신설</td><td>5단계 UI와 1:1로 깔끔하게 맞지만, <code>crawling</code>과 별도로 페이지를 한 번 더 로드해야 해서 Puppeteer 크롤링이 중복됨(PRD가 애초에 페이지를 두 번 안 읽으려고 <code>getOnloadHtml</code> 확장을 권장한 이유와 배치)</td></tr>
+      <tr><td>점수 계산을 <code>crawling</code> API 응답 확장과 함께 백엔드에서 처리</td><td>기술적으로는 더 깔끔하지만, 지금 단계에서는 백엔드 변경 없이 빠르게 시작할 수 있는 프론트 계산 쪽을 우선하기로 함</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li>PRD 원안보다 변경 범위가 작음 — 라우팅/오케스트레이션 구조를 갈아엎지 않고 "결과를
+            버리지 않게 고치기 + 점수 계산 얹기"로 축소됨</li>
+          <li>진행 UI가 실제 이벤트 기반이 되어 사용자 신뢰도가 올라감(가짜 progress 제거)</li>
+          <li>기존 4개 API가 계속 실사용되므로 "죽은 코드가 될 위험" 자체가 해소됨</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li><code>crawling</code> 백엔드 확장은 여전히 필요 — "프론트 계산"이 백엔드 작업을 없애주지
+            않음</li>
+          <li><code>prompts.txt</code> 배치 방식, 캐시 도입 여부는 이번에 결정하지 않고 구현 시점으로
+            미룸(<a href="../prd/index.html#userflow">PRD 페이지 3.2</a> 참고)</li>
+          <li>PRD 문서(5.2/6/7장)의 <code>/analyze</code> 엔드포인트 관련 서술은 이 ADR로 대체됨 —
+            PRD 원문 자체는 아직 갱신하지 않았으므로 PRD md를 읽을 땐 이 ADR이 최신 결정임을 감안할 것</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
 </main>
 </body>
 </html>

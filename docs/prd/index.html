@@ -136,9 +136,9 @@ flowchart LR
       <tr><td>robots.txt 파싱 + allow 판정</td><td><span class="badge ok">구현됨</span></td><td><code>scanService.robotsTxt</code> (자체 파서)</td></tr>
       <tr><td>sitemap.xml 존재 확인 (HEAD)</td><td><span class="badge warn">일부 구현</span></td><td>URL 개수 카운트는 미구현</td></tr>
       <tr><td>Lighthouse 점수 (performance/seo/a11y/best-practices)</td><td><span class="badge ok">구현됨</span></td><td><code>LighthouseService</code> + chrome-launcher</td></tr>
-      <tr><td>AI 친화도(AEO) 점수 · 구조화 데이터 · prompts.txt · hreflang/viewport</td><td><span class="badge bad">미구현</span></td><td>백엔드에 관련 코드 없음</td></tr>
-      <tr><td>스코어링 엔진(0–100 가중합산)</td><td><span class="badge bad">미구현</span></td><td>점수 계산 로직 전무</td></tr>
-      <tr><td>결과 통합 API (<code>/api/analyze</code> 성격)</td><td><span class="badge bad">미구현</span></td><td>프런트가 4개 API를 개별 호출만 함</td></tr>
+      <tr><td>AI 친화도(AEO) 점수 · 구조화 데이터 · prompts.txt · hreflang/viewport</td><td><span class="badge bad">미구현</span></td><td>백엔드에 관련 코드 없음 — <code>crawling</code> 응답 확장으로 추가 예정(3장 목표 플로우)</td></tr>
+      <tr><td>스코어링 엔진(0–100 가중합산)</td><td><span class="badge bad">미구현</span></td><td>점수 계산 로직 전무 — 목표안은 프론트 유틸로 계산(3장, <a href="../adr/index.html#adr-003">ADR-003</a>)</td></tr>
+      <tr><td>결과 통합 API (<code>/api/analyze</code> 성격)</td><td><span class="badge none">계획 취소</span></td><td>PRD 원안은 신규 엔드포인트였지만, <a href="../adr/index.html#adr-003">ADR-003</a>에서 기존 4개 API 오케스트레이션 유지로 확정 — 이 엔드포인트는 만들지 않음</td></tr>
       <tr><td>결과 리포트 UI (배지/탭/카드)</td><td><span class="badge warn">UI만 완성</span></td><td>데이터는 전부 <code>Math.random()</code> 목업 (<code>app/[lang]/scan/page.tsx</code>)</td></tr>
       <tr><td>다국어 카피(한/영)</td><td><span class="badge ok">이미 존재</span></td><td><code>dictionaries/{ko,en}.json</code>의 <code>scan.*</code> 키</td></tr>
       <tr><td>분석 진행 화면</td><td><span class="badge warn">UI만 구현</span></td><td>API 응답을 저장하지 않고 버림 (<code>ProcessScreen.tsx</code>)</td></tr>
@@ -196,42 +196,45 @@ pie showData
   <!-- 3. 유저 플로우 -->
   <section id="userflow">
     <h2>3. 유저 플로우 <span class="tag">FLOW</span></h2>
-    <p>실제 라우팅 단위로 정리한 시나리오를, 코드에서 확인한 동작(무엇이 저장되고 무엇이 버려지는지)과
-      함께 두 버전으로 나눠 그렸습니다.</p>
+    <p>원래는 AS-IS(현재 코드)와 TO-BE(PRD 원안)를 별도 다이어그램 두 개로 그렸으나, 기획 인터뷰를 거쳐
+      <strong>단일 목표 플로우</strong>로 통합했습니다. 결정 배경과 검토한 대안은
+      <a href="../adr/index.html#adr-003">ADR-003</a>에 있습니다.</p>
 
-    <h3>3.1 현재 코드 기준 흐름 (AS-IS)</h3>
+    <h3>3.1 확정된 목표 플로우</h3>
     <div class="diagram-card">
       <pre class="mermaid">
 flowchart TD
-  A["메인 페이지에서 URL 입력<br/>(HeroSection)"] -->|"setDocumentCookies(crrUrlKey)"| B["쿠키 저장"]
+  A["메인 페이지 URL 입력<br/>(HeroSection)"] -->|"setDocumentCookies(crrUrlKey)"| B["쿠키 저장"]
   B --> C["/request-scan 이동"]
   C --> D["RequestScanPage (서버 컴포넌트)<br/>sitePingApi 호출"]
-  D -->|성공| E["ProcessScreen 렌더 (클라이언트)"]
+  D -->|성공| E["ProcessScreen (클라이언트)"]
   D -->|"실패 or crrUrl 없음"| X["ErrorScreen 렌더"]
-  E --> F["Promise.allSettled로<br/>robots/sitemap/crawling/lighthouse 병렬 호출"]
-  F -->|"응답 바디는 버림, status==='ok' 여부만 확인"| G["router.replace('/scan')"]
-  G --> H["/scan 서버 컴포넌트<br/>Math.random()으로 생성한 목업 데이터 렌더"]
+  E --> F["robotsTxt / siteMap / crawling(확장) / lighthouse<br/>4개 API 호출 유지 (analyze 단일 엔드포인트로 교체 안 함)"]
+  F -->|"API 완료마다"| G["결과 저장 + 해당 스텝 실시간 '완료' 반영<br/>(더 이상 가짜 progress 아님)"]
+  G -->|"4개 모두 완료"| H["computeAiPreparedness()<br/>프론트 유틸로 AI Preparedness 점수 계산"]
+  H --> I["zustand 스토어에 저장<br/>(url → 원본 4개 응답 + 점수)"]
+  I --> J["router.replace('/scan')"]
+  J --> K["/scan (서버 → 클라이언트 컴포넌트로 전환)<br/>스토어 값을 기존 카드/탭/배지 UI에 바인딩"]
+  K -->|"스토어에 값 없음(직접 진입 등)"| L["'/'로 안내"]
       </pre>
-    </div>
-    <div class="callout">
-      <strong>단절 지점</strong> — F→G 구간에서 4개 API의 실제 응답 데이터가 저장되지 않고 버려지며,
-      H의 <code>/scan</code> 화면은 그 데이터를 쓰지 않고 매번 새로 <code>Math.random()</code> 값을
-      만들어 렌더링합니다.
     </div>
 
-    <h3>3.2 계획된 흐름 (TO-BE)</h3>
-    <div class="diagram-card">
-      <pre class="mermaid">
-flowchart TD
-  A2["메인 페이지 URL 입력"] --> B2["쿠키 저장"] --> C2["/request-scan 이동"]
-  C2 --> D2["sitePingApi 호출"]
-  D2 -->|성공| E2["ProcessScreen"]
-  E2 --> F2["scanAnalyzeApi 단일 호출<br/>POST /api/v1/scan/analyze"]
-  F2 --> G2["분석 결과를 스토어에 저장<br/>(zustand, url → AnalysisResult)"]
-  G2 --> H2["/scan 클라이언트 컴포넌트<br/>스토어의 실제 결과를 기존 카드/탭 UI에 바인딩"]
-      </pre>
+    <div class="callout info">
+      <strong>백엔드 변경 필요 지점</strong> — <code>crawling</code> API 응답 확장(구조화 데이터,
+      prompts.txt, FAQ 섹션, hreflang, viewport, noindex, 본문 단어수/h2·h3, TL;DR 후보 등 AI 신호
+      원본 필드, PRD 3장 그대로)이 선행돼야 프론트 스코어링이 의미가 있습니다. "프론트에서 점수를
+      계산한다"는 결정이 "백엔드 작업이 없다"는 뜻은 아닙니다 — 원본 신호 추출은 여전히 백엔드(Puppeteer
+      DOM 접근) 몫입니다.
     </div>
-    <p class="sub">3.2는 아직 코드에 반영되지 않은 계획 단계입니다.</p>
+
+    <h3>3.2 이번엔 결정하지 않은 세부사항</h3>
+    <ul>
+      <li><code>prompts.txt</code> 체크를 <code>crawling</code> 응답에 얹을지, <code>robotsTxt</code>
+        처럼 별도 경량 API(<code>promptsTxt</code>)로 뺄지</li>
+      <li>동일 URL 1시간 캐시 도입 여부(PRD Day2 체크리스트의 선택 항목)</li>
+    </ul>
+    <p class="sub">3.1은 2026-08-13 기획 인터뷰로 확정된 목표 상태이며, 아직 코드에는 반영되지
+      않았습니다.</p>
   </section>
 
 </main>
