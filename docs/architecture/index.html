@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>meta-scan Architecture Diagram</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    body { background: #1a1a1a; color: #eee; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 2rem; }
+    h1 { color: #eee; font-size: 1.4rem; }
+    p.sub { color: #999; margin-top: -0.5rem; }
+    .mermaid { background: #1a1a1a; }
+  </style>
+</head>
+<body>
+  <h1>meta-scan Architecture Diagram</h1>
+  <p class="sub">packages/meta-scan-api + packages/meta-scan-front — src/ 내부 모듈 의존관계</p>
+  <pre class="mermaid">
+graph TD
+  subgraph meta-scan-api
+    api_app["app.ts"]
+    api_config["config"]
+    api_core_http["core/http"]
+    api_core_validation["core/validation"]
+    api_constant["constant"]
+    api_infra["infra"]
+    api_modules_health["modules/health"]
+    api_modules_scan["modules/scan"]
+    api_modules_lighthouse["modules/lighthouse"]
+
+    api_app --> api_core_http
+    api_app --> api_config
+    api_app --> api_modules_health
+    api_app --> api_modules_scan
+    api_app --> api_modules_lighthouse
+
+    api_core_validation --> api_core_http
+
+    api_modules_health --> api_core_http
+    api_modules_health --> api_constant
+
+    api_modules_scan --> api_core_http
+    api_modules_scan --> api_core_validation
+    api_modules_scan --> api_constant
+    api_modules_scan --> api_infra
+
+    api_modules_lighthouse --> api_core_http
+    api_modules_lighthouse --> api_core_validation
+    api_modules_lighthouse --> api_infra
+  end
+
+  subgraph meta-scan-front
+    fe_middleware["middleware.ts"]
+    fe_app["app/[lang]"]
+    fe_apis["apis"]
+    fe_dictionaries["dictionaries"]
+    fe_stores["stores"]
+    fe_constans["constans"]
+    fe_utils["utils"]
+    fe_components["components"]
+    fe_components_ui["components/ui"]
+    fe_templates_root["templates/root"]
+    fe_templates_main["templates/main"]
+    fe_templates_request_scan["templates/request-scan"]
+
+    fe_middleware --> fe_constans
+
+    fe_app --> fe_apis
+    fe_app --> fe_dictionaries
+    fe_app --> fe_utils
+    fe_app --> fe_constans
+    fe_app --> fe_components
+    fe_app --> fe_components_ui
+    fe_app --> fe_templates_root
+    fe_app --> fe_templates_main
+    fe_app --> fe_templates_request_scan
+
+    fe_templates_root --> fe_dictionaries
+    fe_templates_root --> fe_components_ui
+    fe_templates_root --> fe_constans
+    fe_templates_root --> fe_utils
+
+    fe_templates_main --> fe_components_ui
+    fe_templates_main --> fe_constans
+    fe_templates_main --> fe_utils
+
+    fe_templates_request_scan --> fe_components_ui
+    fe_templates_request_scan --> fe_constans
+
+    fe_stores
+  end
+  </pre>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: "dark" });
+  </script>
+</body>
+</html>
