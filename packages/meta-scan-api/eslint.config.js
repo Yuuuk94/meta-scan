@@ -1,10 +1,11 @@
 // @ts-check
 import tsParser from "@typescript-eslint/parser";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
+import { sharedIgnores, sharedTypeScriptRules } from "../../eslint.config.base.mjs";
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: ["dist/**", "node_modules/**", ...sharedIgnores],
   },
   {
     files: ["src/**/*.ts"],
@@ -19,10 +20,7 @@ export default [
     },
     rules: {
       ...tsPlugin.configs.recommended.rules,
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-      // Express error-handler/middleware signatures legitimately need `any`
-      // (err: any, req.body: any, etc.) — keep visible but non-blocking.
-      "@typescript-eslint/no-explicit-any": "warn",
+      ...sharedTypeScriptRules,
     },
   },
 ];

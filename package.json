@@ -9,7 +9,8 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r --if-present typecheck",
-    "docker:build:api": "docker build -f packages/meta-scan-api/dockerfile -t meta-scan-api ."
+    "docker:build:api": "docker build -f packages/meta-scan-api/dockerfile -t meta-scan-api .",
+    "prepare": "husky"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -19,5 +20,13 @@
       "sharp",
       "unrs-resolver"
     ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.3.0"
+  },
+  "lint-staged": {
+    "packages/meta-scan-api/**/*.ts": "pnpm --filter meta-scan-api exec eslint --fix",
+    "packages/meta-scan-front/**/*.{ts,tsx}": "pnpm --filter meta-scan-front exec eslint --fix"
   }
 }
