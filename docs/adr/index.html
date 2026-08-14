@@ -44,10 +44,10 @@
   <span class="brand">meta-scan docs</span>
   <a href="../index.html">허브</a>
   <a href="../prd/index.html">PRD · 기획</a>
-  <a href="../design/index.html">설계 · 아키텍처</a>
-  <a href="../adr/index.html" class="active">ADR</a>
+  <a href="../design/index.html">디자인 시스템</a>
+  <a href="../architecture/stack.html">아키텍처</a>
   <a href="../architecture/index.html">모듈 그래프</a>
-  <a href="../design-system/index.html">디자인 시스템</a>
+  <a href="../adr/index.html" class="active">ADR</a>
 </div>
 
 <main>
@@ -127,7 +127,7 @@
 
     <h4>배경 (Context)</h4>
     <p>저장소를 스캔한 결과 테스트/CI/CD/브랜치 전략/커밋 컨벤션이 전무했고
-      (<a href="../design/index.html#common">설계 페이지 2장</a> 참고), 두 패키지의 ESLint 규칙
+      (<a href="../architecture/stack.html#common">아키텍처 페이지 2장</a> 참고), 두 패키지의 ESLint 규칙
       (<code>@typescript-eslint/no-unused-vars</code>, <code>no-explicit-any</code> 등)이 완전히
       따로 관리돼 시간이 지날수록 규칙이 서로 어긋날 위험이 있었습니다.</p>
 
@@ -140,7 +140,7 @@
       <li><code>commit-msg</code>: <code>commitlint</code>가 Conventional Commits 형식을 강제</li>
       <li>두 패키지가 겹치는 TypeScript 규칙만 <code>eslint.config.base.mjs</code>로 분리해 공유
         (Next.js 전용 규칙 등 프레임워크 특화 부분은 각자 유지 —
-        <a href="../design/index.html#frontend">설계 1.2</a>/<a href="../design/index.html#backend">1.3</a> 참고)</li>
+        <a href="../architecture/stack.html#frontend">아키텍처 1.2</a>/<a href="../architecture/stack.html#backend">1.3</a> 참고)</li>
     </ul>
 
     <h4>고려한 대안 (Alternatives Considered)</h4>
@@ -247,7 +247,7 @@
   <div class="card" id="adr-004">
     <h3 style="margin-top:0;">ADR-004 — 디자인 시스템: 토큰 기반 + <code>data-theme</code> 다크모드로 전환</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-13 — <a href="../design-system/index.html">디자인 시스템 페이지</a>에 결과 반영</td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-13 — <a href="../design/index.html">디자인 시스템 페이지</a>에 결과 반영</td></tr>
     </table>
 
     <h4>배경 (Context)</h4>

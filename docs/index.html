@@ -54,10 +54,10 @@
   <span class="brand">meta-scan docs</span>
   <a href="index.html" class="active">허브</a>
   <a href="prd/index.html">PRD · 기획</a>
-  <a href="design/index.html">설계 · 아키텍처</a>
-  <a href="adr/index.html">ADR</a>
+  <a href="design/index.html">디자인 시스템</a>
+  <a href="architecture/stack.html">아키텍처</a>
   <a href="architecture/index.html">모듈 그래프</a>
-  <a href="design-system/index.html">디자인 시스템</a>
+  <a href="adr/index.html">ADR</a>
 </div>
 
 <main>
@@ -82,25 +82,24 @@
       <p>제품 컨셉, 왜 만드는지, 현재 구현 상태, 스코어링 규칙, 유저 플로우(AS-IS/TO-BE)</p>
     </a>
     <a class="hub-card" href="design/index.html">
-      <div class="icon">🏗️</div>
-      <h3>설계 · 아키텍처</h3>
-      <p>저장소 구조, 프론트엔드/백엔드 스택·패턴, 공통 영역(테스트/Git/CI-CD 현황)</p>
+      <div class="icon">🎨</div>
+      <h3>디자인 시스템</h3>
+      <p>UI/UX 디자인 시스템 — 컬러·타이포·스페이싱 토큰, 다크모드 배선, 재사용 컴포넌트 패턴</p>
     </a>
-    <a class="hub-card" href="adr/index.html">
-      <div class="icon">📜</div>
-      <h3>ADR</h3>
-      <p>왜 이렇게 만들었는지 — 모노레포 도구 선택, Git 훅 도입 등 설계 결정 기록</p>
+    <a class="hub-card" href="architecture/stack.html">
+      <div class="icon">🏗️</div>
+      <h3>아키텍처</h3>
+      <p>기술 설계 — 저장소 구조, 프론트엔드/백엔드 스택·패턴, 공통 영역(테스트/Git/CI-CD 현황)</p>
     </a>
     <a class="hub-card" href="architecture/index.html">
       <div class="icon">🕸️</div>
       <h3>모듈 의존성 그래프</h3>
       <p><code>src/</code> 기준 컴포넌트/모듈 import 관계 mermaid 그래프 (코드 변경 시 재생성 필요)</p>
     </a>
-    <a class="hub-card" href="design-system/index.html">
-      <div class="icon">🎨</div>
-      <h3>디자인 시스템</h3>
-      <p>컬러·타이포·스페이싱 토큰, 다크모드 배선, 재사용 컴포넌트 패턴 — "설계 · 아키텍처"와 달리
-        비주얼 디자인 전용</p>
+    <a class="hub-card" href="adr/index.html">
+      <div class="icon">📜</div>
+      <h3>ADR</h3>
+      <p>왜 이렇게 만들었는지 — 모노레포 도구 선택, Git 훅 도입, 디자인 시스템 전환 등 설계 결정 기록</p>
     </a>
   </div>
 
@@ -108,7 +107,7 @@
   <ul class="source-list">
     <li><a href="meta-scan-plus-prd.md">meta-scan-plus-prd.md</a> <span>— PRD 원문 (마크다운)</span></li>
     <li><a href="monorepo-dependency-management.md">monorepo-dependency-management.md</a> <span>— ADR-001 원문 (마크다운)</span></li>
-    <li><a href="design-system.md">design-system.md</a> <span>— 디자인 시스템 개요 원문 (컬러/타이포/스페이싱/컴포넌트 상세는 <code>docs/design-system/</code> 폴더)</span></li>
+    <li><a href="design.md">design.md</a> <span>— 디자인 시스템 개요 원문 (컬러/타이포/스페이싱/컴포넌트 상세는 <code>docs/design/</code> 폴더)</span></li>
   </ul>
 
   <p class="sub" style="margin-top:2.5rem;">이 페이지들은 2026-08-13 기준 저장소 스캔 결과이며, 코드가

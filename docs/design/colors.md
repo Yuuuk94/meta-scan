@@ -1,8 +1,8 @@
 # 컬러 — meta-scan 디자인 시스템
 
 > `packages/meta-scan-front/src/css/globals.css`에 정의된 실제 토큰 기준. 개요/배경은
-> [`docs/design-system.md`](../design-system.md), 시각화는
-> [`docs/design-system/index.html`](./index.html) 참고.
+> [`docs/design.md`](../design.md), 시각화는
+> [`docs/design/index.html`](./index.html) 참고.
 
 ## 원칙
 
