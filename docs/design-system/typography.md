@@ -14,8 +14,8 @@
 `className`에 붙긴 하지만(`${RobotoSans.variable} ${geistMono.variable}`), `globals.css`의
 `@theme inline` 블록에 `--font-sans: var(--font-geist-sans)` 같은 매핑이 없고 `body`에
 `font-sans` 유틸리티도 적용돼 있지 않습니다. 즉 **현재 실제로 렌더링되는 폰트는 Roboto가 아니라
-Tailwind Preflight의 기본 시스템 폰트 스택**입니다 — `dotenv`가 의존성엔 있었지만 import되지 않아
-죽어있던 것과 같은 종류의 "선언은 했는데 배선이 안 된" 상태입니다. `font-mono` 유틸리티(아래 참고)도
+Tailwind Preflight의 기본 시스템 폰트 스택**입니다 — 선언은 했는데 배선이 안 된 상태입니다.
+`font-mono` 유틸리티(아래 참고)도
 마찬가지로 Geist Mono가 아니라 Tailwind 기본 모노스페이스 스택(`ui-monospace, SFMono-Regular,
 Menlo, Monaco, Consolas, ...`)으로 렌더링됩니다.
 
