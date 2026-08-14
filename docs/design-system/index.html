@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>meta-scan 디자인 시스템</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #1a1a1a; --bg-card: #232323; --bg-card-2: #1f1f1f; --border: #3a3a3a;
+    --text: #eee; --text-dim: #a3a3a3; --accent: #22d3ee; --accent-2: #a78bfa;
+    --ok: #4ade80; --warn: #fbbf24; --bad: #f87171; --none: #6b7280;
+    --topbar-h: 3.2rem;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", sans-serif; margin: 0; }
+  .topbar { position: sticky; top: 0; z-index: 20; height: var(--topbar-h); display: flex; align-items: center; gap: 0.3rem; padding: 0 1.2rem; background: var(--bg-card-2); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .topbar .brand { font-weight: 700; color: var(--text); margin-right: 1rem; font-size: 0.9rem; white-space: nowrap; }
+  .topbar a { color: var(--text-dim); text-decoration: none; font-size: 0.83rem; padding: 0.4rem 0.8rem; border-radius: 6px; white-space: nowrap; }
+  .topbar a:hover { background: #2c2c2c; color: var(--text); }
+  .topbar a.active { background: rgba(34,211,238,0.15); color: var(--accent); font-weight: 600; }
+  .shell { display: flex; min-height: calc(100vh - var(--topbar-h)); }
+  nav { position: sticky; top: var(--topbar-h); align-self: flex-start; width: 220px; flex-shrink: 0; height: calc(100vh - var(--topbar-h)); overflow-y: auto; padding: 1.5rem 1rem; border-right: 1px solid var(--border); background: var(--bg-card-2); }
+  nav h2 { font-size: 0.95rem; color: var(--text-dim); margin: 0 0 1rem; letter-spacing: 0.02em; }
+  nav a { display: block; color: var(--text-dim); text-decoration: none; font-size: 0.88rem; padding: 0.35rem 0.5rem; border-radius: 6px; margin-bottom: 0.15rem; }
+  nav a.sub { padding-left: 1.1rem; font-size: 0.8rem; }
+  nav a:hover { background: #2c2c2c; color: var(--text); }
+  main { flex: 1; max-width: 980px; padding: 2.5rem 3rem 6rem; min-width: 0; }
+  header.page-header { margin-bottom: 3rem; }
+  header.page-header h1 { font-size: 1.8rem; margin: 0 0 0.4rem; }
+  header.page-header p { color: var(--text-dim); margin: 0; font-size: 0.95rem; }
+  section { margin-bottom: 4rem; scroll-margin-top: calc(var(--topbar-h) + 1rem); }
+  section h2 { font-size: 1.35rem; border-bottom: 1px solid var(--border); padding-bottom: 0.6rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
+  section h2 .tag { font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 999px; background: rgba(34,211,238,0.15); color: var(--accent); letter-spacing: 0.03em; }
+  h3 { font-size: 1.1rem; color: var(--accent-2); margin: 2rem 0 0.8rem; }
+  h3.subsection { font-size: 1.15rem; color: var(--text); margin: 2.4rem 0 0.9rem; padding-top: 1.6rem; border-top: 1px dashed var(--border); }
+  h4 { font-size: 0.92rem; color: var(--accent-2); margin: 1.3rem 0 0.5rem; }
+  p { line-height: 1.7; color: #d4d4d4; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.4rem; margin: 1rem 0; }
+  .diagram-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin: 1rem 0; overflow-x: auto; }
+  .diagram-card .mermaid { display: flex; justify-content: center; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.86rem; }
+  th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--text-dim); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  code { background: #2a2a2a; padding: 0.12rem 0.4rem; border-radius: 4px; font-size: 0.85em; color: #f3f3f3; }
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; white-space: nowrap; }
+  .badge.ok { background: rgba(74,222,128,0.15); color: var(--ok); }
+  .badge.warn { background: rgba(251,191,36,0.15); color: var(--warn); }
+  .badge.bad { background: rgba(248,113,113,0.15); color: var(--bad); }
+  .badge.none { background: rgba(107,114,128,0.2); color: #9ca3af; }
+  .callout { border-left: 3px solid var(--bad); background: rgba(248,113,113,0.07); padding: 0.8rem 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0; font-size: 0.9rem; }
+  .callout.info { border-left-color: var(--accent); background: rgba(34,211,238,0.07); }
+  .callout.ok { border-left-color: var(--ok); background: rgba(74,222,128,0.07); }
+  .callout strong { color: var(--text); }
+  ul, ol { line-height: 1.8; color: #d4d4d4; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .swatch-row { display: flex; align-items: center; gap: 0.6rem; }
+  .swatch { width: 1.1rem; height: 1.1rem; border-radius: 5px; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
+  @media (max-width: 900px) { nav { display: none; } main { padding: 1.5rem; } .grid-2 { grid-template-columns: 1fr; } }
+  .sub { color: var(--text-dim); font-size: 0.85rem; }
+  .footer-link { display: inline-block; margin-top: 0.5rem; color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+  .footer-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">meta-scan docs</span>
+  <a href="../index.html">허브</a>
+  <a href="../prd/index.html">PRD · 기획</a>
+  <a href="../design/index.html">설계 · 아키텍처</a>
+  <a href="../adr/index.html">ADR</a>
+  <a href="../architecture/index.html">모듈 그래프</a>
+  <a href="../design-system/index.html" class="active">디자인 시스템</a>
+</div>
+
+<div class="shell">
+<nav>
+  <h2>디자인 시스템</h2>
+  <a href="#overview">1. 개요</a>
+  <a href="#tokens">2. 토큰</a>
+  <a class="sub" href="#color">2.1 컬러</a>
+  <a class="sub" href="#shadow">2.2 그림자</a>
+  <a href="#dark-mode">3. 다크모드 배선</a>
+  <a href="#principles">4. 사용 원칙</a>
+  <a href="#components">5. 컴포넌트 패턴</a>
+  <a href="#out-of-scope">6. 다루지 않은 것</a>
+  <a href="#ref">7. 참고</a>
+</nav>
+
+<main>
+  <header class="page-header">
+    <h1>meta-scan 디자인 시스템</h1>
+    <p>2026-08-13, <code>packages/meta-scan-front</code>의 시각적 디자인을 재작업하며 정립한
+      토큰·컴포넌트 규칙입니다. <a href="../design/index.html">설계 · 아키텍처</a> 페이지와는 다른
+      주제입니다 — 그쪽은 저장소 구조/스택/구현 패턴 같은 <strong>엔지니어링 설계</strong>를 다루고,
+      이 페이지는 색상·타이포·다크모드 같은 <strong>비주얼 디자인 시스템</strong>을 다룹니다.</p>
+  </header>
+
+  <!-- 1. 개요 -->
+  <section id="overview">
+    <h2>1. 개요 <span class="tag">BEFORE / AFTER</span></h2>
+    <p>작업 전 전 화면(헤더/푸터/히어로/프로세스/FAQ/스캔 진행화면/<code>/scan</code> 결과 페이지)은
+      shadcn 기본 스캐폴드 토큰이 남아있는 채로, 실제 화면은 그 토큰을 쓰지 않고 요소마다
+      <code>theme === "dark" ? "..." : "..."</code> 삼항 연산자로 cyan→purple→pink 그라디언트,
+      <code>backdrop-blur</code>, glow 섀도우를 직접 나열하고 있었습니다.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <strong style="color:var(--bad);">이전</strong>
+        <ul>
+          <li>화면/카드마다 다른 그라디언트 색(cyan/purple/pink)</li>
+          <li>점수·상태 색이 등급과 무관하게 장식적으로만 사용됨</li>
+          <li><code>@custom-variant dark</code>가 주석 처리돼 <code>components/ui/*</code>가 OS
+            설정을 따르는 실제 버그</li>
+          <li>푸터에 조작된 <code>SCANS: 247,891</code> 통계, 에러 화면이 엉뚱한 문구 재사용</li>
+        </ul>
+      </div>
+      <div class="card">
+        <strong style="color:var(--ok);">이후</strong>
+        <ul>
+          <li>화이트/차콜 중립 + 인디고 단일 포인트 컬러</li>
+          <li>점수·상태는 success/warning/destructive로 고정 매핑</li>
+          <li><code>data-theme</code> 쿠키 하나로 전체 화면 + <code>components/ui/*</code> 통일</li>
+          <li>가짜 통계 제거, 에러 카피 수정</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub">관련 커밋: <code>style(front): replace AI-generated gradient theme with
+      token-based design system</code>, 배경/대안 검토는 <a href="../adr/index.html#adr-004">ADR-004</a>
+      참고.</p>
+  </section>
+
+  <!-- 2. 토큰 -->
+  <section id="tokens">
+    <h2>2. 토큰 <span class="tag">TOKENS</span></h2>
+    <p><code>src/css/globals.css</code>에 정의됩니다. 라이트는 <code>:root</code>, 다크는
+      <code>:root[data-theme="dark"]</code>에 같은 변수명으로 재정의하고, 화면 코드는
+      <code>bg-primary</code>/<code>text-success</code>처럼 토큰만 참조합니다 — 라이트/다크 값
+      자체를 알 필요가 없습니다. 전체 팔레트와 의미별 매핑표는
+      <a href="../design-system/colors.md">colors.md</a>, 타이포그래피 스케일은
+      <a href="../design-system/typography.md">typography.md</a>, 여백/그리드 스케일은
+      <a href="../design-system/spacing.md">spacing.md</a>에 정리돼 있습니다.</p>
+
+    <h3 class="subsection" id="color">2.1 컬러</h3>
+    <table>
+      <tr><th>토큰</th><th>라이트</th><th>다크</th><th>용도</th></tr>
+      <tr>
+        <td><code>--background</code></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#ffffff"></span>#ffffff</div></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#0b0c10"></span>#0b0c10</div></td>
+        <td>페이지 배경</td>
+      </tr>
+      <tr>
+        <td><code>--card</code></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#ffffff"></span>#ffffff</div></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#131419"></span>#131419</div></td>
+        <td>카드 표면 (다크에서 배경보다 한 단 밝게 — 계단식 elevation)</td>
+      </tr>
+      <tr>
+        <td><code>--muted</code></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#f4f5f7"></span>#f4f5f7</div></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#1a1c22"></span>#1a1c22</div></td>
+        <td>보조 배경, 저강조 영역</td>
+      </tr>
+      <tr>
+        <td><code>--primary</code></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#4f46e5"></span>#4f46e5</div></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#6366f1"></span>#6366f1</div></td>
+        <td><strong>단일 포인트 컬러(인디고)</strong> — 버튼, 액티브 상태, 강조 아이콘</td>
+      </tr>
+      <tr>
+        <td><code>--secondary</code></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#eef0ff"></span>#eef0ff</div></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#1c1b3a"></span>#1c1b3a</div></td>
+        <td>포인트 컬러의 은은한 배경 톤(배지 등)</td>
+      </tr>
+      <tr>
+        <td><code>--success</code></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#16803c"></span>#16803c</div></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#34a260"></span>#34a260</div></td>
+        <td rowspan="3"><strong>점수/상태의 의미 색</strong> — 등급별 무지개색이 아니라 좋음/보통/
+          나쁨에 고정 매핑 (<code>score &gt;= 80 ? success : score &gt;= 60 ? warning :
+          destructive</code>)</td>
+      </tr>
+      <tr>
+        <td><code>--warning</code></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#b45309"></span>#b45309</div></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#d69433"></span>#d69433</div></td>
+      </tr>
+      <tr>
+        <td><code>--destructive</code></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#d1293d"></span>#d1293d</div></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#e35267"></span>#e35267</div></td>
+      </tr>
+    </table>
+
+    <h3 class="subsection" id="shadow">2.2 그림자</h3>
+    <p><code>--elevation-sm/md/lg</code>를 인디고 색조로 살짝 틴트해서(<code>rgba(45, 39, 130,
+      ...)</code>) 순수 검정 그림자보다 배경과 어우러지게 하고, <code>@theme inline</code>에서
+      Tailwind의 <code>shadow-sm/md/lg</code> 유틸리티에 매핑했습니다.</p>
+    <div class="card">
+      <code>--elevation-sm: 0 1px 2px rgba(30, 27, 75, 0.05);</code><br/>
+      <code>--elevation-md: 0 6px 16px -4px rgba(45, 39, 130, 0.1);</code><br/>
+      <code>--elevation-lg: 0 20px 40px -12px rgba(45, 39, 130, 0.18);</code>
+    </div>
+  </section>
+
+  <!-- 3. 다크모드 배선 -->
+  <section id="dark-mode">
+    <h2>3. 다크모드 배선 <span class="tag">BUGFIX + SYSTEM</span></h2>
+    <div class="card"><code>@custom-variant dark (&amp;:where([data-theme=dark], [data-theme=dark] *));</code></div>
+    <p>이전엔 이 선언이 주석 처리돼 있었습니다. <code>components/ui/*</code>(button/badge/tabs)는
+      이미 Tailwind <code>dark:</code> 클래스로 작성돼 있었는데, 이 변형이 없으면 Tailwind v4
+      기본값인 OS <code>prefers-color-scheme</code>을 따릅니다 — 브라우저 설정이 다크인데 앱의 테마
+      토글은 라이트인 경우 컴포넌트마다 다르게 보이는 <strong>실제 버그</strong>였습니다.</p>
+
+    <div class="diagram-card">
+      <pre class="mermaid">
+flowchart LR
+  TOGGLE["ToggleSetting.tsx<br/>사용자가 테마 토글 클릭"] -->|"document.cookie 갱신"| COOKIE[("theme 쿠키")]
+  COOKIE -->|"getSiteSetting() (서버)"| LAYOUT["app/[lang]/layout.tsx<br/>&lt;html data-theme={theme}&gt;"]
+  LAYOUT -->|"data-theme 속성"| VARIANT["@custom-variant dark<br/>[data-theme=dark] 매칭"]
+  VARIANT --> TOKENS["globals.css<br/>:root[data-theme=dark] { ... }"]
+  VARIANT --> DARKCLS["dark: 클래스<br/>components/ui/*, templates/*"]
+  TOKENS --> RENDER["렌더링 결과"]
+  DARKCLS --> RENDER
+      </pre>
+    </div>
+    <p class="sub">쿠키를 쓰고 읽는 책임 분리(쓰기=클라이언트, 읽기=서버)는 이번에 바꾸지 않았습니다 —
+      <a href="../design/index.html#frontend">설계 · 아키텍처 페이지</a>의 기존 상태관리 패턴 그대로
+      입니다.</p>
+  </section>
+
+  <!-- 4. 사용 원칙 -->
+  <section id="principles">
+    <h2>4. 사용 원칙 <span class="tag">RULES</span></h2>
+    <ul>
+      <li><strong>포인트 컬러는 하나(인디고)</strong> — 화면마다/카드마다 다른 그라디언트 색을 쓰지
+        않습니다.</li>
+      <li><strong>점수·상태는 항상 success/warning/destructive로 매핑</strong> — 임의 색이 아니라
+        고정 규칙을 따릅니다.</li>
+      <li><strong>그라디언트/blur/glow 금지</strong> — <code>bg-gradient-to-r</code>,
+        <code>backdrop-blur-xl</code>, <code>shadow-*-500/20</code> 같은 장식 효과를 다시 넣지
+        않습니다. 강조가 필요하면 <code>--primary</code> 색상 자체나 그림자 토큰을 씁니다.</li>
+      <li><strong>다크 분기는 <code>dark:</code> 변형으로, 삼항 연산자로 반복하지 않음</strong> —
+        <code>theme === "dark" ? "bg-x" : "bg-y"</code>를 요소마다 나열하는 대신 토큰 클래스
+        (<code>bg-card</code>, <code>text-muted-foreground</code>)를 쓰면 라이트/다크가 CSS 변수
+        레벨에서 자동으로 갈립니다. <code>theme</code>/<code>lang</code> prop 자체는 테마 토글
+        로직·카피 분기에 여전히 필요하므로 계속 내려가지만, 순수 스타일링 목적의 삼항 분기는 새로
+        만들지 않습니다.</li>
+    </ul>
+    <div class="callout bad">
+      <strong>다시 넣지 말 것</strong> — <code>from-cyan-*</code>/<code>from-purple-*</code>/
+      <code>from-pink-*</code> 그라디언트, <code>Sparkles</code> 장식 아이콘, 조작된 통계 수치(예:
+      <code>SCANS: 247,891</code>). 전부 이번 작업에서 제거된 패턴입니다.
+    </div>
+  </section>
+
+  <!-- 5. 컴포넌트 패턴 -->
+  <section id="components">
+    <h2>5. 컴포넌트 패턴 <span class="tag">COMPONENTS</span></h2>
+    <p><code>components/ui/*</code>(shadcn 골격: <code>cva</code> variant → <code>cn()</code> 클래스
+      병합 → <code>data-slot</code>)는 이번에 구조를 바꾸지 않았습니다 — 이미 토큰을 참조하고
+      있었고, 문제는 토큰 값과 <code>dark:</code> 배선 쪽이었기 때문입니다. 새 프리미티브를 추가할 때도
+      이 골격을 그대로 따르세요.</p>
+    <p><code>templates/*</code>의 화면별 컴포넌트는 계속 <code>theme</code>/<code>lang</code>/
+      <code>t</code>를 props로 받는 구조를 유지하되(프롭 드릴링 자체는 이번 작업 범위 밖), 스타일링에
+      한해서만 토큰 + <code>dark:</code> 변형으로 옮겼습니다. 버튼/카드/인풋/모달 같은 프리미티브별
+      상세와 화면 레벨 합성 패턴(StatusBadge, ScoreCard, ProcessStep)은
+      <a href="../design-system/components.md">components.md</a> 참고.</p>
+    <table>
+      <tr><th>영역</th><th>바뀐 것</th><th>안 바뀐 것</th></tr>
+      <tr><td><code>components/ui/*</code></td><td>참조하는 토큰 값(팔레트)</td><td>cva/cn/data-slot 골격, props 인터페이스</td></tr>
+      <tr><td><code>templates/*</code></td><td>스타일링 클래스(토큰 + dark: 변형)</td><td>theme/lang/t props drilling, 화살표 함수 vs function 선언 컨벤션</td></tr>
+    </table>
+  </section>
+
+  <!-- 6. 다루지 않은 것 -->
+  <section id="out-of-scope">
+    <h2>6. 다루지 않은 것 <span class="tag">OUT OF SCOPE</span></h2>
+    <ul>
+      <li><strong>아이콘/모션/카피 톤</strong> — Lucide 아이콘 전량 사용, 정적 트랜지션 등도 "AI 생성
+        티"의 일부로 지적될 수 있지만, 이번 라운드는 색상·그라디언트·다크모드 배선에 집중했습니다.</li>
+      <li><strong><code>/scan</code> 결과 데이터</strong> — 여전히 <code>Math.random()</code>
+        목업입니다. 실데이터 연결(<code>POST /api/v1/scan/analyze</code>)은
+        <code>docs/meta-scan-plus-prd.md</code>/<a href="../adr/index.html#adr-003">ADR-003</a>
+        스코프이며 이번 디자인 작업과 분리해서 진행하기로 확정했습니다.</li>
+      <li><strong>완전 커스텀 루트 404</strong> — <code>/ko/asdf</code>처럼 라우트 자체가 없는 경로는
+        여전히 Next.js 기본 404가 뜹니다. 이 저장소에 진짜 루트 <code>app/layout.tsx</code>가 없어서
+        (<code>app/[lang]/layout.tsx</code>가 사실상 루트 역할) 루트 <code>app/not-found.tsx</code>를
+        추가하려면 레이아웃 구조 자체를 바꿔야 합니다 — 별도 작업으로 분리했습니다.</li>
+    </ul>
+  </section>
+
+  <!-- 7. 참고 -->
+  <section id="ref">
+    <h2>7. 참고 <span class="tag">LINKS</span></h2>
+    <p>배경/대안 검토는 <a href="../adr/index.html#adr-004">ADR-004</a>, 저장소 구조/스택은
+      <a href="../design/index.html">설계 · 아키텍처</a> 페이지를 참고하세요.</p>
+    <a class="footer-link" href="../design-system.md">→ docs/design-system.md (개요 원문) 열기</a><br/>
+    <a class="footer-link" href="../design-system/colors.md">→ colors.md</a><br/>
+    <a class="footer-link" href="../design-system/typography.md">→ typography.md</a><br/>
+    <a class="footer-link" href="../design-system/spacing.md">→ spacing.md</a><br/>
+    <a class="footer-link" href="../design-system/components.md">→ components.md</a>
+    <p class="sub" style="margin-top:2rem;">이 페이지는 2026-08-13 기준 작업 결과이며, 토큰이나 원칙이
+      바뀌면 내용도 함께 갱신이 필요합니다.</p>
+  </section>
+
+</main>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "dark",
+    themeVariables: {
+      background: "#1a1a1a", primaryColor: "#232323", primaryTextColor: "#eee",
+      primaryBorderColor: "#3a3a3a", lineColor: "#6b7280", secondaryColor: "#2c2c2c", tertiaryColor: "#1f1f1f"
+    },
+    flowchart: { curve: "basis" }
+  });
+</script>
+</body>
+</html>

@@ -68,6 +68,7 @@
   <a href="../design/index.html" class="active">설계 · 아키텍처</a>
   <a href="../adr/index.html">ADR</a>
   <a href="../architecture/index.html">모듈 그래프</a>
+  <a href="../design-system/index.html">디자인 시스템</a>
 </div>
 
 <div class="shell">
@@ -214,7 +215,7 @@ flowchart LR
       <tr><td>성능 감사</td><td>lighthouse + chrome-launcher</td><td>^12 / ^1</td></tr>
       <tr><td>API 문서</td><td>swagger-ui-express (수기 작성 OpenAPI 3.1)</td><td>^5</td></tr>
       <tr><td>로깅</td><td>morgan("tiny")</td><td>^1.10.1</td></tr>
-      <tr><td>.env 로더</td><td>dotenv</td><td>^17.2.2 <span class="badge none">설치됨, import 흔적 없음(미사용)</span></td></tr>
+      <tr><td>.env 로더</td><td>dotenv</td><td>^17.2.2 <span class="badge ok">사용 중</span> — <code>src/app.ts</code> 최상단 <code>import "dotenv/config"</code></td></tr>
     </table>
 
     <h4>레이어 구조</h4>
@@ -291,9 +292,11 @@ flowchart LR
       <tr><td><code>CHROME_PATH</code></td><td>chrome-launcher용 시스템 Chromium 경로</td><td>없음(미설정 시 chrome-launcher 자동 탐색)</td></tr>
       <tr><td><code>NODE_ENV</code></td><td>개발 모드일 때 에러 응답에 stack 포함 여부</td><td>-</td></tr>
     </table>
-    <p><code>.env</code> 파일을 로드하는 코드가 없습니다 — <code>dotenv</code>는 의존성엔 있지만
-      <code>src</code> 어디에서도 import되지 않는 죽은 의존성이며, 실제로는 배포 환경(Cloud Run 등)이
-      주입한 <code>process.env</code> 값을 코드에서 직접 참조합니다.</p>
+    <p>2026-08-14부터 <code>src/app.ts</code>가 최상단에서 <code>import "dotenv/config"</code>를
+      호출해 로컬 개발 시 <code>packages/meta-scan-api/.env</code>(gitignore 대상)를 로드합니다 —
+      이전엔 <code>dotenv</code>가 의존성에만 있고 어디서도 import되지 않아 로컬에서 CORS 허용 목록이
+      항상 빈 문자열로 떨어지는 버그가 있었습니다. 배포 환경(Cloud Run 등)은 여전히 플랫폼이 주입한
+      <code>process.env</code> 값을 그대로 쓰고, <code>.env</code> 파일 자체는 없습니다.</p>
   </section>
 
   <!-- 2. 공통 -->
