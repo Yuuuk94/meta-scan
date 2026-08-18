@@ -17,14 +17,18 @@ Lighthouse 4개 점수만 예외적으로 구글 자체 채점이라 숫자 그�
 **현재 상태(중요, 착각하기 쉬운 지점)**: 백엔드의 개별 스캔 엔드포인트(`ping`/`robotsTxt`/`siteMap`/
 `crawling`/`lighthouse run`)는 각각 정상 동작합니다. [ADR-003](docs/adr/index.html#adr-003)에 따라
 이걸 하나로 합치는 `/api/v1/scan/analyze` 같은 통합 엔드포인트는 **의도적으로 만들지 않습니다** —
-`ProcessScreen`의 단계별 진행 UI가 각 API의 실제 완료 시점에 반응하게 하려는 목적입니다. 대신
-`crawling` 엔드포인트 응답을 확장하고, 4개 응답을 다 모은 뒤 프론트 유틸이 체크리스트 판정을 계산하는
-구조로 갑니다. 프런트의 `/scan` 결과 페이지 UI(배지, AI Signals 카드, Indexing 카드, 탭 등)는 이미 다
-그려져 있지만, 그 화면이 렌더링하는 데이터는 서버 컴포넌트 안에서 `Math.random()`으로 만든 목업이고
-(`packages/meta-scan-front/src/app/[lang]/scan/page.tsx`), 직전 단계인 `ProcessScreen`은 4개 스캔
-API를 병렬 호출하긴 하지만 응답 바디를 저장하지 않고 성공 여부(`status === "ok"`)만 확인한 뒤 버립니다.
-즉 "새 UI를 만드는 일"이 아니라 **"이미 있는 UI/API 사이에 파이프를 연결하고, 그 사이에서 체크리스트를
-판정하는 로직(가중합산 없는 순수 룰 판정)을 채우는 일"**이 현재 남은 작업의 본질입니다.
+`ProcessScreen`의 단계별 진행 UI가 각 API의 실제 완료 시점에 반응하게 하려는 목적입니다. 판정
+(pass/warning/fail/info)은 **전부 백엔드**가 각 엔드포인트 응답의 `checks[]`에 담아 반환하고,
+프런트는 4개 응답이 다 모이면 이미 판정된 결과들을 그룹별로 합치기만 합니다(`combineScanResults`,
+계산이 아니라 취합 — ADR-003 갱신). 또한 [ADR-006](docs/adr/index.html#adr-006)에 따라
+`robotsTxt`를 먼저 단독 실행해 비허용(disallow)이면 나머지 3개(sitemap/crawling/lighthouse)를 아예
+호출하지 않고 차단 화면만 보여줍니다(비용 절감). 프런트의 `/scan` 결과 페이지 UI(배지, AI Signals
+카드, Indexing 카드, 탭 등)는 이미 다 그려져 있지만, 그 화면이 렌더링하는 데이터는 서버 컴포넌트
+안에서 `Math.random()`으로 만든 목업이고(`packages/meta-scan-front/src/app/[lang]/scan/page.tsx`),
+직전 단계인 `ProcessScreen`은 4개 스캔 API를 병렬 호출하긴 하지만 응답 바디를 저장하지 않고 성공
+여부(`status === "ok"`)만 확인한 뒤 버립니다. 즉 "새 UI를 만드는 일"이 아니라 **"이미 있는 UI/API
+사이에 파이프를 연결하고, 백엔드에는 원본 신호 추출·판정 로직(가중합산 없는 순수 룰 판정)을, 프런트에는
+결과 취합 로직을 채우는 일"**이 현재 남은 작업의 본질입니다.
 
 ## 저장소 구조
 
@@ -194,7 +198,9 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
 - `docs/adr/index.html` — 설계 결정 기록(ADR). ADR-001(모노레포 도구 선택, 원문은
   `docs/monorepo-dependency-management.md`), ADR-002(Git 훅 기반 린트·커밋 컨벤션), ADR-003(4-API
   오케스트레이션 + 프론트 판정 유지, 단일 `/analyze` 엔드포인트 기각), ADR-004(디자인 시스템 전환),
-  ADR-005(스코어링 엔진 폐기, 체크리스트(pass/warning/fail/info) 방향으로 전환). 새 결정이 생기면
+  ADR-005(스코어링 엔진 폐기, 체크리스트(pass/warning/fail/info) 방향으로 전환), ADR-006(robots.txt
+  선검사 게이팅 — 비허용 시 전체 스캔 하드 차단, 비용 절감), ADR-007(Lighthouse 개별 감사 `lhr.audits`
+  재사용 — 결과 화면 하단 "Lighthouse 개선 제안" 카드, Hero의 자체 판정과 출처 구분). 새 결정이 생기면
   여기 계속 추가. **작성 규칙(페이지 상단 "ADR 작성 규칙" 카드)**: `Accepted`가 된 ADR의 본문(배경/
   결정/대안/결과)과 최초 작성일은 append-only — 다시 쓰지 않습니다. 방향이 바뀌면 새 번호의 ADR을
   추가하고, 기존 ADR은 상태 배지 변경 + 카드 맨 아래 "변경 이력"에 날짜와 사유만 한 줄 추가하세요.

@@ -144,8 +144,9 @@
       <tr><td>Lighthouse 점수 (performance/seo/a11y/best-practices)</td><td><span class="badge ok">구현됨</span></td><td><code>LighthouseService</code> + chrome-launcher</td></tr>
       <tr><td>SEO/AEO 체크 항목 (구조화 데이터 · prompts.txt · hreflang/viewport 등)</td><td><span class="badge bad">미구현</span></td><td>백엔드에 관련 코드 없음 — <code>crawling</code> 응답 확장으로 추가 예정(3장 목표 플로우)</td></tr>
       <tr><td>~~스코어링 엔진(0–100 가중합산)~~</td><td><span class="badge none">폐기</span></td><td>사용자 본인 기획이 아니었음이 확인돼 폐기 — pass/warning/fail/info 판정으로 대체(2.3절)</td></tr>
-      <tr><td>판정 로직(pass/warning/fail/info)</td><td><span class="badge bad">미구현</span></td><td>가중치 없는 룰 판정 — 목표안은 프론트 유틸로 계산(3장, <a href="../adr/index.html#adr-003">ADR-003</a>)</td></tr>
+      <tr><td>판정 로직(pass/warning/fail/info)</td><td><span class="badge bad">미구현</span></td><td>가중치 없는 룰 판정 — <strong>백엔드</strong>가 추출과 동시에 판정까지 수행(3장, <a href="../adr/index.html#adr-003">ADR-003</a>), 프론트는 결과 취합만</td></tr>
       <tr><td>결과 통합 API (<code>/api/analyze</code> 성격)</td><td><span class="badge none">계획 취소</span></td><td>PRD 원안은 신규 엔드포인트였지만, <a href="../adr/index.html#adr-003">ADR-003</a>에서 기존 4개 API 오케스트레이션 유지로 확정 — 이 엔드포인트는 만들지 않음</td></tr>
+      <tr><td>robots.txt 선검사 게이팅(비허용 시 하드 차단)</td><td><span class="badge bad">미구현</span></td><td><a href="../adr/index.html#adr-006">ADR-006</a> — 비용 절감 목적, <code>ProcessScreen</code>이 아직 4개를 무조건 병렬 호출</td></tr>
       <tr><td>결과 리포트 UI (배지/탭/카드)</td><td><span class="badge warn">UI만 완성</span></td><td>데이터는 전부 <code>Math.random()</code> 목업 (<code>app/[lang]/scan/page.tsx</code>)</td></tr>
       <tr><td>다국어 카피(한/영)</td><td><span class="badge ok">이미 존재</span></td><td><code>dictionaries/{ko,en}.json</code>의 <code>scan.*</code> 키</td></tr>
       <tr><td>분석 진행 화면</td><td><span class="badge warn">UI만 구현</span></td><td>API 응답을 저장하지 않고 버림 (<code>ProcessScreen.tsx</code>)</td></tr>
@@ -166,17 +167,27 @@
     <h3>2.3 체크리스트 그룹 · 판정 규칙 (스코어링 아님)</h3>
     <p>각 항목은 <strong>가중치 없이</strong> 아래 기준대로 <code>pass</code> / <code>warning</code> /
       <code>fail</code> / <code>info</code> 넷 중 하나로만 판정합니다. 합산 점수·등급·가중치는 없습니다.
-      <a href="../adr/index.html#adr-003">ADR-003</a>에 따라 이 판정은 백엔드가 아니라 프론트 유틸
-      (<code>computeChecklist</code>)이 4개 API 응답을 모은 뒤 클라이언트에서 계산합니다.</p>
+      <strong>판정은 전부 백엔드</strong>가 수행 — 기존 <code>runChecks()</code>가 이미 "추출 직후
+      그 자리에서 판정"하는 패턴이라 신규 항목도 그대로 확장합니다(<a href="../adr/index.html#adr-003">ADR-003</a>).
+      프론트 <code>combineScanResults</code>는 이미 판정된 4개 API 응답을 그룹별로 <strong>합치고
+      개수를 세는 것뿐</strong>(취합) — 도메인 임계치 판단은 하지 않습니다.</p>
     <table>
       <tr><th>그룹</th><th>항목 예시</th><th>판정 감각</th></tr>
-      <tr><td>색인(Indexing)</td><td>robots 허용, canonical 다중 태그, noindex 여부</td><td>대부분 pass/fail — 검색엔진 노출에 직결</td></tr>
-      <tr><td>미리보기(Previews)</td><td>OG/Twitter 필수값, og:image 크기 메타, favicon</td><td>누락 시 대부분 warning</td></tr>
-      <tr><td>AI 신호(AI Signals)</td><td>prompts.txt, PromptObject, FAQ 섹션, 구조화 데이터 타입</td><td>없어도 감점 아님 — "있으면 좋은 신호"로 info 표시</td></tr>
-      <tr><td>콘텐츠(Content)</td><td>본문 단어 수, 헤딩 계층, TL;DR</td><td>임계치 기준 pass/warning</td></tr>
+      <tr><td>기본 SEO</td><td>title/description 존재·길이, 이미지 alt 누락, 중복 meta</td><td>기존 <code>runChecks()</code> 그대로 재사용 — 신규 카드만 신설</td></tr>
+      <tr><td>색인(Indexing)</td><td>sitemap.xml 존재, canonical 다중 태그, noindex 여부</td><td>대부분 pass/fail — 검색엔진 노출에 직결. robots.txt 허용 여부는 2.4절 게이팅으로 이동(카드에서 제외)</td></tr>
+      <tr><td>미리보기(Previews)</td><td>OG/Twitter 필수값, og:image 크기 메타, favicon + 실제 카드 미리보기 렌더링</td><td>누락 시 대부분 warning</td></tr>
+      <tr><td>AI 신호(AI Signals)</td><td>prompts.txt, PromptObject, FAQ 섹션, 구조화 데이터 타입, JS 렌더링 의존도(<code>deltaRatio</code>)</td><td>없어도 감점 아님 — "있으면 좋은 신호"로 info 표시. <code>deltaRatio</code>는 예외로 warning/fail까지 감</td></tr>
+      <tr><td>콘텐츠(Content)</td><td>본문 단어 수, 헤딩 계층(h1 규칙 흡수), TL;DR</td><td>임계치 기준 pass/warning</td></tr>
       <tr><td>국제화/UX</td><td>hreflang, viewport</td><td>viewport는 warning, hreflang은 info</td></tr>
-      <tr><td>Lighthouse</td><td>performance/seo/accessibility/best-practices</td><td>구글 자체 점수, 체크리스트 판정 대상 아님</td></tr>
+      <tr><td>Lighthouse</td><td>performance/seo/accessibility/best-practices</td><td>구글 자체 점수, 체크리스트 판정 대상 아님. 개별 감사(<code>lhr.audits</code>)는 결과 화면 하단 "Lighthouse 개선 제안" 카드로 재사용(<a href="../adr/index.html#adr-007">ADR-007</a>) — Hero(자체 판정)와 출처 구분, 백엔드 변경 없음</td></tr>
     </table>
+
+    <h3>2.4 robots.txt 선검사 게이팅 (신규)</h3>
+    <p><code>ProcessScreen</code>이 4개 API를 한 번에 병렬 호출하는 대신, <strong>robots.txt를
+      먼저 단독 호출</strong>하고 비허용(disallow)이면 sitemap/crawling/lighthouse 3개를 아예 호출하지
+      않고 즉시 "이 사이트는 검사할 수 없습니다" 차단 화면(신규 <code>BlockedScreen.tsx</code>)을
+      보여줍니다 — Puppeteer/Lighthouse 실행 비용을 아끼고 사이트 소유자 의사를 존중하기 위함
+      (<a href="../adr/index.html#adr-006">ADR-006</a>). 경고 후 진행 옵션은 없음 — 하드 차단.</p>
     <p>Hero 영역에는 개수 요약 대신 <code>fail</code> 항목 상위 N개(기본 3개, 모자라면
       <code>warning</code>으로 채움)를 그대로 노출합니다 — "점수가 낮습니다" 대신 "지금 고쳐야 할 것".
       세부 규칙과 각 그룹 표는 <code>docs/meta-scan-plus-prd.md</code> 3~4절 참고.</p>
@@ -189,12 +200,12 @@
       <li>PDF 리포트, 경쟁 URL 비교(최대 3개)</li>
     </ul>
 
-    <h3>2.5 다음 단계 (이 PRD 범위 밖) — <code>qna.json</code> 생성 도구</h3>
-    <p>체크리스트 도구가 완성된 뒤 이어서 만들 계획입니다. 체크리스트가 "이 사이트엔 FAQ/PromptObject
-      신호가 없다"고 <strong>진단</strong>해주면, 후속 도구는 실제 페이지 콘텐츠를 기반으로
-      <code>qna.json</code>(질문-답변 쌍, prompts.txt/FAQPage 계열 포맷)을 생성해 <strong>처방</strong>까지
-      이어줍니다. 2.3절 AI 신호 그룹의 감지 로직(구조화 데이터 타입, FAQ 섹션)이 그대로 입력 데이터로
-      재사용될 가능성이 높습니다.</p>
+    <h3>2.5 다음 단계 (이 PRD 범위 밖) — FAQ 스키마 생성 도구</h3>
+    <p>체크리스트 도구가 완성된 뒤 이어서 만들 계획입니다. 체크리스트가
+      "이 사이트엔 FAQ/PromptObject 신호가 없다"고 <strong>진단</strong>해주면, 후속 도구는 실제 페이지
+      콘텐츠를 기반으로 <code>FAQPage</code> JSON-LD를 생성해 <strong>처방</strong>까지 이어줍니다.
+      2.3절 AI 신호 그룹의 감지 로직(구조화 데이터 타입, FAQ 섹션)이 그대로 입력 데이터로 재사용될
+      가능성이 높습니다.</p>
   </section>
 
   <!-- 3. 유저 플로우 -->
@@ -215,7 +226,7 @@ flowchart TD
   D -->|"실패 or crrUrl 없음"| X["ErrorScreen 렌더"]
   E --> F["robotsTxt / siteMap / crawling(확장) / lighthouse<br/>4개 API 호출 유지 (analyze 단일 엔드포인트로 교체 안 함)"]
   F -->|"API 완료마다"| G["결과 저장 + 해당 스텝 실시간 '완료' 반영<br/>(더 이상 가짜 progress 아님)"]
-  G -->|"4개 모두 완료"| H["computeChecklist()<br/>프론트 유틸로 pass/warning/fail/info 판정 (합산 점수 없음)"]
+  G -->|"4개 모두 완료"| H["combineScanResults()<br/>프론트 유틸로 이미 판정된 checks[] 그룹별 취합(merge) — 판정은 전부 백엔드가 완료함"]
   H --> I["zustand 스토어에 저장<br/>(url → 원본 4개 응답 + 체크리스트 결과)"]
   I --> J["router.replace('/scan')"]
   J --> K["/scan (서버 → 클라이언트 컴포넌트로 전환)<br/>스토어 값을 기존 카드/탭/배지 UI에 바인딩"]

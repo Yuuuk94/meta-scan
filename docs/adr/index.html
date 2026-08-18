@@ -32,6 +32,9 @@
   code { background: #2a2a2a; padding: 0.12rem 0.4rem; border-radius: 4px; font-size: 0.85em; color: #f3f3f3; }
   .badge { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; white-space: nowrap; }
   .badge.ok { background: rgba(74,222,128,0.15); color: var(--ok); }
+  .badge.warn { background: rgba(251,191,36,0.15); color: var(--warn); }
+  .badge.bad { background: rgba(248,113,113,0.15); color: var(--bad); }
+  .badge.none { background: rgba(107,114,128,0.2); color: #9ca3af; }
   ul, ol { line-height: 1.8; color: #d4d4d4; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
@@ -205,9 +208,9 @@
   </div>
 
   <div class="card" id="adr-003">
-    <h3 style="margin-top:0;">ADR-003 — 유저 플로우 통합: 4-API 오케스트레이션 + 프론트 스코어링 유지</h3>
+    <h3 style="margin-top:0;">ADR-003 — 유저 플로우 통합: 4-API 오케스트레이션 유지, 판정은 백엔드</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-13 (기획 인터뷰로 확정, 구현 착수 전 — <a href="../prd/index.html#userflow">PRD 페이지 3장</a>에 결과 반영)</td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-13, 2026-08-18 수정 (기획 인터뷰로 확정, 구현 착수 전 — <a href="../prd/index.html#userflow">PRD 페이지 3장</a>에 결과 반영)</td></tr>
     </table>
 
     <h4>배경 (Context)</h4>
@@ -234,10 +237,15 @@
         crawling/lighthouse) 호출을 그대로 유지</strong> — <code>ProcessScreen</code>의 5단계 진행
         애니메이션이 각 API의 실제 완료 시점에 반응하도록 하고 싶다는 요구가 우선했음</li>
       <li>각 API 완료마다 결과를 버리지 않고 저장, 4개가 다 모이면 <strong>프론트 유틸
-        (<code>computeAiPreparedness</code>)이 클라이언트 사이드에서 점수를 계산</strong></li>
-      <li>단, AI 신호의 원본 필드(구조화 데이터, prompts.txt, hreflang 등)는 DOM 접근이 필요해
-        <strong><code>crawling</code> API 응답 확장(백엔드)이 선행 조건</strong>으로 남음 — "프론트
-        계산"은 가중합산 로직만 프론트로 가져온다는 뜻이지 백엔드 작업이 없어진다는 뜻이 아님</li>
+        (<code>combineScanResults</code>)이 이미 판정된 결과들을 취합</strong> — <em>2026-08-18
+        수정: 최초엔 이 유틸이 점수까지 계산한다고 썼으나(<code>computeAiPreparedness</code>), 스코어링
+        자체가 <a href="#adr-005">ADR-005</a>로 폐기됐고 사용자가 "판정은 백엔드, 프론트는 결과 취합만"
+        이라고 정정함. 그래서 판정(pass/warning/fail/info)은 전부 백엔드가 각 엔드포인트 응답의
+        <code>checks[]</code>에 담아 반환하고, 프론트는 그걸 그룹별로 합치고 <code>summary</code>
+        (개수 집계)/<code>topIssues</code>(fail 우선 정렬)만 만듦 — "계산"이 아니라 "취합"</em></li>
+      <li>AI 신호의 원본 필드(구조화 데이터, prompts.txt, hreflang 등) 추출과 그 판정 모두
+        <strong><code>crawling</code> API 응답 확장(백엔드)</strong> 몫 — 프론트는 추출도 판정도
+        하지 않음</li>
     </ul>
 
     <h4>고려한 대안 (Alternatives Considered)</h4>
@@ -263,8 +271,8 @@
       <div class="card" style="margin:0;">
         <strong style="color:var(--warn);">트레이드오프</strong>
         <ul>
-          <li><code>crawling</code> 백엔드 확장은 여전히 필요 — "프론트 계산"이 백엔드 작업을 없애주지
-            않음</li>
+          <li><code>crawling</code> 백엔드 확장은 여전히 필요 — 원본 신호 추출뿐 아니라 판정까지
+            백엔드 몫이라 작업량이 더 큼(2026-08-18 수정 반영)</li>
           <li><code>prompts.txt</code> 배치 방식, 캐시 도입 여부는 이번에 결정하지 않고 구현 시점으로
             미룸(<a href="../prd/index.html#userflow">PRD 페이지 3.2</a> 참고)</li>
           <li>PRD 문서(5.2/6/7장)의 <code>/analyze</code> 엔드포인트 관련 서술은 이 ADR로 대체됨 —
@@ -373,8 +381,9 @@
         엔드포인트 없음, 프론트에서 계산)은 그대로 유지 — 바뀐 건 "무엇을 계산하는가"(점수 → 체크리스트
         판정)뿐, "어디서 계산하는가"는 그대로. 프론트 유틸 이름도 <code>computeAiPreparedness</code> →
         <code>computeChecklist</code>로 변경</li>
-      <li>체크리스트 완성 후 <code>qna.json</code> 생성 도구(진단이 아니라 처방 — 감지된 신호 부재를
-        보고 실제 콘텐츠 기반 Q&amp;A 파일을 생성)를 다음 단계로 계획, 이번 스코프에는 포함하지 않음</li>
+      <li>체크리스트 완성 후 FAQ 스키마(schema.org <code>FAQPage</code>) 생성 도구(진단이 아니라
+        처방 — 감지된 신호 부재를 보고 실제 콘텐츠 기반 FAQ 스키마를 생성)를 다음 단계로 계획, 이번
+        스코프에는 포함하지 않음</li>
     </ul>
 
     <h4>고려한 대안 (Alternatives Considered)</h4>
@@ -402,8 +411,133 @@
           <li>화면 UI가 다시 손이 감 — Hero 영역 교체, <code>info</code> 상태 배지 스타일 추가,
             국제화/UX 카드 신설 등(PRD 6장)</li>
           <li>다국어 카피(<code>scan.aiPreparednessScore</code> 등)도 재정리 필요</li>
-          <li><code>qna.json</code> 생성 도구는 이번 스코프 밖으로 명시적으로 미룸 — 범위가 다시
-            늘어나지 않도록 별도 PRD/ADR에서 다룰 것</li>
+          <li>FAQ 스키마 생성 도구는 이번 스코프 밖으로 명시적으로 미룸 — 범위가 다시 늘어나지
+            않도록 별도 PRD/ADR에서 다룰 것</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="adr-006">
+    <h3 style="margin-top:0;">ADR-006 — robots.txt 선검사 게이팅: 비허용 시 전체 스캔 하드 차단</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p>기존 <code>ProcessScreen</code>은 robots/sitemap/crawling/lighthouse 4개 API를
+      <code>Promise.allSettled</code>로 **동시에** 호출합니다. robots.txt가 스캔을 명시적으로
+      차단(disallow)하는 사이트여도 나머지 3개(특히 Puppeteer 크롤링과 Lighthouse — 둘 다 헤드리스
+      Chrome을 띄우는 비용이 큰 작업)가 이미 병렬로 실행되고 난 뒤에야 결과 화면에서 "허용 안 됨"이
+      드러나는 구조였습니다. 사용자가 비용 절감을 이유로 이 순서를 바꾸길 원했습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li><strong>robots.txt를 1차로 단독 실행</strong> — <code>ProcessScreen</code>이 4개를 한 번에
+        병렬 호출하지 않고, robots.txt 결과를 먼저 <code>await</code></li>
+      <li><strong>비허용(disallow) 판정 시 완전 하드 차단</strong> — sitemap/crawling/lighthouse
+        3개를 아예 호출하지 않고 즉시 중단, "이 사이트는 검사할 수 없습니다" 안내만 표시(경고 후
+        진행 옵션 없음)</li>
+      <li><strong>허용 시에만</strong> 나머지 3개(sitemap/crawling/lighthouse)를
+        <code>Promise.allSettled</code>로 병렬 실행 — 이 부분은 기존 구조와 동일</li>
+      <li>차단 화면은 <strong>기존 <code>ErrorScreen</code>과 별도의 신규 컴포넌트</strong>로 분리 —
+        "사이트 접속 실패"(네트워크/서버 문제)와 "접속은 되지만 robots.txt가 차단"은 원인이 달라
+        사용자에게 정확한 이유를 전달할 필요가 있음</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각 사유</th></tr>
+      <tr><td>경고만 표시하고 사용자가 원하면 계속 진행</td><td>비용 절감이 목적인데 사용자가 계속 진행을 누르면 절감 효과가 사라짐 — 사용자가 직접 "완전 차단"을 선택</td></tr>
+      <tr><td>차단 화면을 <code>ErrorScreen</code> 재사용, 메시지만 분기</td><td>구현은 더 단순하지만 "접속 실패"와 "차단"이 사용자 입장에서 다른 상황이라 원인 전달이 흐려짐 — 사용자가 직접 신규 화면을 선택</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li>robots.txt가 차단한 사이트에서 Puppeteer/Lighthouse를 아예 실행하지 않아 비용 절감</li>
+          <li>크롤링 윤리 측면에서도 사이트 소유자 의사를 존중하는 방향과 일치</li>
+          <li><code>/scan</code> 결과 화면의 Indexing 카드에서 "robots.txt 허용" 항목이 사실상 중복
+            제거됨 — 여기 도달했다는 것 자체가 이미 허용됐다는 뜻이라 별도 배지로 보여줄 필요가 없어짐
+            (<a href="../prd/index.html">PRD 페이지</a> 참고)</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>4개 API가 완전 병렬이 아니게 됨 — robots.txt 완료까지는 다른 3개가 대기, 정상 사이트
+            기준으로 체감 스캔 시간이 robots.txt 응답 시간만큼 늘어남</li>
+          <li>신규 화면 컴포넌트(가칭 <code>BlockedScreen.tsx</code>) 하나가 추가로 필요</li>
+          <li>어떤 user-agent 규칙을 기준으로 허용/비허용을 판단할지(와일드카드 <code>*</code> vs
+            특정 봇 이름)는 이번에 확정하지 않음 — 구현 시점에 <code>*</code> 규칙을 기본으로 결정
+            필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="adr-007">
+    <h3 style="margin-top:0;">ADR-007 — Lighthouse 개별 감사(<code>lhr.audits</code>) 재사용: 결과 화면 하단 "Lighthouse 개선 제안" 카드</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p>PRD 3.7절은 "Lighthouse는 4개 숫자 점수만 유지하고 개별 감사(<code>lhr.audits</code>)는
+      재사용하지 않는다"고 정했었습니다(<a href="#adr-003">ADR-003</a>의 "<code>crawling</code>
+      독립성 유지" 취지를 Lighthouse에도 적용한 것). 그런데 결과 화면 하단에 Hero("지금 고쳐야 할
+      것")와 별개로 "개선 제안" 카드를 배치하는 과정에서, 이 카드를 자체 체크리스트(<code>checks[]</code>)
+      재노출이 아니라 <strong>Lighthouse가 이미 계산해주는 감사 항목(opportunities/diagnostics)</strong>
+      으로 채우는 쪽이 사용자 의도임이 확인됐습니다. 코드 확인 결과
+      <code>LighthouseController</code>가 이미 <code>result?.lhr</code> 전체(<code>audits</code>
+      포함)를 그대로 반환하고 있어, 백엔드 파싱 추가 없이 프론트에서 바로 소비 가능하다는 것도
+      함께 확인됐습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li>결과 화면 하단 "Lighthouse 개선 제안" 카드는 자체 <code>checks[]</code>가 아니라
+        <code>lighthouse run</code> 응답의 <code>lhr.audits</code>에서 점수가 낮은 opportunity/
+        diagnostic 항목을 추려 보여줌</li>
+      <li>Hero("지금 고쳐야 할 것")는 계속 자체 <code>checks[]</code> 기반 <code>topIssues</code>
+        그대로 — 두 영역은 출처가 다름을 화면에서 명확히 구분(Hero = 우리 판정, 하단 = Lighthouse
+        자체 판정)</li>
+      <li>신규 백엔드 엔드포인트·필드 불필요 — <code>lhr.audits</code>가 이미 응답에 포함돼 있어
+        프론트가 그중 일부만 골라 렌더링</li>
+      <li>PRD 3.7절의 "개별 감사(<code>lhr.audits</code>)도 재사용하지 않습니다" 문구는 이 결정으로
+        뒤집힘 — PRD 원문(<code>docs/meta-scan-plus-prd.md</code>, <a href="../prd/index.html">PRD
+        페이지</a>)에 직접 반영(PRD는 ADR과 달리 append-only 대상이 아님)</li>
+      <li><a href="#adr-003">ADR-003</a>의 핵심 결정(4개 API 오케스트레이션, 신규 <code>/analyze</code>
+        엔드포인트 없음)은 그대로 유지 — <code>crawling</code>/<code>lighthouse</code>는 여전히 별도
+        API 호출이며, 이번 결정은 "이미 받은 응답 중 무엇을 재사용하는가"만 넓힌 것</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각 사유</th></tr>
+      <tr><td>하단 카드도 자체 <code>checks[]</code> 재노출(직전 초안)</td><td>Hero에서 이미 본 내용과 중복 — Lighthouse가 이미 계산해주는 정보를 활용하는 쪽이 정보 가치가 더 큼</td></tr>
+      <tr><td><code>lhr.audits</code> 전체를 그대로 나열</td><td>보통 수십 개 항목이 있어 그대로 노출하면 과함 — opportunity/diagnostic 중 점수 낮은 것만 추리는 쪽으로 확정</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li>Lighthouse가 이미 계산한 데이터를 재사용 — 신규 판정 로직·백엔드 변경 불필요</li>
+          <li>Hero(자체 판정)와 하단(Lighthouse 판정)의 출처가 분리돼 사용자에게 더 명확함</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>프론트가 <code>lhr.audits</code> 스키마(<code>score</code>, <code>details.type</code>
+            등)를 이해하고 필터링 로직을 가져야 함 — 어떤 기준으로 몇 개를 뽑을지는 구현 시점에 확정
+            필요</li>
+          <li><a href="#adr-003">ADR-003</a>이 원래 내세운 "<code>crawling</code> 독립성 유지" 취지와는
+            부분적으로 어긋남(Lighthouse 응답을 화면 구성에 다시 끌어옴) — 다만 API 호출 구조 자체는
+            안 바뀌므로 ADR-003 본문은 <code>Accepted</code> 그대로 두고 상태 변경은 하지 않음</li>
         </ul>
       </div>
     </div>
