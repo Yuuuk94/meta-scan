@@ -1,7 +1,7 @@
 # 디자인 시스템 — meta-scan-front
 
 > 2026-08-13, `packages/meta-scan-front`의 시각적 디자인을 전면 재작업하며 정립한 토큰/컴포넌트
-> 규칙을 정리한 문서입니다. `docs/architecture/stack.html`("아키텍처")과는 다른 주제입니다 — 그
+> 규칙을 정리한 문서입니다. `docs/architecture/index.html`("아키텍처")과는 다른 주제입니다 — 그
 > 문서는 저장소 구조/스택/구현 패턴 같은 **기술 설계**를 다루고, 이 문서는 색상·타이포·다크모드
 > 같은 **UI/UX 디자인 시스템**을 다룹니다.
 
@@ -81,7 +81,7 @@
 
 `components/ui/*`(shadcn 골격: `cva` variant → `cn()` 클래스 병합 → `data-slot`)는 이번에 구조를
 바꾸지 않았습니다 — 이미 토큰을 참조하고 있었고, 문제는 토큰 값과 `dark:` 배선 쪽이었기 때문입니다.
-새 프리미티브를 추가할 때도 이 골격을 그대로 따르세요(`docs/architecture/stack.html` "컴포넌트 구현
+새 프리미티브를 추가할 때도 이 골격을 그대로 따르세요(`docs/architecture/index.html` "컴포넌트 구현
 패턴" 참고).
 
 `templates/*`의 화면별 컴포넌트는 계속 `theme`/`lang`/`t`를 props로 받는 구조를 유지하되(프롭

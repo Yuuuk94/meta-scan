@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>meta-scan 디자인 시스템</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <style>
   :root {
     --bg: #1a1a1a; --bg-card: #232323; --bg-card-2: #1f1f1f; --border: #3a3a3a;
@@ -37,8 +36,6 @@
   h4 { font-size: 0.92rem; color: var(--accent-2); margin: 1.3rem 0 0.5rem; }
   p { line-height: 1.7; color: #d4d4d4; }
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.4rem; margin: 1rem 0; }
-  .diagram-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin: 1rem 0; overflow-x: auto; }
-  .diagram-card .mermaid { display: flex; justify-content: center; }
   table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.86rem; }
   th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
   th { color: var(--text-dim); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
@@ -69,8 +66,7 @@
   <a href="../index.html">허브</a>
   <a href="../prd/index.html">PRD · 기획</a>
   <a href="../design/index.html" class="active">디자인 시스템</a>
-  <a href="../architecture/stack.html">아키텍처</a>
-  <a href="../architecture/index.html">모듈 그래프</a>
+  <a href="../architecture/index.html">아키텍처</a>
   <a href="../adr/index.html">ADR</a>
 </div>
 
@@ -92,7 +88,7 @@
   <header class="page-header">
     <h1>meta-scan 디자인 시스템</h1>
     <p>2026-08-13, <code>packages/meta-scan-front</code>의 시각적 디자인을 재작업하며 정립한
-      토큰·컴포넌트 규칙입니다. <a href="../architecture/stack.html">아키텍처</a> 페이지와는 다른
+      토큰·컴포넌트 규칙입니다. <a href="../architecture/index.html">아키텍처</a> 페이지와는 다른
       주제입니다 — 그쪽은 저장소 구조/스택/구현 패턴 같은 <strong>기술 설계</strong>를 다루고,
       이 페이지는 색상·타이포·다크모드 같은 <strong>UI/UX 디자인 시스템</strong>을 다룹니다.</p>
   </header>
@@ -215,20 +211,19 @@
       기본값인 OS <code>prefers-color-scheme</code>을 따릅니다 — 브라우저 설정이 다크인데 앱의 테마
       토글은 라이트인 경우 컴포넌트마다 다르게 보이는 <strong>실제 버그</strong>였습니다.</p>
 
-    <div class="diagram-card">
-      <pre class="mermaid">
-flowchart LR
-  TOGGLE["ToggleSetting.tsx<br/>사용자가 테마 토글 클릭"] -->|"document.cookie 갱신"| COOKIE[("theme 쿠키")]
-  COOKIE -->|"getSiteSetting() (서버)"| LAYOUT["app/[lang]/layout.tsx<br/>&lt;html data-theme={theme}&gt;"]
-  LAYOUT -->|"data-theme 속성"| VARIANT["@custom-variant dark<br/>[data-theme=dark] 매칭"]
-  VARIANT --> TOKENS["globals.css<br/>:root[data-theme=dark] { ... }"]
-  VARIANT --> DARKCLS["dark: 클래스<br/>components/ui/*, templates/*"]
-  TOKENS --> RENDER["렌더링 결과"]
-  DARKCLS --> RENDER
-      </pre>
-    </div>
+    <ol class="card" style="margin:1rem 0;">
+      <li><code>ToggleSetting.tsx</code>에서 사용자가 테마를 토글하면 <code>document.cookie</code>의
+        <code>theme</code> 값을 갱신합니다.</li>
+      <li>서버의 <code>getSiteSetting()</code>이 이 쿠키를 읽어 <code>app/[lang]/layout.tsx</code>가
+        <code>&lt;html data-theme={theme}&gt;</code>를 렌더링합니다.</li>
+      <li><code>data-theme</code> 속성이 <code>@custom-variant dark</code>
+        (<code>[data-theme=dark]</code>)와 매칭됩니다.</li>
+      <li>그 결과 <code>globals.css</code>의 <code>:root[data-theme=dark] { ... }</code> 토큰과
+        <code>components/ui/*</code>/<code>templates/*</code>의 <code>dark:</code> 클래스가 동시에
+        반응해 렌더링됩니다.</li>
+    </ol>
     <p class="sub">쿠키를 쓰고 읽는 책임 분리(쓰기=클라이언트, 읽기=서버)는 이번에 바꾸지 않았습니다 —
-      <a href="../architecture/stack.html#frontend">아키텍처 페이지</a>의 기존 상태관리 패턴 그대로
+      <a href="../architecture/index.html#frontend">아키텍처 페이지</a>의 기존 상태관리 패턴 그대로
       입니다.</p>
   </section>
 
@@ -297,7 +292,7 @@ flowchart LR
   <section id="ref">
     <h2>7. 참고 <span class="tag">LINKS</span></h2>
     <p>배경/대안 검토는 <a href="../adr/index.html#adr-004">ADR-004</a>, 저장소 구조/스택은
-      <a href="../architecture/stack.html">아키텍처</a> 페이지를 참고하세요.</p>
+      <a href="../architecture/index.html">아키텍처</a> 페이지를 참고하세요.</p>
     <a class="footer-link" href="../design.md">→ docs/design.md (개요 원문) 열기</a><br/>
     <a class="footer-link" href="colors.md">→ colors.md</a><br/>
     <a class="footer-link" href="typography.md">→ typography.md</a><br/>
@@ -309,17 +304,5 @@ flowchart LR
 
 </main>
 </div>
-
-<script>
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: "dark",
-    themeVariables: {
-      background: "#1a1a1a", primaryColor: "#232323", primaryTextColor: "#eee",
-      primaryBorderColor: "#3a3a3a", lineColor: "#6b7280", secondaryColor: "#2c2c2c", tertiaryColor: "#1f1f1f"
-    },
-    flowchart: { curve: "basis" }
-  });
-</script>
 </body>
 </html>

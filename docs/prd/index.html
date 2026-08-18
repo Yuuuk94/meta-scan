@@ -65,8 +65,7 @@
   <a href="../index.html">허브</a>
   <a href="../prd/index.html" class="active">PRD · 기획</a>
   <a href="../design/index.html">디자인 시스템</a>
-  <a href="../architecture/stack.html">아키텍처</a>
-  <a href="../architecture/index.html">모듈 그래프</a>
+  <a href="../architecture/index.html">아키텍처</a>
   <a href="../adr/index.html">ADR</a>
 </div>
 
@@ -104,17 +103,11 @@
       은 이 공백 — 구조화 데이터 유무, AI가 참고할 수 있는 명시적 신호, 본문이 인용하기 좋은 형태로
       구조화됐는지 — 를 기존 SEO 점검과 같은 자리에서 함께 보여주는 것을 목표로 합니다.</p>
 
-    <h3>제품 컨셉 다이어그램</h3>
-    <div class="diagram-card">
-      <pre class="mermaid">
-flowchart LR
-  URL["URL 1개 입력"] --> EXIST["기존 스캔 영역<br/>메타 태그 · robots/sitemap · Lighthouse"]
-  URL --> NEW["신규 확장 영역<br/>구조화 데이터 · AI 신호(prompts.txt 등)<br/>인용 친화성 · 색인/미리보기"]
-  EXIST --> SCORE["AI Preparedness 점수<br/>0–100 가중합산"]
-  NEW --> SCORE
-  SCORE --> FIX["topFixes<br/>개선 제안 목록"]
-      </pre>
-    </div>
+    <h3>제품 컨셉</h3>
+    <p>URL 1개를 입력하면 두 영역이 함께 평가됩니다: <strong>기존 스캔 영역</strong>(메타 태그·
+      robots/sitemap·Lighthouse)과 <strong>신규 확장 영역</strong>(구조화 데이터·AI 신호(prompts.txt
+      등)·인용 친화성·색인/미리보기). 두 영역의 결과가 합쳐져 <strong>AI Preparedness 점수</strong>
+      (0–100 가중합산)가 되고, 여기서 <code>topFixes</code>(개선 제안 목록)가 도출됩니다.</p>
 
     <div class="callout info">
       <strong>제품 방향의 일관성</strong> — 같은 기획 세션에서 "TubeBuddy를 레퍼런스로 한 YouTube SEO
@@ -154,16 +147,13 @@ flowchart LR
     </ul>
 
     <h3>2.3 스코어링 규칙 (100점 배분)</h3>
-    <div class="diagram-card">
-      <pre class="mermaid">
-pie showData
-  title AI Preparedness 점수 배분 (100점 만점)
-  "구조화 데이터 (최대 35)" : 35
-  "AI 신호 (최대 25)" : 25
-  "인용 친화성 (최대 20)" : 20
-  "색인/미리보기/기타 (최대 20)" : 20
-      </pre>
-    </div>
+    <table>
+      <tr><th>영역</th><th>배점</th></tr>
+      <tr><td>구조화 데이터</td><td>최대 35</td></tr>
+      <tr><td>AI 신호</td><td>최대 25</td></tr>
+      <tr><td>인용 친화성</td><td>최대 20</td></tr>
+      <tr><td>색인/미리보기/기타</td><td>최대 20</td></tr>
+    </table>
     <div class="grid-2">
       <div class="card">
         <h4>가점 규칙</h4>
