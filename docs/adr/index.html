@@ -626,6 +626,86 @@
   </div>
 
 
+  <div class="card" id="adr-009">
+    <h3 style="margin-top:0;">ADR-009 — 프론트 컴포넌트 아키텍처: FSD-lite로 UI/기능 분리</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — 원문은 <code>docs/frontend-component-architecture.md</code>, 구현은 아직 착수 전</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p><code>docs/design-system.md</code>(<a href="#adr-008">ADR-008</a>, 진 인덱스 톤)로 확정된
+      와이어프레임 캔버스를 실제 <code>meta-scan-front</code> 코드로 옮기기에 앞서, "UI 컴포넌트"와
+      "기능(데이터 페칭·판정 취합·상태)"을 어떻게 분리할지가 정해지지 않은 상태였습니다. 지금 남은
+      진짜 작업(<code>ProcessScreen</code>이 4개 API 응답을 버리는 것, <code>/scan</code>이
+      <code>Math.random()</code> 목업인 것, <code>combineScanResults</code> 취합 로직이 없는 것 —
+      <a href="../index.html">CLAUDE.md</a> 참고)이 전부 "기능" 쪽에 몰려 있어서, 이 경계를 명확히
+      긋는 것이 목적이었습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li>정석 FSD(Feature-Sliced Design) 6계층(<code>app</code>/<code>pages</code>/
+        <code>widgets</code>/<code>features</code>/<code>entities</code>/<code>shared</code>)이
+        아니라, <code>features</code>와 <code>widgets</code>를 통합한 <strong>4계층
+        "FSD-lite"</strong>를 채택 — <code>shared</code> / <code>entities</code>(도메인 얕아
+        당장은 생략 가능) / <code>features</code> / <code>pages</code>(=Next.js
+        <code>app/[lang]/**/page.tsx</code>)</li>
+      <li><strong>핵심 규칙</strong>: <code>shared/</code>는 API 호출·스토어를 모르고 props만
+        받는다. API 호출·판정 취합(<code>combineScanResults</code>)·
+        <a href="#adr-006">ADR-006</a> 게이팅 로직은 반드시 해당 feature 슬라이스의
+        <code>model/</code> 또는 <code>api/</code> 세그먼트 안에만 존재하고, <code>ui/</code>
+        세그먼트나 <code>shared/</code>로 새지 않는다</li>
+      <li>기존 폴더와의 충돌 지점 정리: <code>src/apis/</code>는 공유 인스턴스만
+        <code>shared/api</code>로, 도메인별 호출은 각 feature 슬라이스로 이동 /
+        <code>src/stores/scanStore.ts</code>는 당분간 <code>shared/</code>에 유지(도메인이
+        얕아 <code>entities</code> 승격은 보류) / <code>src/templates/</code>는 이름을
+        유지한 채 FSD의 <code>features</code>+<code>widgets</code> 역할을 흡수 /
+        <code>src/app/[lang]/</code>는 Next.js App Router가 이미 그 이름을 쓰고 있어 FSD
+        <code>app</code> 레이어를 별도 폴더로 만들지 않고 <code>layout.tsx</code> +
+        <code>src/providers/</code>로 흡수</li>
+      <li>구현은 이번 ADR 범위 밖 — 방향만 확정, 슬라이스 경계 세부(예:
+        <code>toggle-checklist-item</code>을 <code>run-scan</code> 안에 둘지 분리할지)는
+        실제 컴포넌트 작성 시점에 확정</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각/보류 사유</th></tr>
+      <tr><td>기존 2계층 그대로 확장 (<code>components/ui/</code> + <code>templates/</code>)</td><td>컨벤션일 뿐 강제력이 없음 — <code>templates/</code>가 커지면서 UI와 기능이 다시 섞일 위험</td></tr>
+      <tr><td>훅(hooks) 계층 분리 (<code>useProcessScan()</code> 등으로 데이터 페칭 캡슐화)</td><td>목적 자체는 FSD의 <code>model</code>/<code>api</code> 세그먼트와 사실상 같음 — FSD 채택으로 흡수됨</td></tr>
+      <tr><td><code>design-system/</code> 폴더 신설 + ESLint import-boundary로 강제</td><td>컴파일타임 강제라는 장점은 있으나, 디자인 시스템이 막 확정된 시점(<a href="#adr-008">ADR-008</a> 당일)이라 폴더 구조까지 못 박기엔 이름</td></tr>
+      <tr><td>Atomic Design 정석 5단계(atoms/molecules/organisms/templates/pages)</td><td>단일 스캔 플로우라 atom/molecule 경계 논쟁이 잦고, <code>templates/</code>라는 이름이 기존 의미와 충돌</td></tr>
+      <tr><td>Atomic-lite (<code>ui</code>=atom+molecule, <code>blocks</code>=organism)</td><td>UI를 얼마나 잘게 쪼갤지엔 답을 주지만 "기능이 어디 사는가"라는 이번 질문의 핵심 경계는 정의하지 않음</td></tr>
+      <tr><td>FSD 정석 6계층</td><td>도메인이 얕아(entities 1~2개) 계층 일부가 형식적 껍데기만 남음</td></tr>
+      <tr><td>Atomic(형태)+FSD(경계) 하이브리드</td><td>자체 조합이라 온보딩 설명 비용이 가장 큼</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li>"UI 컴포넌트는 기능을 모른다"는 경계가 폴더 세그먼트(<code>ui</code> vs
+            <code>model</code>/<code>api</code>) 단위로 명시적으로 정의됨</li>
+          <li>남은 작업(4-API 취합, ADR-006 게이팅)이 정확히 <code>features/run-scan</code>
+            슬라이스 하나로 매핑돼 구현 범위가 뚜렷함</li>
+          <li>정석 6계층 대비 이 앱 규모(단일 도메인)에 맞게 계층 수를 줄여 형식적 폴더가
+            생기지 않음</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>"정석" FSD가 아니라서 FSD를 아는 사람이 합류하면 <code>widgets</code>/
+            <code>entities</code>가 왜 없거나 통합됐는지 설명이 필요함</li>
+          <li>구현 전이라 슬라이스 경계가 실제로 잘 맞는지는 검증되지 않음 — 컴포넌트를
+            만들면서 조정될 수 있음</li>
+          <li><code>src/components/ui/</code>(기존 shadcn 프리미티브)와 새
+            <code>shared/</code>의 관계(완전 대체 vs 공존)는 이번에 정하지 않음</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
 </main>
 </body>
 </html>
