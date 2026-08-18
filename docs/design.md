@@ -92,9 +92,9 @@
 - **아이콘/모션/카피 톤** — `redesign-existing-projects` 스킬 감사 기준으로 보면 Lucide 아이콘
   전량 사용, 정적 트랜지션 등도 "AI 생성 티"의 일부로 지적될 수 있지만, 이번 라운드는 색상·그라디언트
   ·다크모드 배선에 집중했습니다.
-- **`/scan` 결과 데이터** — 여전히 `Math.random()` 목업입니다. 실데이터 연결(`POST
-  /api/v1/scan/analyze`)은 `docs/meta-scan-plus-prd.md`/ADR-003 스코프이며 이번 디자인 작업과
-  분리해서 진행하기로 확정했습니다.
+- **`/scan` 결과 데이터** — 여전히 `Math.random()` 목업입니다. 실데이터 연결(`crawling` 응답 확장 +
+  프론트 `computeChecklist` 판정, ADR-003/ADR-005 결정에 따라 신규 `/analyze` 엔드포인트는 만들지
+  않음)은 `docs/meta-scan-plus-prd.md` 스코프이며 이번 디자인 작업과 분리해서 진행하기로 확정했습니다.
 - **완전 커스텀 루트 404** — `/ko/asdf`처럼 라우트 자체가 없는 경로는 여전히 Next.js 기본 404가
   뜹니다. 이 저장소에 진짜 루트 `app/layout.tsx`가 없어서(`app/[lang]/layout.tsx`가 사실상 루트
   역할) 루트 `app/not-found.tsx`를 추가하려면 레이아웃 구조 자체를 바꿔야 합니다 — 별도 작업으로

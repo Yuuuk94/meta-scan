@@ -92,27 +92,39 @@
       <strong>meta-scan</strong>은 URL 하나를 입력받아 메타 태그 · robots.txt · sitemap ·
       Lighthouse(성능/SEO/접근성/모범사례)를 스캔해 보여주는 사이트 진단 서비스입니다. 여기서 한 걸음 더
       나아가, Lighthouse가 다루지 않는 <strong>"AI 시대의 발견 가능성"</strong> — 구조화 데이터,
-      <code>prompts.txt</code> 같은 AI 신호, 인용 친화성(GEO), AEO(AI 엔진 최적화) 준비도 — 까지
-      0–100점 하나의 점수로 합산해 보여주는 <strong>"Lighthouse+ / AI Preparedness"</strong> 제품으로
-      확장하는 중입니다.
+      <code>prompts.txt</code> 같은 AI 신호, 인용 친화성(GEO), AEO(AI 엔진 최적화) 준비도 — 도 항목별로
+      점검해 <strong>pass / warning / fail / info</strong>로 보여주는 <strong>SEO/AEO 체크리스트</strong>
+      제품입니다. 수익 모델은 <strong>Google 애드센스</strong>(무료 도구 + 광고 트래픽)입니다.
+    </div>
+
+    <div class="callout">
+      <strong>2026-08-18 방향 정정</strong> — 이전 버전(v1)은 이 신호들을 0–100점 하나로 가중합산하는
+      "AI Preparedness Index" 스코어링 엔진으로 기획됐었습니다. 이건 사용자 본인이 낸 기획이 아니라
+      이전 세션에서 AI가 덧붙인 것으로 확인되어 폐기했습니다. 원래 기획 의도는 점수를 매기는 능동적
+      진단이 아니라, 체크리스트를 보여주는 <strong>수동적 진단 도구</strong>였고 — 수익 모델(애드센스:
+      무료·고트래픽·광고 기반)도 점수 합산형 프리미엄 제품과는 문법이 맞지 않았습니다. 최신 근거는
+      <code>docs/meta-scan-plus-prd.md</code>.
     </div>
 
     <h3>왜 만드는가</h3>
     <p>기존 Lighthouse는 사람이 브라우저로 방문했을 때의 성능/접근성/SEO 기본기를 측정하지만, ChatGPT나
       Perplexity 같은 AI 답변 엔진이 이 사이트를 실제로 인용할 수 있는지는 측정하지 않습니다. meta-scan
       은 이 공백 — 구조화 데이터 유무, AI가 참고할 수 있는 명시적 신호, 본문이 인용하기 좋은 형태로
-      구조화됐는지 — 를 기존 SEO 점검과 같은 자리에서 함께 보여주는 것을 목표로 합니다.</p>
+      구조화됐는지 — 를 기존 SEO 점검과 같은 자리에서 항목별 체크리스트로 함께 보여주는 것을 목표로
+      합니다.</p>
 
     <h3>제품 컨셉</h3>
-    <p>URL 1개를 입력하면 두 영역이 함께 평가됩니다: <strong>기존 스캔 영역</strong>(메타 태그·
-      robots/sitemap·Lighthouse)과 <strong>신규 확장 영역</strong>(구조화 데이터·AI 신호(prompts.txt
-      등)·인용 친화성·색인/미리보기). 두 영역의 결과가 합쳐져 <strong>AI Preparedness 점수</strong>
-      (0–100 가중합산)가 되고, 여기서 <code>topFixes</code>(개선 제안 목록)가 도출됩니다.</p>
+    <p>URL 1개를 입력하면 두 영역이 함께 점검됩니다: <strong>기존 스캔 영역</strong>(메타 태그·
+      robots/sitemap·Lighthouse — Lighthouse 4개 점수는 구글 자체 채점이라 숫자 그대로 유지)과
+      <strong>신규 확장 영역</strong>(구조화 데이터·AI 신호(prompts.txt 등)·인용 친화성·색인/미리보기·
+      국제화/UX). 신규 확장 영역의 각 항목은 <strong>pass/warning/fail/info</strong>로만 판정되고,
+      합산 점수나 등급은 만들지 않습니다. 결과 화면 Hero는 점수 대신 <strong>가장 심각한 실패 항목
+      상위 N개</strong>를 보여줍니다.</p>
 
     <div class="callout info">
       <strong>제품 방향의 일관성</strong> — 같은 기획 세션에서 "TubeBuddy를 레퍼런스로 한 YouTube SEO
       SaaS 피벗"이 잠시 제안됐다가 중단된 이력이 있습니다. 현재 컨셉은 그 피벗과 무관하게, 웹사이트
-      SEO/AEO 스캐너라는 원래 방향을 그대로 유지하고 있습니다.
+      SEO/AEO 체크리스트라는 원래 방향을 그대로 유지하고 있습니다.
     </div>
   </section>
 
@@ -130,8 +142,9 @@
       <tr><td>robots.txt 파싱 + allow 판정</td><td><span class="badge ok">구현됨</span></td><td><code>scanService.robotsTxt</code> (자체 파서)</td></tr>
       <tr><td>sitemap.xml 존재 확인 (HEAD)</td><td><span class="badge warn">일부 구현</span></td><td>URL 개수 카운트는 미구현</td></tr>
       <tr><td>Lighthouse 점수 (performance/seo/a11y/best-practices)</td><td><span class="badge ok">구현됨</span></td><td><code>LighthouseService</code> + chrome-launcher</td></tr>
-      <tr><td>AI 친화도(AEO) 점수 · 구조화 데이터 · prompts.txt · hreflang/viewport</td><td><span class="badge bad">미구현</span></td><td>백엔드에 관련 코드 없음 — <code>crawling</code> 응답 확장으로 추가 예정(3장 목표 플로우)</td></tr>
-      <tr><td>스코어링 엔진(0–100 가중합산)</td><td><span class="badge bad">미구현</span></td><td>점수 계산 로직 전무 — 목표안은 프론트 유틸로 계산(3장, <a href="../adr/index.html#adr-003">ADR-003</a>)</td></tr>
+      <tr><td>SEO/AEO 체크 항목 (구조화 데이터 · prompts.txt · hreflang/viewport 등)</td><td><span class="badge bad">미구현</span></td><td>백엔드에 관련 코드 없음 — <code>crawling</code> 응답 확장으로 추가 예정(3장 목표 플로우)</td></tr>
+      <tr><td>~~스코어링 엔진(0–100 가중합산)~~</td><td><span class="badge none">폐기</span></td><td>사용자 본인 기획이 아니었음이 확인돼 폐기 — pass/warning/fail/info 판정으로 대체(2.3절)</td></tr>
+      <tr><td>판정 로직(pass/warning/fail/info)</td><td><span class="badge bad">미구현</span></td><td>가중치 없는 룰 판정 — 목표안은 프론트 유틸로 계산(3장, <a href="../adr/index.html#adr-003">ADR-003</a>)</td></tr>
       <tr><td>결과 통합 API (<code>/api/analyze</code> 성격)</td><td><span class="badge none">계획 취소</span></td><td>PRD 원안은 신규 엔드포인트였지만, <a href="../adr/index.html#adr-003">ADR-003</a>에서 기존 4개 API 오케스트레이션 유지로 확정 — 이 엔드포인트는 만들지 않음</td></tr>
       <tr><td>결과 리포트 UI (배지/탭/카드)</td><td><span class="badge warn">UI만 완성</span></td><td>데이터는 전부 <code>Math.random()</code> 목업 (<code>app/[lang]/scan/page.tsx</code>)</td></tr>
       <tr><td>다국어 카피(한/영)</td><td><span class="badge ok">이미 존재</span></td><td><code>dictionaries/{ko,en}.json</code>의 <code>scan.*</code> 키</td></tr>
@@ -140,48 +153,48 @@
 
     <h3>2.2 목표</h3>
     <ul>
-      <li>기존 Lighthouse 결과 + AI 친화도(AEO 준비도) 0–100 점수 제공</li>
-      <li>구조화 데이터 · 프롬프트 신호 · 인용 친화성 등 Lighthouse가 다루지 않는 영역을 룰 기반으로 보강</li>
-      <li>이미 만들어진 <code>/scan</code> 리포트 화면에 실제 분석 결과 연결</li>
+      <li>기존 Lighthouse 4개 점수(성능/SEO/접근성/모범사례)는 숫자 그대로 유지</li>
+      <li>구조화 데이터 · 프롬프트 신호 · 인용 친화성 등 Lighthouse가 다루지 않는 영역을 <strong>개별
+        체크리스트 항목</strong>(pass/warning/fail/info)으로 룰 기반 판정 — 합산 점수 없음</li>
+      <li>이미 만들어진 <code>/scan</code> 리포트 화면에 실제 체크리스트 결과 연결, 합산 점수 Hero는
+        "가장 심각한 실패 항목 N개" 강조 영역으로 교체</li>
       <li>외부 ML/유료 API 없이 기존 Puppeteer + 자체 파싱만으로 구현 (신규 라이브러리 추가 없음)</li>
+      <li>애드센스 승인/운영 고려 — 결과 화면은 로그인 없이 공개 접근, 항목별 설명 텍스트로 원본 콘텐츠
+        확보</li>
     </ul>
 
-    <h3>2.3 스코어링 규칙 (100점 배분)</h3>
+    <h3>2.3 체크리스트 그룹 · 판정 규칙 (스코어링 아님)</h3>
+    <p>각 항목은 <strong>가중치 없이</strong> 아래 기준대로 <code>pass</code> / <code>warning</code> /
+      <code>fail</code> / <code>info</code> 넷 중 하나로만 판정합니다. 합산 점수·등급·가중치는 없습니다.
+      <a href="../adr/index.html#adr-003">ADR-003</a>에 따라 이 판정은 백엔드가 아니라 프론트 유틸
+      (<code>computeChecklist</code>)이 4개 API 응답을 모은 뒤 클라이언트에서 계산합니다.</p>
     <table>
-      <tr><th>영역</th><th>배점</th></tr>
-      <tr><td>구조화 데이터</td><td>최대 35</td></tr>
-      <tr><td>AI 신호</td><td>최대 25</td></tr>
-      <tr><td>인용 친화성</td><td>최대 20</td></tr>
-      <tr><td>색인/미리보기/기타</td><td>최대 20</td></tr>
+      <tr><th>그룹</th><th>항목 예시</th><th>판정 감각</th></tr>
+      <tr><td>색인(Indexing)</td><td>robots 허용, canonical 다중 태그, noindex 여부</td><td>대부분 pass/fail — 검색엔진 노출에 직결</td></tr>
+      <tr><td>미리보기(Previews)</td><td>OG/Twitter 필수값, og:image 크기 메타, favicon</td><td>누락 시 대부분 warning</td></tr>
+      <tr><td>AI 신호(AI Signals)</td><td>prompts.txt, PromptObject, FAQ 섹션, 구조화 데이터 타입</td><td>없어도 감점 아님 — "있으면 좋은 신호"로 info 표시</td></tr>
+      <tr><td>콘텐츠(Content)</td><td>본문 단어 수, 헤딩 계층, TL;DR</td><td>임계치 기준 pass/warning</td></tr>
+      <tr><td>국제화/UX</td><td>hreflang, viewport</td><td>viewport는 warning, hreflang은 info</td></tr>
+      <tr><td>Lighthouse</td><td>performance/seo/accessibility/best-practices</td><td>구글 자체 점수, 체크리스트 판정 대상 아님</td></tr>
     </table>
-    <div class="grid-2">
-      <div class="card">
-        <h4>가점 규칙</h4>
-        <ul>
-          <li>구조화 데이터: WebPage/Article/FAQPage/LocalBusiness 각 6점(최대 24) + JSON-LD 파싱 성공 6 + FAQPage 포함 +5</li>
-          <li>AI 신호: prompts.txt 10(존재) + 3(100–5,000자) + PromptObject 8 + FAQ 섹션 감지 +4</li>
-          <li>인용 친화성: 본문 600–2,000단어 +8, 문장 중위 길이 8–24 +4, 헤딩 계층 적정 +4, TL;DR 감지 +4</li>
-          <li>색인/기타: robots 허용 +5, canonical 적정 +5, og/twitter 충돌 無 +5, hreflang/viewport +5</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h4>벌점 규칙</h4>
-        <ul>
-          <li>noindex −10</li>
-          <li>canonical 다중/순환 −8</li>
-          <li>og:image width/height 미기재 또는 600px 미만 −4</li>
-          <li>JSON-LD 파싱 에러 −6</li>
-        </ul>
-      </div>
-    </div>
+    <p>Hero 영역에는 개수 요약 대신 <code>fail</code> 항목 상위 N개(기본 3개, 모자라면
+      <code>warning</code>으로 채움)를 그대로 노출합니다 — "점수가 낮습니다" 대신 "지금 고쳐야 할 것".
+      세부 규칙과 각 그룹 표는 <code>docs/meta-scan-plus-prd.md</code> 3~4절 참고.</p>
 
     <h3>2.4 이번 스코프에서 의도적으로 뺀 것 (v0.2 후보)</h3>
     <ul>
       <li>og:image 실제 픽셀 크기 측정(이미지 다운로드/디코딩)</li>
       <li>sitemap.xml 내 URL 개수 카운트(GET + XML 파싱)</li>
-      <li>결과 캐시의 영속화(현재 무상태 API라 재시작 시 캐시 소실 — DB 도입 시점에 재검토)</li>
+      <li>애드센스 실제 슬롯 삽입, 광고 정책 준수 세부 작업</li>
       <li>PDF 리포트, 경쟁 URL 비교(최대 3개)</li>
     </ul>
+
+    <h3>2.5 다음 단계 (이 PRD 범위 밖) — <code>qna.json</code> 생성 도구</h3>
+    <p>체크리스트 도구가 완성된 뒤 이어서 만들 계획입니다. 체크리스트가 "이 사이트엔 FAQ/PromptObject
+      신호가 없다"고 <strong>진단</strong>해주면, 후속 도구는 실제 페이지 콘텐츠를 기반으로
+      <code>qna.json</code>(질문-답변 쌍, prompts.txt/FAQPage 계열 포맷)을 생성해 <strong>처방</strong>까지
+      이어줍니다. 2.3절 AI 신호 그룹의 감지 로직(구조화 데이터 타입, FAQ 섹션)이 그대로 입력 데이터로
+      재사용될 가능성이 높습니다.</p>
   </section>
 
   <!-- 3. 유저 플로우 -->
@@ -202,8 +215,8 @@ flowchart TD
   D -->|"실패 or crrUrl 없음"| X["ErrorScreen 렌더"]
   E --> F["robotsTxt / siteMap / crawling(확장) / lighthouse<br/>4개 API 호출 유지 (analyze 단일 엔드포인트로 교체 안 함)"]
   F -->|"API 완료마다"| G["결과 저장 + 해당 스텝 실시간 '완료' 반영<br/>(더 이상 가짜 progress 아님)"]
-  G -->|"4개 모두 완료"| H["computeAiPreparedness()<br/>프론트 유틸로 AI Preparedness 점수 계산"]
-  H --> I["zustand 스토어에 저장<br/>(url → 원본 4개 응답 + 점수)"]
+  G -->|"4개 모두 완료"| H["computeChecklist()<br/>프론트 유틸로 pass/warning/fail/info 판정 (합산 점수 없음)"]
+  H --> I["zustand 스토어에 저장<br/>(url → 원본 4개 응답 + 체크리스트 결과)"]
   I --> J["router.replace('/scan')"]
   J --> K["/scan (서버 → 클라이언트 컴포넌트로 전환)<br/>스토어 값을 기존 카드/탭/배지 UI에 바인딩"]
   K -->|"스토어에 값 없음(직접 진입 등)"| L["'/'로 안내"]
@@ -213,16 +226,18 @@ flowchart TD
     <div class="callout info">
       <strong>백엔드 변경 필요 지점</strong> — <code>crawling</code> API 응답 확장(구조화 데이터,
       prompts.txt, FAQ 섹션, hreflang, viewport, noindex, 본문 단어수/h2·h3, TL;DR 후보 등 AI 신호
-      원본 필드, PRD 3장 그대로)이 선행돼야 프론트 스코어링이 의미가 있습니다. "프론트에서 점수를
-      계산한다"는 결정이 "백엔드 작업이 없다"는 뜻은 아닙니다 — 원본 신호 추출은 여전히 백엔드(Puppeteer
-      DOM 접근) 몫입니다.
+      원본 필드, PRD 3장 그대로)이 선행돼야 프론트 판정이 의미가 있습니다. "프론트에서 판정한다"는
+      결정이 "백엔드 작업이 없다"는 뜻은 아닙니다 — 원본 신호 추출은 여전히 백엔드(Puppeteer DOM 접근)
+      몫입니다. <code>prompts.txt</code>는 DOM이 필요 없는 순수 fetch라 별도 API로 빼지 않고
+      <code>crawling</code>이 원본 HTML을 가져오는 지점에서 병렬 fetch로 함께 처리 — 5번째 API 호출을
+      만들면 <code>ProcessScreen</code>의 4단계 구성이 깨지기 때문(ADR-003이 5번째 API 대안을 기각한
+      이유와 동일).
     </div>
 
     <h3>3.2 이번엔 결정하지 않은 세부사항</h3>
     <ul>
-      <li><code>prompts.txt</code> 체크를 <code>crawling</code> 응답에 얹을지, <code>robotsTxt</code>
-        처럼 별도 경량 API(<code>promptsTxt</code>)로 뺄지</li>
-      <li>동일 URL 1시간 캐시 도입 여부(PRD Day2 체크리스트의 선택 항목)</li>
+      <li>동일 URL 캐시 도입 여부 — 프론트 계산이라 서버 캐시의 실익이 크지 않아 이번 스코프에서는
+        보류</li>
     </ul>
     <p class="sub">3.1은 2026-08-13 기획 인터뷰로 확정된 목표 상태이며, 아직 코드에는 반영되지
       않았습니다.</p>

@@ -53,8 +53,39 @@
   <header class="page-header">
     <h1>ADR (설계 결정 기록)</h1>
     <p>왜 이렇게 만들었는지를 나중에 다시 찾아보기 쉽도록, 코드에 남지 않는 의사결정 배경을 기록합니다.
-      새 결정이 생기면 이 아래에 계속 추가하세요.</p>
+      새 결정이 생기면 이 아래에 계속 추가하세요. 작성 규칙은 바로 아래 카드 참고.</p>
   </header>
+
+  <div class="card" id="adr-rules" style="border-color: var(--accent-2);">
+    <h3 style="margin-top:0;">ADR 작성 규칙 <span class="badge" style="background: rgba(167,139,250,0.15); color: var(--accent-2);">META</span></h3>
+    <p class="sub">이 카드 자체도 아래 규칙을 따릅니다 — 규칙이 바뀌면 이 본문을 고치지 않고 맨 아래
+      변경 이력에 추가합니다.</p>
+
+    <h4>1. 본문은 append-only — Accepted 이후 다시 쓰지 않는다</h4>
+    <p>ADR 카드가 <span class="badge ok">Accepted</span>가 된 뒤에는 배경(Context)/결정(Decision)/
+      고려한 대안(Alternatives)/결과(Consequences) 본문을 절대 고쳐 쓰지 않습니다. 그 시점에 실제로
+      어떤 근거로 무엇을 결정했는지를 있는 그대로 남기는 것이 ADR의 존재 이유이기 때문입니다. 이후
+      생각이 바뀌거나 방향이 전환되면:</p>
+    <ul>
+      <li><strong>새 번호의 ADR을 추가</strong>하고, 관련된 예전 ADR과 서로 링크(<code>#adr-00N</code>)</li>
+      <li>예전 ADR의 결정이 실질적으로 뒤집혔다면 상태 배지만 <code>Superseded by ADR-00N</code>으로
+        바꾸고, 본문은 그대로 둠 (예: 이번에 ADR-005가 스코어링을 폐기했지만 ADR-003의 "4-API 유지"
+        결정 자체는 안 뒤집혀서 ADR-003은 <code>Accepted</code> 그대로 — 상태 변경은 결정이 실제로
+        무효가 됐을 때만)</li>
+    </ul>
+
+    <h4>2. 날짜는 두 종류 — 작성일(고정) vs 변경 이력(누적)</h4>
+    <ul>
+      <li><strong>작성일</strong>: 상태 줄의 <code>Accepted · YYYY-MM-DD</code>가 최초 작성일입니다.
+        이 날짜는 본문과 마찬가지로 이후 절대 바꾸지 않습니다.</li>
+      <li><strong>변경 이력</strong>: 상태 배지 변경, 다른 ADR에서의 참조 추가처럼 카드에 손을 대야
+        하는 경우, 본문 대신 카드 맨 아래에 <code>변경 이력</code> 목록을 추가하고
+        <code>YYYY-MM-DD — 무엇이 왜 바뀌었는지 (관련 ADR 링크)</code> 형식으로 한 줄씩 append합니다.
+        이렇게 하면 git blame 없이도 카드 자체에서 ADR의 버전 이력이 보입니다.</li>
+    </ul>
+    <p class="sub">변경 이력 없이 상태 배지만 슬쩍 바뀌어 있으면 안 됩니다 — 배지가 바뀔 땐 반드시
+      변경 이력 한 줄이 같이 붙어야 합니다.</p>
+  </div>
 
   <div class="card" id="adr-001">
     <h3 style="margin-top:0;">ADR-001 — 모노레포 의존성 관리 도구: pnpm workspaces</h3>
@@ -310,6 +341,69 @@
           <li>완전 커스텀 루트 404는 미해결 — 진짜 루트 <code>app/layout.tsx</code>가 없는 기존
             구조 때문에 루트 <code>app/not-found.tsx</code>를 붙이면 빌드 에러가 나서(실제로 시도 후
             롤백) 레이아웃 구조 변경이 선행돼야 함</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="adr-005">
+    <h3 style="margin-top:0;">ADR-005 — 스코어링 엔진 폐기, 체크리스트(pass/warning/fail/info)로 전환</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — <code>docs/meta-scan-plus-prd.md</code>·<a href="../prd/index.html">PRD 페이지</a>에 결과 반영</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p>사용자와 대화하며 확인된 사실: PRD의 "0–100점 AI Preparedness Index" 가중합산 스코어링 개념은
+      사용자 본인이 낸 기획이 아니라 이전 세션에서 AI가 기획하며 덧붙인 것이었습니다. 사용자의 원래
+      의도는 "크롤링 결과를 SEO/AEO 체크리스트로 점검해주는" <strong>수동적 진단 도구</strong>였고,
+      수익 모델도 <strong>Google 애드센스</strong>(무료·고트래픽·광고 기반)라 점수 합산·가중치·등급
+      같은 프리미엄 진단 제품의 문법과 맞지 않았습니다. 이 불일치가 "기획에 확신이 안 선다"는 감각의
+      실제 원인으로 확인됐습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li>0–100 가중합산 스코어링 엔진(원 PRD 4절, <code>topFixes</code> 생성 로직 포함)을 전량 폐기</li>
+      <li>각 체크 항목은 가중치 없이 <code>pass</code> / <code>warning</code> / <code>fail</code> /
+        <code>info</code> 넷 중 하나로만 판정 — 합산 점수·등급 없음</li>
+      <li>결과 화면 Hero(기존 "AI Preparedness Score" 큰 숫자)는 <code>fail</code> 항목 상위 N개를
+        강조하는 카드로 교체("점수가 낮습니다"가 아니라 "지금 고쳐야 할 것")</li>
+      <li>Lighthouse 4개 점수(performance/seo/accessibility/best-practices)는 예외 — 구글 자체 채점
+        기준이라 숫자 그대로 유지, 우리 체크리스트 판정 대상에서 제외</li>
+      <li><a href="#adr-003">ADR-003</a>의 아키텍처 결정(4개 API 유지, 신규 <code>/analyze</code>
+        엔드포인트 없음, 프론트에서 계산)은 그대로 유지 — 바뀐 건 "무엇을 계산하는가"(점수 → 체크리스트
+        판정)뿐, "어디서 계산하는가"는 그대로. 프론트 유틸 이름도 <code>computeAiPreparedness</code> →
+        <code>computeChecklist</code>로 변경</li>
+      <li>체크리스트 완성 후 <code>qna.json</code> 생성 도구(진단이 아니라 처방 — 감지된 신호 부재를
+        보고 실제 콘텐츠 기반 Q&amp;A 파일을 생성)를 다음 단계로 계획, 이번 스코프에는 포함하지 않음</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각 사유</th></tr>
+      <tr><td>스코어링 엔진 유지, 가중치만 재조정</td><td>근본 문제가 가중치 튜닝이 아니라 "점수 합산이라는 제품 형태 자체가 사용자 기획과 다르다"는 것이었음 — 튜닝으로 해결 안 됨</td></tr>
+      <tr><td>점수와 체크리스트 둘 다 제공(점수는 부가 정보로 축소)</td><td>애드센스형 무료 진단 도구 톤과 맞지 않고, 사용자가 명시적으로 "능동적인게 아니라 체크리스트"라고 확인 — 점수 자체를 없애는 쪽으로 확정</td></tr>
+      <tr><td>ADR-003도 함께 재검토(백엔드 단일 엔드포인트로 재전환)</td><td>실수로 초안에서 잠깐 되돌아갔었으나, ADR-003의 근거(단계별 진행 UI가 실제 이벤트에 반응)는 스코어링 폐기와 무관하게 여전히 유효 — ADR-003은 그대로 유지하기로 확정</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li>가장 복잡하고 주관적이었던 부분(가중치 합산 규칙)이 통째로 사라져 구현 범위가 단순해짐 —
+            순수 룰 판정 함수만 남음</li>
+          <li>기획이 사용자 본인 의도와 다시 일치 — "확신이 안 선다"던 근본 원인 해소</li>
+          <li>애드센스(무료·고트래픽) 수익 모델과 제품 톤이 맞춰짐</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>화면 UI가 다시 손이 감 — Hero 영역 교체, <code>info</code> 상태 배지 스타일 추가,
+            국제화/UX 카드 신설 등(PRD 6장)</li>
+          <li>다국어 카피(<code>scan.aiPreparednessScore</code> 등)도 재정리 필요</li>
+          <li><code>qna.json</code> 생성 도구는 이번 스코프 밖으로 명시적으로 미룸 — 범위가 다시
+            늘어나지 않도록 별도 PRD/ADR에서 다룰 것</li>
         </ul>
       </div>
     </div>
