@@ -285,7 +285,7 @@
   <div class="card" id="adr-004">
     <h3 style="margin-top:0;">ADR-004 — 디자인 시스템: 토큰 기반 + <code>data-theme</code> 다크모드로 전환</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-13 — <a href="../design/index.html">디자인 시스템 페이지</a>에 결과 반영</td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge none">Superseded by ADR-008</span> · 2026-08-13 — <a href="../design/index.html">디자인 시스템 페이지</a>에 결과 반영</td></tr>
     </table>
 
     <h4>배경 (Context)</h4>
@@ -352,6 +352,14 @@
         </ul>
       </div>
     </div>
+
+    <h4>변경 이력</h4>
+    <ul>
+      <li>2026-08-18 — 와이어프레임 디자인 방향 탐색 과정에서 "프리미엄 SaaS(화이트/차콜+인디고)"
+        톤을 폐기하고 "진 인덱스(Zine Index) + 오렌지 액센트" 톤으로 완전히 교체하기로 결정 —
+        <a href="#adr-008">ADR-008</a> 참고. 이 카드의 본문(배경/결정/대안/결과)은 그대로 두고
+        상태 배지만 변경.</li>
+    </ul>
   </div>
 
   <div class="card" id="adr-005">
@@ -542,6 +550,81 @@
       </div>
     </div>
   </div>
+
+  <div class="card" id="adr-008">
+    <h3 style="margin-top:0;">ADR-008 — 디자인 시스템 재정립: "진 인덱스(Zine Index) + 오렌지" 톤, ADR-004 대체</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — <code>docs/design-system.md</code>에 결과 반영</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p>PRD 체크리스트 방향(ADR-005)으로 전환하면서 결과 화면(Hero·AI Signals·Lighthouse 개선 제안
+      등)을 다시 그려야 했고, 이 기회에 ADR-004의 "화이트/차콜 + 인디고 포인트 컬러" 프리미엄 SaaS
+      톤도 함께 재검토했습니다. 와이어프레임 캔버스에서 저해상도 방향 3안(미니멀·로우파이 / 베이지
+      캠퍼스 오렌지 강조 / 종이 문서 스타일)을 먼저 스케치했지만 전부 기각됐고, 이어서 더 대담한
+      방향 3안(랩 리포트 / 네온 스캐너 / 진 인덱스)을 다시 그려 비교한 뒤 <strong>진 인덱스(Zine
+      Index)</strong>가 선택됐습니다. 포인트 컬러도 오렌지-레드/블루/옐로/핑크 4안을 나란히 비교해
+      원안 오렌지-레드(<code>#FF4B1F</code>)로 확정했습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li>ADR-004의 화이트/차콜+인디고 팔레트를 폐기하고, <strong>진 인덱스</strong> 톤(굵은
+        타이포·하드라인 룰·모서리 없는 사각 배지)으로 전면 교체</li>
+      <li>배경 <code>#FAF6ED</code>(웜 페이퍼 화이트), 잉크 <code>#141311</code>, 브랜드 액센트
+        <code>#FF4B1F</code>(오렌지-레드) 1개만 사용</li>
+      <li>판정 배지(pass/warning/fail/info) 색은 브랜드 액센트와 별도의 시맨틱 팔레트로 관리 —
+        특히 <code>fail</code>은 브랜드 오렌지와 혼동되지 않도록 크림슨 계열(<code>#C81E3A</code>)로
+        분리</li>
+      <li><strong>pass/warning/fail 배지는 전부 동일한 무게의 채움 박스</strong>로 표시(2026-08-18
+        사용자 피드백 반영 — 기존엔 fail만 채움 박스였고 pass/warn은 텍스트색뿐이라 위계가
+        어긋나 있었음), <code>info</code>만 얇은 외곽선으로 낮은 무게 유지</li>
+      <li>디스플레이 폰트 <code>Big Shoulders Display</code> + 본문 <code>IBM Plex Sans</code>,
+        모서리 둥글림 전면 금지(sharp corners)</li>
+      <li>디자인 시스템 문서는 Google Stitch의 <code>DESIGN.md</code> 문서 정리 방식(섹션 구성:
+        분위기 → 컬러 → 타이포 → 컴포넌트 → 레이아웃 → 모션 → 안티패턴)을 그대로 따르되, 내용은
+        Stitch 자체 스타일이 아니라 meta-scan이 확정한 진 인덱스 톤으로 채움 —
+        <code>docs/design-system.md</code>. 기존 <code>docs/design.md</code> +
+        <code>docs/design/{colors,typography,spacing,components}.md</code> 분할 구조는 이 단일
+        문서로 대체(재구성은 다음 라운드)</li>
+      <li>메인/결과 화면(Main·Scan) 데스크톱+모바일에 우선 적용, 나머지 7개 화면(ProcessScreen 계열
+        3개, Privacy/Terms/NotFound/ErrorBoundary)과 Scan 모바일은 다음 라운드로 이월</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각 사유</th></tr>
+      <tr><td>ADR-004 팔레트 유지, 배지 스타일만 수정</td><td>근본적으로 "프리미엄 SaaS" 톤 자체가 무료 애드센스 진단 도구 성격과 안 맞는다는 게 방향 탐색 과정에서 재확인됨 — 부분 수정이 아니라 전면 교체로 확정</td></tr>
+      <tr><td>1차 저해상도 3안(미니멀·로우파이 / 베이지 오렌지 / 종이 문서)</td><td>사용자가 셋 다 기각 — "몰라 개쩌는거 없어?" 피드백으로 더 대담한 방향 요청</td></tr>
+      <tr><td>랩 리포트 / 네온 스캐너</td><td>진 인덱스와 함께 비교했으나 최종 선택되지 않음 — 두 방향 모두 와이어프레임 캔버스에 참고용으로 남겨둠(디자인 방향 탐색 페이지)</td></tr>
+      <tr><td>포인트 컬러 블루/옐로/핑크</td><td>진 인덱스 색상 3안으로 나란히 비교 후 원안 오렌지-레드가 최종 선택됨</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li>제품 톤(무료·애드센스·진단 도구)과 시각 언어가 다시 일치</li>
+          <li>판정 배지 3종(pass/warn/fail)의 시각적 위계가 동등해져 체크리스트 가독성 개선</li>
+          <li>디자인 결정이 <code>docs/design-system.md</code> 한 문서에 정리돼 향후 컴포넌트
+            구현 시 참조하기 쉬움</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>9개 화면 중 2개(Main, Scan)만 데스크톱 우선 적용됨 — 나머지 7개 화면 + 전 화면
+            모바일 버전은 아직 미완료</li>
+          <li><code>docs/design/index.html</code>(시각화 페이지)과 기존 분할 md 문서들은 아직
+            갱신 전 — <code>docs/design-system.md</code>가 최신 소스이니 그 사이 이 문서를
+            우선 참고할 것</li>
+          <li>실제 <code>meta-scan-front</code> 컴포넌트(Tailwind 토큰, `globals.css`)로의
+            반영은 이번 ADR 범위 밖 — 와이어프레임 확정 이후 별도 구현 작업</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
 
 </main>
 </body>
