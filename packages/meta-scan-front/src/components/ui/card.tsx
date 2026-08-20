@@ -6,8 +6,11 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card"
+      // Hardline border (1.5px solid Ink), never a shadow — the "printed
+      // box" boundary this whole system uses instead of elevation
+      // (design-system.md §4). Sharp corners, no exceptions.
       className={cn(
-        "bg-card text-card-foreground flex flex-col rounded-xl border",
+        "bg-card text-card-foreground flex flex-col border-[1.5px] border-foreground",
         className
       )}
       {...props}
@@ -32,7 +35,9 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <h4
       data-slot="card-title"
-      className={cn("leading-none", className)}
+      // Card titles use the display face (design-system.md §3: "카드
+      // 제목에 사용"), weight over size for hierarchy.
+      className={cn("font-display font-bold leading-none tracking-tight", className)}
       {...props}
     />
   );

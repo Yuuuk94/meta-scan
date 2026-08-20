@@ -1,5 +1,6 @@
 import { getDictionary } from "@/dictionaries";
 import { getSiteSetting } from "@/utils/siteSetting";
+import { NumberLabel } from "@/components/ui/number-label";
 
 const lastUpdated = "2026-08-13";
 
@@ -8,51 +9,51 @@ const content: Record<
   { lead: string; sections: { heading: string; body: string[] }[] }
 > = {
   ko: {
-    lead: "이 약관은 Meta-Scan(이하 '서비스')을 이용할 때 적용됩니다. 서비스를 이용하면 아래 내용에 동의한 것으로 간주합니다.",
+    lead: "이 약관은 Meta-Scan(이하 '서비스')을 이용할 때 적용된다. 서비스를 이용하면 아래 내용에 동의한 것으로 간주한다.",
     sections: [
       {
         heading: "서비스 소개",
         body: [
-          "Meta-Scan은 입력한 URL의 메타 태그, robots.txt, sitemap, Lighthouse(성능·SEO·접근성·모범사례) 결과를 보여주는 무료 진단 도구입니다.",
-          "서비스는 현재 베타 단계로 운영되며, 계정 가입이나 결제 없이 이용할 수 있습니다.",
+          "Meta-Scan은 입력한 URL의 메타 태그, robots.txt, sitemap, Lighthouse(성능·SEO·접근성·모범사례) 결과를 보여주는 무료 진단 도구다.",
+          "서비스는 현재 베타 단계로 운영되며, 계정 가입이나 결제 없이 이용할 수 있다.",
         ],
       },
       {
         heading: "허용되는 이용",
         body: [
-          "본인이 소유했거나 스캔 권한이 있는 사이트를 대상으로 서비스를 이용해주세요.",
-          "서비스나 인프라에 과도한 부하를 주는 자동화된 대량 요청, 취약점 탐색 목적의 스캔은 허용되지 않습니다.",
+          "본인이 소유했거나 스캔 권한이 있는 사이트를 대상으로 서비스를 이용하라.",
+          "서비스나 인프라에 과도한 부하를 주는 자동화된 대량 요청, 취약점 탐색 목적의 스캔은 허용되지 않는다.",
         ],
       },
       {
         heading: "면책 조항",
         body: [
-          "스캔 결과(점수, 진단 항목)는 참고용 정보이며 정확성·완전성을 보장하지 않습니다. 실제 SEO·성능 개선 여부는 별도로 검증해주세요.",
-          "서비스는 '있는 그대로(as-is)' 제공되며, 특정 목적에 대한 적합성을 보증하지 않습니다.",
+          "스캔 결과(점수, 진단 항목)는 참고용 정보이며 정확성·완전성을 보장하지 않는다. 실제 SEO·성능 개선 여부는 별도로 검증하라.",
+          "서비스는 '있는 그대로(as-is)' 제공되며, 특정 목적에 대한 적합성을 보증하지 않는다.",
         ],
       },
       {
         heading: "서비스 변경 및 중단",
         body: [
-          "베타 서비스 특성상 사전 고지 없이 기능이 추가, 변경, 중단될 수 있습니다.",
-          "서버 부하나 장애로 일부 스캔이 실패할 수 있으며, 이 경우 재시도를 안내합니다.",
+          "베타 서비스 특성상 사전 고지 없이 기능이 추가, 변경, 중단될 수 있다.",
+          "서버 부하나 장애로 일부 스캔이 실패할 수 있으며, 이 경우 재시도를 안내한다.",
         ],
       },
       {
         heading: "책임의 제한",
         body: [
-          "서비스 이용 또는 이용 불가로 발생하는 간접적·부수적 손해에 대해 서비스 운영자는 법이 허용하는 한도 내에서 책임을 지지 않습니다.",
+          "서비스 이용 또는 이용 불가로 발생하는 간접적·부수적 손해에 대해 서비스 운영자는 법이 허용하는 한도 내에서 책임을 지지 않는다.",
         ],
       },
       {
         heading: "약관 변경",
         body: [
-          "약관 내용은 서비스 개선에 따라 변경될 수 있으며, 변경 시 이 페이지 상단의 최종 수정일이 업데이트됩니다.",
+          "약관 내용은 서비스 개선에 따라 변경될 수 있으며, 변경 시 이 페이지 상단의 최종 수정일이 업데이트된다.",
         ],
       },
       {
         heading: "문의",
-        body: ["약관에 대한 문의는 legal@meta-scan.dev로 연락해주세요."],
+        body: ["약관에 대한 문의는 legal@meta-scan.dev로 연락하라."],
       },
     ],
   },
@@ -113,32 +114,41 @@ export default async function TermsPage() {
   const { lead, sections } = content[lang];
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <article className="mx-auto max-w-2xl">
-        <h1 className="mb-2 text-3xl font-semibold text-foreground">
+    <div className="content-frame py-16">
+      <article className="max-w-3xl">
+        <h1 className="font-display text-4xl font-black text-foreground">
           {t.termsTitle}
         </h1>
-        <p className="mb-10 font-mono text-xs text-muted-foreground">
+        <p className="mt-2 text-xs text-muted-foreground">
           {t.updated}: {lastUpdated}
         </p>
 
-        <p className="mb-10 text-muted-foreground">{lead}</p>
+        <p className="mt-10 max-w-2xl text-foreground-secondary">{lead}</p>
 
-        <div className="space-y-10">
-          {sections.map((section) => (
-            <section key={section.heading}>
-              <h2 className="mb-3 text-lg font-semibold text-foreground">
-                {section.heading}
-              </h2>
-              <div className="space-y-3">
-                {section.body.map((paragraph) => (
-                  <p
-                    key={paragraph}
-                    className="text-sm leading-relaxed text-muted-foreground"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
+        <div className="mt-10 flex flex-col">
+          {sections.map((section, index) => (
+            <section
+              key={section.heading}
+              className="flex gap-4 border-b-[1.5px] border-border py-5 last:border-none sm:gap-5 sm:py-6"
+            >
+              <NumberLabel
+                value={index + 1}
+                className="w-8 shrink-0 text-xl sm:w-11 sm:text-2xl"
+              />
+              <div>
+                <h2 className="mb-3 text-[15px] font-bold text-foreground">
+                  {section.heading}
+                </h2>
+                <div className="space-y-2.5">
+                  {section.body.map((paragraph) => (
+                    <p
+                      key={paragraph}
+                      className="text-sm leading-relaxed text-foreground-secondary"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </div>
             </section>
           ))}

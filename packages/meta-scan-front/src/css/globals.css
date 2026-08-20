@@ -7,120 +7,172 @@
  * OS setting while the rest of the app followed the theme cookie. */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/*
+ * "Zine Index" design system (ADR-008, docs/design-system.md). Replaces the
+ * ADR-004 white/charcoal + indigo "premium SaaS" palette below this comment
+ * used to hold — same token *names* (so components/ui/* and every
+ * `bg-primary`/`text-success`/etc. consumer across templates/* re-skin for
+ * free), new *values*: warm paper background, ink text, a single orange
+ * brand accent, sharp corners everywhere, no shadows. See
+ * docs/design-system.md for the full rationale per token.
+ */
 :root {
   --font-size: 15px;
 
-  /* Neutral scale (cool gray, single family) */
-  --background: #ffffff;
-  --foreground: #16181d;
-  --card: #ffffff;
-  --card-foreground: #16181d;
+  /* Paper / Ink neutrals (warm, never pure white/black) */
+  --background: #faf6ed;
+  --foreground: #141311;
+  --card: #fff9f0;
+  --card-foreground: #141311;
   --popover: #ffffff;
-  --popover-foreground: #16181d;
-  --muted: #f4f5f7;
-  --muted-foreground: #686e79;
-  --border: #e6e8ec;
-  --input: #e6e8ec;
-  --input-background: #f7f8fa;
+  --popover-foreground: #141311;
+  --muted: #efe9d8;
+  --muted-foreground: #8a8577;
+  --border: #e4decb;
+  --input: #141311;
+  --input-background: #faf6ed;
 
-  /* Single accent: indigo */
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --secondary: #eef0ff;
-  --secondary-foreground: #362f9e;
-  --accent: #eef0ff;
-  --accent-foreground: #362f9e;
-  --ring: #4f46e5;
+  /* Ink Secondary (design-system.md §2) — subcopy/body-description text, one
+   * step darker than Ink Tertiary (--muted-foreground, used for meta info /
+   * labels / timestamps). Missing from this file at zine-index-full intake
+   * time (spec §4.3-①); added as a mechanical token addition per that
+   * intake's §6 decision 5. */
+  --foreground-secondary: #4a473f;
 
-  /* Status (used for score bands, not decoration) */
-  --success: #16803c;
-  --success-foreground: #ffffff;
-  --warning: #b45309;
-  --warning-foreground: #ffffff;
-  --destructive: #d1293d;
-  --destructive-foreground: #ffffff;
+  /* Primary = the button/CTA fill (design-system.md §4: "채움 사각형,
+   * #141311 배경 + #FAF6ED 텍스트"), not the brand accent. */
+  --primary: #141311;
+  --primary-foreground: #faf6ed;
+  --secondary: #efe9d8;
+  --secondary-foreground: #141311;
 
-  --switch-background: #d5d7dd;
+  /* Single brand accent: Signal Orange. Doubles as the shadcn `accent`
+   * hover/emphasis slot (links, hover fills) per design-system.md §2. */
+  --accent: #ff4b1f;
+  --accent-foreground: #faf6ed;
+  --ring: #ff4b1f;
+
+  /* Checklist judgement semantics (design-system.md §8) — pass/warning/fail
+   * always render as equal-weight filled boxes; info is outline-only and
+   * has no fill color of its own, just a text/border pair. */
+  --success: #3e7d4f;
+  --success-foreground: #faf6ed;
+  --warning: #e3a61e;
+  --warning-foreground: #141311;
+  --destructive: #c81e3a;
+  --destructive-foreground: #faf6ed;
+  --info: #6b6659;
+  --info-border: #d8d3c4;
+
+  /* Opaque fail/warning row tints (ScanZine wireframe: #FFF1EC / #FFFAEE).
+   * Deliberately solid, not `bg-destructive/10` — those rows sit inside the
+   * hardline-grid gap-px trick (an opaque `bg-foreground` parent showing
+   * through as 1px rule lines), so a translucent child composites onto that
+   * near-black parent instead of the page background. */
+  --fail-tint: #fff1ec;
+  --warning-tint: #fffaee;
+
+  --switch-background: #e4decb;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --radius: 0.75rem;
 
-  /* Shadows tinted toward the accent hue instead of flat black */
-  --elevation-sm: 0 1px 2px rgba(30, 27, 75, 0.05);
-  --elevation-md: 0 6px 16px -4px rgba(45, 39, 130, 0.1);
-  --elevation-lg: 0 20px 40px -12px rgba(45, 39, 130, 0.18);
+  /* Sharp corners system-wide — this system's signature, no exceptions. */
+  --radius: 0rem;
 
-  /* Sequential/qualitative chart scale, one hue family, muted saturation */
-  --chart-1: #4f46e5;
-  --chart-2: #0f9d8b;
-  --chart-3: #6b7280;
-  --chart-4: #b45309;
-  --chart-5: #be185d;
+  /* "그림자 없음" — hard hairline/hardline borders carry all separation,
+   * never elevation shadows. */
+  --elevation-sm: none;
+  --elevation-md: none;
+  --elevation-lg: none;
 
-  --sidebar: #f7f8fa;
-  --sidebar-foreground: #16181d;
-  --sidebar-primary: #4f46e5;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef0ff;
-  --sidebar-accent-foreground: #362f9e;
-  --sidebar-border: #e6e8ec;
-  --sidebar-ring: #4f46e5;
+  --chart-1: #ff4b1f;
+  --chart-2: #3e7d4f;
+  --chart-3: #8a8577;
+  --chart-4: #e3a61e;
+  --chart-5: #c81e3a;
+
+  --sidebar: #fff9f0;
+  --sidebar-foreground: #141311;
+  --sidebar-primary: #141311;
+  --sidebar-primary-foreground: #faf6ed;
+  --sidebar-accent: #ff4b1f;
+  --sidebar-accent-foreground: #faf6ed;
+  --sidebar-border: #e4decb;
+  --sidebar-ring: #ff4b1f;
 }
 
-/* Dark mode: tinted charcoal, never pure black — driven by [data-theme=dark] */
+/*
+ * Dark mode is NOT specified in docs/design-system.md (the Zine Index tone
+ * is written as a light, printed-paper concept). This is a minimal inverted
+ * companion — Ink becomes the background, Paper becomes the text, status
+ * colors brightened for contrast — so the existing `data-theme` toggle
+ * doesn't render illegibly. Treat as provisional until design-system.md
+ * says otherwise.
+ */
 :root[data-theme="dark"] {
-  --background: #0b0c10;
-  --foreground: #eceef1;
-  --card: #131419;
-  --card-foreground: #eceef1;
-  --popover: #131419;
-  --popover-foreground: #eceef1;
-  --muted: #1a1c22;
-  --muted-foreground: #9a9fab;
-  --border: #24262e;
-  --input: #24262e;
-  --input-background: #1a1c22;
+  --background: #141311;
+  --foreground: #faf6ed;
+  --card: #1f1d19;
+  --card-foreground: #faf6ed;
+  --popover: #1f1d19;
+  --popover-foreground: #faf6ed;
+  --muted: #26231d;
+  --muted-foreground: #b5af9c;
+  --border: #3a362c;
+  --input: #faf6ed;
+  --input-background: #1f1d19;
 
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-  --secondary: #1c1b3a;
-  --secondary-foreground: #c7d2fe;
-  --accent: #1c1b3a;
-  --accent-foreground: #c7d2fe;
-  --ring: #6366f1;
+  /* Ink Secondary dark counterpart — one step dimmer than the dark
+   * --foreground, one step brighter than dark --muted-foreground. */
+  --foreground-secondary: #c9c3b2;
 
-  --success: #34a260;
-  --success-foreground: #05170c;
-  --warning: #d69433;
-  --warning-foreground: #1a1103;
-  --destructive: #e35267;
-  --destructive-foreground: #1a0407;
+  --primary: #faf6ed;
+  --primary-foreground: #141311;
+  --secondary: #26231d;
+  --secondary-foreground: #faf6ed;
 
-  --switch-background: #33363f;
+  --accent: #ff6b45;
+  --accent-foreground: #141311;
+  --ring: #ff6b45;
 
-  --elevation-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --elevation-md: 0 6px 20px -4px rgba(0, 0, 0, 0.45);
-  --elevation-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.55);
+  --success: #5fa372;
+  --success-foreground: #0d1f12;
+  --warning: #f0bb4a;
+  --warning-foreground: #241a03;
+  --destructive: #e0546c;
+  --destructive-foreground: #240208;
+  --info: #9a9486;
+  --info-border: #4a453a;
 
-  --chart-1: #818cf8;
-  --chart-2: #2dd4bf;
-  --chart-3: #9ca3af;
-  --chart-4: #d69433;
-  --chart-5: #ec4899;
+  --fail-tint: #3a2420;
+  --warning-tint: #332c18;
 
-  --sidebar: #131419;
-  --sidebar-foreground: #eceef1;
-  --sidebar-primary: #6366f1;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1c1b3a;
-  --sidebar-accent-foreground: #c7d2fe;
-  --sidebar-border: #24262e;
-  --sidebar-ring: #6366f1;
+  --switch-background: #3a362c;
+
+  --elevation-sm: none;
+  --elevation-md: none;
+  --elevation-lg: none;
+
+  --chart-1: #ff6b45;
+  --chart-2: #5fa372;
+  --chart-3: #b5af9c;
+  --chart-4: #f0bb4a;
+  --chart-5: #e0546c;
+
+  --sidebar: #1f1d19;
+  --sidebar-foreground: #faf6ed;
+  --sidebar-primary: #faf6ed;
+  --sidebar-primary-foreground: #141311;
+  --sidebar-accent: #ff6b45;
+  --sidebar-accent-foreground: #141311;
+  --sidebar-border: #3a362c;
+  --sidebar-ring: #ff6b45;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -139,6 +191,10 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-border: var(--info-border);
+  --color-fail-tint: var(--fail-tint);
+  --color-warning-tint: var(--warning-tint);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-input-background: var(--input-background);
@@ -149,10 +205,15 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Sharp corners everywhere — set directly rather than deriving via
+   * calc(var(--radius) ± Npx), which would produce invalid negative
+   * radii now that --radius is 0. */
+  --radius-sm: 0rem;
+  --radius-md: 0rem;
+  --radius-lg: 0rem;
+  --radius-xl: 0rem;
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -164,6 +225,15 @@
   --shadow-sm: var(--elevation-sm);
   --shadow-md: var(--elevation-md);
   --shadow-lg: var(--elevation-lg);
+
+  /* design-system.md §3: Big Shoulders Display for headlines/numbers,
+   * IBM Plex Sans for everything else. Variables come from next/font in
+   * layout.tsx (--font-big-shoulders / --font-ibm-plex-sans). Declaring
+   * them under --font-* here auto-generates the `font-display`/`font-sans`
+   * Tailwind utilities. */
+  --font-sans: var(--font-ibm-plex-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-display: var(--font-big-shoulders), sans-serif;
 }
 
 @layer base {
@@ -173,6 +243,28 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Design-system.md §5: "컨테이너는 최대 폭 제한(데스크톱 1200px 프레임 기준... max-width
+ * 컨테이너 + 좌우 여백 56px)". Replaces the ad-hoc `container mx-auto px-4` (Tailwind's
+ * breakpoint-stepped container, no fixed cap) that templates/* and app/[lang]/* previously
+ * repeated inconsistently.
+ *
+ * Mobile step-down: every Mobile artboard (zine-index intake, docs/design/intake/
+ * zine-index/spec.md §2.1) uses 20px side padding instead of the desktop 56px — at a
+ * 390px viewport, 56px would leave only ~278px of content vs. the design's ~350px. Tailwind's
+ * `sm` breakpoint (640px) is this codebase's established mobile/desktop split (see
+ * HeroSection's `flex-col sm:flex-row`, etc.), so this steps down below `sm` rather than at
+ * the artboard's literal 390px. */
+@utility content-frame {
+  margin-inline: auto;
+  max-width: 1200px;
+  padding-inline: 20px;
+
+  @variant sm {
+    padding-inline: 56px;
   }
 }
 

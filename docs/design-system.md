@@ -5,6 +5,12 @@
 > 만들 때 그대로 참조하는 소스 오브 트루스입니다 — Google Stitch의 `DESIGN.md` 문서 정리 방식을
 > 그대로 따르되(섹션 구성·서술 방식), 내용은 meta-scan이 확정한 "진 인덱스"(Zine Index) 톤입니다.
 
+> **디자인 원본(캔버스)**: <https://claude.ai/code/artifact/43c00b5f-73e5-4720-b77f-265dffe7e71c>
+> ("meta-scan Wireframes" — Claude Design 캔버스, 18개 아트보드: `*Zine.dc.html` 데스크톱 9 +
+> `*Mobile.dc.html` 모바일 9, "final" 페이지가 채택본). 디자인/프레임워크(퍼블리싱) 작업은 기본적으로
+> **이 아티팩트를 소스로 삼습니다** — 새 캔버스를 만들기 전에 먼저 이 링크를 재사용/갱신할지 확인하세요.
+> 인테이크 스펙은 `docs/design/intake/zine-index-full/spec.md`.
+
 ## 1. Visual Theme & Atmosphere
 
 인쇄된 진단 보고서를 스캔한 듯한 편집/진(zine) 톤 — 신문·잡지 인덱스 페이지의 굵은 타이포와

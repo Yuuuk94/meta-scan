@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { Roboto, Geist_Mono } from "next/font/google";
+import { Big_Shoulders, IBM_Plex_Sans } from "next/font/google";
 import { okStatus, pageTitle } from "@/constans";
 import { RootHeader } from "@/templates/root/RootHeader";
 import { RootFooter } from "@/templates/root/RootFooter";
@@ -10,13 +10,23 @@ import { pingApi } from "@/apis/status";
 
 import "@/css/globals.css";
 
-const RobotoSans = Roboto({
-  variable: "--font-geist-sans",
+// Zine Index typography (docs/design-system.md §3): condensed display face
+// for headlines/numbers, IBM Plex Sans for everything else. Replaces the
+// prior Roboto/Geist Mono pairing from the superseded ADR-004 palette.
+//
+// design-system.md names "Big Shoulders Display" specifically, but Google
+// Fonts has since folded Display/Text/Inline/Stencil into one variable
+// family ("Big Shoulders") — next/font/google only exposes the merged
+// family, so this loads that at the same 700/800/900 weights instead.
+const bigShoulders = Big_Shoulders({
+  variable: "--font-big-shoulders",
+  weight: ["700", "800", "900"],
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: "--font-ibm-plex-sans",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
@@ -50,7 +60,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} data-theme={theme} suppressHydrationWarning>
       <body
-        className={`${RobotoSans.variable} ${geistMono.variable} antialiased`}
+        className={`${bigShoulders.variable} ${ibmPlexSans.variable} antialiased`}
       >
         <div className="min-h-screen bg-background">
           <RootHeader theme={theme} lang={lang} ready={ready} />

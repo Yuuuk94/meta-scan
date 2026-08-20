@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bot, Search, Globe, Zap, Scan, Check } from "lucide-react";
 import { okStatus } from "@/constans";
 import {
   lsRunApi,
@@ -19,13 +18,11 @@ const promistList = [
   lsRunApi,
 ];
 
-const steps = [
-  { id: "ping", icon: Search },
-  { id: "ai", icon: Bot },
-  { id: "meta", icon: Globe },
-  { id: "analysis", icon: Zap },
-  { id: "gen", icon: Check },
-];
+// The design's step grid has exactly 4 tiles, one per real scan API
+// (robots.txt/sitemap.xml/crawling+AI/lighthouse) — the "site is reachable"
+// ping result is shown only via the URL-chip badge above the grid, not
+// duplicated as a 5th tile (zine-index intake §3.2 decision).
+const stepIds = ["ai", "meta", "analysis", "gen"];
 
 interface ProcessScreenProps extends DefaultPageProps {
   siteStatus: SiteStatusData;
@@ -39,10 +36,9 @@ export function ProcessScreen({
   const router = useRouter();
 
   const [progress, setProgress] = useState(10);
-  const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>([
-    siteStatus.status === okStatus,
-    ...Array(steps.length - 1).fill(null),
-  ]);
+  const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>(
+    Array(stepIds.length).fill(null)
+  );
   const didRunRef = useRef(false);
 
   useEffect(() => {
@@ -71,7 +67,7 @@ export function ProcessScreen({
                   (res.data as OkStatus).status === okStatus
                   ? true
                   : false,
-                idx + 1
+                idx
               );
               return res;
             })
@@ -92,53 +88,49 @@ export function ProcessScreen({
   }, []);
 
   return (
-    <div className="flex items-center justify-center py-20">
-      <div className="mx-auto max-w-xl px-4 text-center">
-        <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
-          <Scan className="h-11 w-11 animate-spin text-primary" />
-        </div>
+    <div className="content-frame flex flex-col items-center gap-7 py-16 text-center">
+      {/* URL chip + live status, mirrors RequestScanProcessZine's header row */}
+      <div className="flex items-center gap-3 border-[1.5px] border-foreground bg-card px-5 py-3">
+        <span className="text-[13px] font-semibold text-foreground">
+          {siteStatus.url}
+        </span>
+        <span className="bg-success px-[9px] py-[3px] text-[10.5px] font-extrabold tracking-[.04em] text-success-foreground">
+          {lang === "ko" ? "생존 확인 완료" : "SITE REACHABLE"}
+        </span>
+      </div>
 
-        <h2 className="mb-3 text-3xl font-semibold text-foreground">
+      <div>
+        <h2 className="font-display text-3xl font-extrabold text-foreground">
           {t.analyzingText}
         </h2>
-        <p className="mb-12 text-muted-foreground">{t.analyzingSubtext}</p>
-
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Progress</span>
-            <span className="text-sm font-medium text-primary">
-              {Math.round(progress)}%
-            </span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-primary transition-[width] duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Current Step */}
-        <div className="space-y-3">
-          {steps.map((step, index) => {
-            const IconComponent = step.icon;
-            const isActive = currentProcess[index] === null;
-            const isCompleted = currentProcess[index] === true;
-            return (
-              <ProcessStep
-                key={step.id}
-                isCompleted={isCompleted}
-                isActive={isActive}
-                IconComponent={IconComponent}
-                txt={t.steps[index]}
-                lang={lang}
-                theme={theme}
-              />
-            );
-          })}
-        </div>
+        <p className="mt-2 text-sm text-foreground-secondary">
+          {t.analyzingSubtext}
+        </p>
       </div>
+
+      {/* Step grid — hardline rule between tiles instead of gaps
+       * (design-system.md §4). */}
+      <div className="grid w-full max-w-3xl grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-4">
+        {stepIds.map((id, index) => (
+          <ProcessStep
+            key={id}
+            isCompleted={currentProcess[index] === true}
+            isActive={currentProcess[index] === null}
+            txt={t.steps[index]}
+            lang={lang}
+            theme={theme}
+          />
+        ))}
+      </div>
+
+      <div className="h-2 w-full max-w-3xl bg-muted">
+        <div
+          className="h-full bg-accent transition-[width] duration-300"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <span className="text-[11px] text-muted-foreground">{t.stepsHint}</span>
     </div>
   );
 }

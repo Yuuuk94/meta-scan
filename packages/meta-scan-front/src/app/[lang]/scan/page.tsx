@@ -1,462 +1,391 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { getDictionary } from "@/dictionaries";
 import { getSiteSetting } from "@/utils/siteSetting";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StatusBadge, type StatusBadgeProps } from "@/components/ui/status-badge";
 
-import {
-  Bot,
-  BarChart3,
-  Globe,
-  Search,
-  Shield,
-  AlertTriangle,
-  Eye,
-  FileText,
-  Code,
-  Zap,
-  Target,
-  TrendingUp,
-  Clock,
-  LucideProps,
-} from "lucide-react";
-import { ForwardRefExoticComponent, RefAttributes } from "react";
+type Status = StatusBadgeProps["status"];
 
-interface AnalysisResult {
-  url: string;
-  timestamp: string;
-  sitemap: {
-    totalPages: number;
-    crawlDepth: number;
-    errors: number;
-    structure: Array<{ name: string; pages: number; depth: number }>;
-  };
-  lighthouse: {
-    performance: number;
-    seo: number;
-    accessibility: number;
-    bestPractices: number;
-    metrics: {
-      fcp: number;
-      lcp: number;
-      cls: number;
-      fid: number;
-    };
-  };
-  seoAudit: {
-    score: number;
-    issues: Array<{
-      type: "error" | "warning" | "info";
-      message: string;
-      count: number;
-    }>;
-    metaTags: { title: boolean; description: boolean; keywords: boolean };
-    structuredData: boolean;
-  };
+interface Row {
+  label: string;
+  status?: Status;
+  detail?: string;
+  /** Plain stat value instead of a pass/warning/fail/info verdict (word count, heading counts). */
+  value?: string;
 }
 
-// NOTE: still mock data (Math.random()) — wiring this to the real
-// POST /api/v1/scan/analyze response is out of scope for this pass,
-// see docs/meta-scan-plus-prd.md. Only the presentation layer changed here.
+interface Group {
+  title: string;
+  rows: Row[];
+}
+
+interface FixItem {
+  status: "fail" | "warning";
+  text: string;
+}
+
+// NOTE: still mock data — wiring this to the real 4-API orchestration
+// (ADR-003: robotsTxt/siteMap/crawling/lighthouse, combined client-side by
+// combineScanResults) is out of scope for this pass, see
+// docs/meta-scan-plus-prd.md and CLAUDE.md "현재 상태". This mock's *shape*
+// mirrors the checklist model backend `checks[]` will return (pass/warning/
+// fail/info per item) — the previous 0-100 "AI Preparedness Score" mock was
+// the scoring engine ADR-005 scrapped and has been replaced here.
+const mock: Record<
+  Language,
+  {
+    aiSignals: Row[];
+    fixNow: FixItem[];
+    groups: Group[];
+    previewChecks: Row[];
+    previewCards: { eyebrow?: string; title: string; desc: string }[];
+    lighthouse: { label: string; score: number }[];
+    suggestions: { label: string; source: string }[];
+  }
+> = {
+  ko: {
+    aiSignals: [
+      { label: "prompts.txt", status: "info", detail: "없음" },
+      { label: "PromptObject", status: "info", detail: "없음" },
+      { label: "FAQ 섹션", status: "pass", detail: "발견됨" },
+      { label: "구조화 데이터", status: "pass", detail: "WebPage, FAQPage" },
+      { label: "JS 렌더링 의존도", status: "pass", detail: "12%" },
+    ],
+    fixNow: [
+      { status: "fail", text: "meta robots에 noindex가 설정돼 있어 색인되지 않는다" },
+      { status: "fail", text: "canonical 태그가 2개 이상 발견됐다" },
+      { status: "warning", text: "og:image 크기 메타가 없다" },
+    ],
+    groups: [
+      {
+        title: "기본 SEO",
+        rows: [
+          { label: "title", status: "pass" },
+          { label: "description", status: "warning" },
+          { label: "keywords 태그", status: "info" },
+          { label: "이미지 alt 누락", status: "warning" },
+          { label: "중복 meta", status: "pass" },
+        ],
+      },
+      {
+        title: "Indexing",
+        rows: [
+          { label: "sitemap.xml 존재", status: "pass" },
+          { label: "robots.txt에 sitemap", status: "pass" },
+          { label: "canonical 존재", status: "pass" },
+          { label: "canonical 다중", status: "fail" },
+          { label: "noindex", status: "fail" },
+        ],
+      },
+      {
+        title: "Content Stats",
+        rows: [
+          { label: "본문 단어 수", value: "1,340" },
+          { label: "헤딩 구조", value: "H1:1 H2:6 H3:12" },
+          { label: "TL;DR", status: "info" },
+        ],
+      },
+      {
+        title: "국제화·UX",
+        rows: [
+          { label: "hreflang", status: "info" },
+          { label: "viewport", status: "pass" },
+        ],
+      },
+    ],
+    previewChecks: [
+      { label: "OG 필수 태그", status: "pass" },
+      { label: "Twitter Card", status: "warning" },
+      { label: "og:image 크기", status: "warning" },
+      { label: "favicon", status: "pass" },
+    ],
+    previewCards: [
+      { eyebrow: "example.com", title: "meta-scan — 무료 SEO/AEO 체크리스트", desc: "URL 하나로 항목별로 점검한다" },
+      { title: "meta-scan — 무료 SEO/AEO 체크리스트", desc: "URL 하나로 항목별로 점검한다", eyebrow: "example.com" },
+    ],
+    lighthouse: [
+      { label: "Performance", score: 88 },
+      { label: "SEO", score: 92 },
+      { label: "Accessibility", score: 76 },
+      { label: "Best Practices", score: 93 },
+    ],
+    suggestions: [
+      { label: "이미지 크기 최적화", source: "Properly size images" },
+      { label: "렌더링 차단 리소스 제거", source: "Eliminate render-blocking" },
+      { label: "차세대 이미지 포맷", source: "Next-gen formats" },
+    ],
+  },
+  en: {
+    aiSignals: [
+      { label: "prompts.txt", status: "info", detail: "Not found" },
+      { label: "PromptObject", status: "info", detail: "Not found" },
+      { label: "FAQ section", status: "pass", detail: "Found" },
+      { label: "Structured data", status: "pass", detail: "WebPage, FAQPage" },
+      { label: "JS render dependency", status: "pass", detail: "12%" },
+    ],
+    fixNow: [
+      { status: "fail", text: "meta robots sets noindex, so this page won't be indexed" },
+      { status: "fail", text: "Two or more canonical tags were found" },
+      { status: "warning", text: "og:image is missing its size meta" },
+    ],
+    groups: [
+      {
+        title: "Basic SEO",
+        rows: [
+          { label: "title", status: "pass" },
+          { label: "description", status: "warning" },
+          { label: "keywords tag", status: "info" },
+          { label: "Missing image alt", status: "warning" },
+          { label: "Duplicate meta", status: "pass" },
+        ],
+      },
+      {
+        title: "Indexing",
+        rows: [
+          { label: "sitemap.xml exists", status: "pass" },
+          { label: "sitemap in robots.txt", status: "pass" },
+          { label: "canonical exists", status: "pass" },
+          { label: "Multiple canonicals", status: "fail" },
+          { label: "noindex", status: "fail" },
+        ],
+      },
+      {
+        title: "Content Stats",
+        rows: [
+          { label: "Word count", value: "1,340" },
+          { label: "Heading structure", value: "H1:1 H2:6 H3:12" },
+          { label: "TL;DR", status: "info" },
+        ],
+      },
+      {
+        title: "Intl & UX",
+        rows: [
+          { label: "hreflang", status: "info" },
+          { label: "viewport", status: "pass" },
+        ],
+      },
+    ],
+    previewChecks: [
+      { label: "Required OG tags", status: "pass" },
+      { label: "Twitter Card", status: "warning" },
+      { label: "og:image size", status: "warning" },
+      { label: "favicon", status: "pass" },
+    ],
+    previewCards: [
+      { eyebrow: "example.com", title: "meta-scan — a free SEO/AEO checklist", desc: "Check every item with a single URL" },
+      { title: "meta-scan — a free SEO/AEO checklist", desc: "Check every item with a single URL", eyebrow: "example.com" },
+    ],
+    lighthouse: [
+      { label: "Performance", score: 88 },
+      { label: "SEO", score: 92 },
+      { label: "Accessibility", score: 76 },
+      { label: "Best Practices", score: 93 },
+    ],
+    suggestions: [
+      { label: "Optimize image sizes", source: "Properly size images" },
+      { label: "Remove render-blocking resources", source: "Eliminate render-blocking" },
+      { label: "Use next-gen image formats", source: "Next-gen formats" },
+    ],
+  },
+};
+
+const StatusOrValue = ({ row }: { row: Row }) =>
+  row.status ? (
+    <StatusBadge status={row.status}>
+      {row.status.toUpperCase()}
+      {row.detail ? ` · ${row.detail}` : ""}
+    </StatusBadge>
+  ) : (
+    <span className="text-xs text-info">{row.value}</span>
+  );
+
 export default async function ScanPage() {
-  const { lang } = await getSiteSetting();
+  const { lang, crrUrl } = await getSiteSetting();
   const t = (await getDictionary(lang)).scan;
-
-  const result = {
-    url: "https://naver.com",
-    timestamp: new Date().toISOString(),
-    aiPreparednessScore: Math.floor(Math.random() * 40) + 60,
-    lighthouse: {
-      performance: Math.floor(Math.random() * 40) + 60,
-      seo: Math.floor(Math.random() * 30) + 70,
-      accessibility: Math.floor(Math.random() * 50) + 50,
-      bestPractices: Math.floor(Math.random() * 50) + 50,
-      metrics: {
-        fcp: Math.floor(Math.random() * 50) + 50,
-        lcp: Math.floor(Math.random() * 50) + 50,
-        cls: Math.floor(Math.random() * 50) + 50,
-        fid: Math.floor(Math.random() * 50) + 50,
-      },
-    },
-    aiSignals: {
-      promptsTxt: Math.random() > 0.5,
-      promptObject: Math.random() > 0.6,
-      faqPage: Math.random() > 0.4,
-      structuredData: ["Article", "Organization", "WebSite"].filter(
-        () => Math.random() > 0.4
-      ),
-    },
-    indexing: {
-      robotsTxt: Math.random() > 0.3,
-      canonical: Math.random() > 0.2,
-      noIndexFlags: Math.floor(Math.random() * 5),
-    },
-    previews: {
-      ogImage: {
-        exists: Math.random() > 0.3,
-        size: Math.random() > 0.5 ? "1200x630" : "600x315",
-      },
-      favicon: Math.random() > 0.2,
-      sitemap: Math.random() > 0.4,
-    },
-    contentStats: {
-      wordCount: Math.floor(Math.random() * 2000) + 500,
-      headings: {
-        h1: Math.floor(Math.random() * 3) + 1,
-        h2: Math.floor(Math.random() * 8) + 2,
-        h3: Math.floor(Math.random() * 15) + 5,
-      },
-      tldrPresent: Math.random() > 0.7,
-    },
-    improvements: [
-      "Add FAQPage schema to improve AI answers",
-      "Your og:image is too small",
-      "Consider adding a prompts.txt file",
-      "Improve page loading speed",
-      "Add more descriptive alt text",
-    ].filter(() => Math.random() > 0.4),
-  };
-
-  // Score band → semantic token, not a decorative rainbow.
-  const scoreBand = (score: number) =>
-    score >= 80 ? "success" : score >= 60 ? "warning" : "destructive";
-
-  const scoreTextClass = (score: number) =>
-    ({
-      success: "text-success",
-      warning: "text-warning",
-      destructive: "text-destructive",
-    })[scoreBand(score)];
-
-  const scoreBarClass = (score: number) =>
-    ({
-      success: "bg-success",
-      warning: "bg-warning",
-      destructive: "bg-destructive",
-    })[scoreBand(score)];
-
-  const ScoreCard = ({
-    title,
-    score,
-    icon: Icon,
-  }: {
-    title: string;
-    score: number;
-    icon: ForwardRefExoticComponent<
-      Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
-    >;
-  }) => (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <Icon className={`h-5 w-5 ${scoreTextClass(score)}`} />
-          <div className={`text-2xl font-semibold ${scoreTextClass(score)}`}>
-            {score}
-          </div>
-        </div>
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-          <div
-            className={`h-full rounded-full ${scoreBarClass(score)}`}
-            style={{ width: `${score}%` }}
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const StatusBadge = ({
-    condition,
-    trueText,
-    falseText,
-  }: {
-    condition: boolean;
-    trueText: string;
-    falseText: string;
-  }) => (
-    <Badge
-      className={
-        condition
-          ? "border-success/30 bg-success/10 text-success"
-          : "border-destructive/30 bg-destructive/10 text-destructive"
-      }
-    >
-      {condition ? trueText : falseText}
-    </Badge>
-  );
+  const m = mock[lang];
+  const url = crrUrl ? decodeURI(crrUrl) : "https://example.com";
+  const timestamp = new Date().toLocaleString(lang === "ko" ? "ko-KR" : "en-US");
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* URL bar */}
-      <div className="mb-8 flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-6">
-        <Globe className="h-5 w-5 text-primary" />
-        <div>
-          <div className="max-w-md truncate font-semibold text-foreground">
-            {result.url}
+    <div className="content-frame py-8">
+      {/* URL row — flat, no card (design-system.md §5). Mobile is two stacked
+       * block-level lines rather than an inline row that happens to wrap
+       * (zine-index intake §3.5). */}
+      <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
+        <span className="text-[15px] font-bold text-foreground">{url}</span>
+        <span className="mt-0.5 text-xs text-muted-foreground sm:mt-0">
+          {t.analyzedAt} {timestamp}
+        </span>
+      </div>
+
+      {/* AI Signals — the product's own differentiator, hardline card */}
+      <div className="mt-6 border-[1.5px] border-foreground bg-card p-5 sm:p-7">
+        <div className="flex items-center justify-between">
+          <div>
+            {/* Desktop keeps the full "핵심 차별화 영역 —" prefix; mobile drops it
+             * and shows only the suffix (zine-index intake §3.5). */}
+            <span className="text-[10.5px] font-bold uppercase tracking-[.06em] text-muted-foreground">
+              <span className="hidden sm:inline">{t.aiSignalsEyebrow}</span>
+              <span className="sm:hidden">{t.aiSignalsEyebrowMobile}</span>
+            </span>
+            <h2 className="mt-1 font-display text-2xl font-extrabold text-foreground">
+              {t.aiSignals}
+            </h2>
           </div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Clock className="h-3.5 w-3.5" />
-            {t.analyzedAt}{" "}
-            {new Date(result.timestamp).toLocaleString(
-              lang === "ko" ? "ko-KR" : "en-US"
-            )}
-          </div>
+          {/* Hint is dropped entirely at mobile, not just repositioned
+           * (zine-index intake §3.5). */}
+          <span className="hidden text-xs text-muted-foreground sm:block">
+            {t.aiSignalsHint}
+          </span>
+        </div>
+        <div className="mt-4 flex flex-col">
+          {m.aiSignals.map((row) => (
+            <div
+              key={row.label}
+              className="flex items-center justify-between border-b-[1.5px] border-border py-2.5 last:border-none"
+            >
+              <span className="text-sm text-foreground">{row.label}</span>
+              <StatusOrValue row={row} />
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* AI Preparedness Score Hero */}
-      <Card className="mb-8">
-        <CardHeader className="items-center text-center">
-          <div className="mb-3 flex items-center justify-center gap-2 text-muted-foreground">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-              <Bot className="h-4.5 w-4.5 text-primary" />
+      {/* Fix now */}
+      <div className="mt-8">
+        <h2 className="font-display text-xl font-extrabold text-foreground">
+          {t.fixNowTitle}
+        </h2>
+        <div className="mt-3 flex flex-col gap-px border-[1.5px] border-foreground bg-foreground">
+          {m.fixNow.map((item) => (
+            <div
+              key={item.text}
+              className={`flex items-center gap-4 px-5 py-3.5 ${
+                item.status === "fail" ? "bg-fail-tint" : "bg-warning-tint"
+              }`}
+            >
+              <StatusBadge status={item.status}>
+                {item.status.toUpperCase()}
+              </StatusBadge>
+              <span className="text-sm font-medium text-foreground">{item.text}</span>
             </div>
-            <CardTitle className="text-lg font-medium text-foreground">
-              {t.aiPreparednessScore}
-            </CardTitle>
-          </div>
-          <div
-            className={`mb-4 text-6xl font-semibold ${scoreTextClass(
-              result.aiPreparednessScore
-            )}`}
-          >
-            {result.aiPreparednessScore}
-          </div>
-          <div className="mx-auto w-full max-w-sm">
-            <div className="h-2 overflow-hidden rounded-full bg-muted">
-              <div
-                className={`h-full rounded-full ${scoreBarClass(
-                  result.aiPreparednessScore
-                )}`}
-                style={{ width: `${result.aiPreparednessScore}%` }}
-              />
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+          ))}
+        </div>
+      </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">
-            <Eye className="h-4 w-4" />
-            {t.overview}
-          </TabsTrigger>
-          <TabsTrigger value="details">
-            <FileText className="h-4 w-4" />
-            {t.details}
-          </TabsTrigger>
-          <TabsTrigger value="raw">
-            <Code className="h-4 w-4" />
-            {t.rawData}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          {/* Lighthouse Scores */}
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-foreground">
-              {t.lighthouseScores}
+      {/* Grouped checklist cards — hardline rule between cards instead of a
+       * real gap (zine-index intake §6 결정 2: 문서 규칙 "갭 대신 룰 라인"으로 통일,
+       * design-system.md §4 "카드 그룹(그리드) 사이는 1px 검정 룰로 셀을 구분"). */}
+      <div className="mt-8 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2 lg:grid-cols-4">
+        {m.groups.map((group) => (
+          <div key={group.title} className="bg-card p-5">
+            <h3 className="mb-2 font-display text-[15px] font-extrabold text-foreground">
+              {group.title}
             </h3>
-            <div className="grid gap-4 md:grid-cols-3">
-              <ScoreCard
-                title={t.performance}
-                score={result.lighthouse.performance}
-                icon={Zap}
-              />
-              <ScoreCard title={t.seo} score={result.lighthouse.seo} icon={TrendingUp} />
-              <ScoreCard
-                title={t.accessibility}
-                score={result.lighthouse.accessibility}
-                icon={Shield}
-              />
+            <div className="flex flex-col">
+              {group.rows.map((row) => (
+                <div
+                  key={row.label}
+                  className="flex items-center justify-between gap-2 border-b-[1.5px] border-border py-2.5 last:border-none"
+                >
+                  <span className="text-[12.5px] text-foreground">{row.label}</span>
+                  <StatusOrValue row={row} />
+                </div>
+              ))}
             </div>
           </div>
+        ))}
+      </div>
 
-          {/* AI Signals */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Bot className="h-5 w-5 text-primary" />
-                {t.aiSignals}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">{t.promptsTxt}</div>
-                  <StatusBadge
-                    condition={result.aiSignals.promptsTxt}
-                    trueText={t.detected}
-                    falseText={t.notDetected}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">{t.promptObject}</div>
-                  <StatusBadge
-                    condition={result.aiSignals.promptObject}
-                    trueText={t.detected}
-                    falseText={t.notDetected}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">{t.faqPage}</div>
-                  <StatusBadge
-                    condition={result.aiSignals.faqPage}
-                    trueText={t.detected}
-                    falseText={t.notDetected}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">{t.structuredData}</div>
-                  {result.aiSignals.structuredData.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {result.aiSignals.structuredData.map((data) => (
-                        <Badge key={data} variant="secondary" className="text-xs">
-                          {data}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <Badge className="border-destructive/30 bg-destructive/10 text-xs text-destructive">
-                      {t.notDetected}
-                    </Badge>
-                  )}
-                </div>
+      {/* Previews */}
+      <div className="mt-8 border-[1.5px] border-foreground bg-card p-6">
+        <h3 className="mb-4 font-display text-[15px] font-extrabold text-foreground">
+          {t.previews}
+        </h3>
+        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
+          {m.previewChecks.map((row) => (
+            <div key={row.label} className="flex items-center justify-between gap-2">
+              <span className="text-[11.5px] text-muted-foreground">{row.label}</span>
+              <StatusOrValue row={row} />
+            </div>
+          ))}
+        </div>
+        {/* Hardline rule between the two preview cards instead of a real gap
+         * (zine-index intake §6 결정 2). Each cell needs its own opaque
+         * background (bg-popover) — a transparent cell over the bg-foreground
+         * gap-px parent would otherwise show black through the gap. */}
+        <div className="mt-5 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
+          {m.previewCards.map((card, i) => (
+            // Mobile shows only the first (Google-result-style) preview card —
+            // the design drops the second (Twitter-style) card entirely at mobile
+            // width rather than stacking both (zine-index intake §3.5).
+            <div
+              key={i}
+              className={`bg-popover ${i === 1 ? "hidden sm:block" : ""}`}
+            >
+              <div className="h-[120px] bg-muted" />
+              <div className="p-3.5">
+                {i === 0 ? (
+                  <span className="text-[10px] uppercase text-muted-foreground">
+                    {card.eyebrow}
+                  </span>
+                ) : null}
+                <div className="mt-1 text-sm font-bold text-foreground">{card.title}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">{card.desc}</div>
+                {i === 1 ? (
+                  <span className="mt-1 block text-[10px] text-muted-foreground">
+                    {card.eyebrow}
+                  </span>
+                ) : null}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          ))}
+        </div>
+      </div>
 
-          {/* Improvements */}
-          {result.improvements.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Target className="h-5 w-5 text-primary" />
-                  {t.improvements}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {result.improvements.map((improvement) => (
-                    <li
-                      key={improvement}
-                      className="flex items-start gap-3 text-sm text-foreground"
-                    >
-                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-                      {improvement}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+      {/* Lighthouse — exception to the checklist model: kept as Google's own
+       * raw scores (design-system.md §2 rationale in CLAUDE.md). */}
+      <div className="mt-10 border-t-4 border-foreground pt-9">
+        <h3 className="font-display text-[15px] font-extrabold text-foreground">
+          {t.lighthouseScores}
+        </h3>
+        <div className="mt-3 grid grid-cols-2 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-4">
+          {m.lighthouse.map((item) => (
+            <div key={item.label} className="bg-card p-5">
+              <span className="font-display text-3xl font-black text-foreground">
+                {item.score}
+              </span>
+              <div className="mt-1 text-[11.5px] text-muted-foreground">{item.label}</div>
+            </div>
+          ))}
+        </div>
 
-        <TabsContent value="details" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Indexing */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Search className="h-5 w-5 text-primary" />
-                  {t.indexing}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">{t.robotsTxt}</span>
-                  <StatusBadge
-                    condition={result.indexing.robotsTxt}
-                    trueText={t.present}
-                    falseText={t.missing}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">{t.canonical}</span>
-                  <StatusBadge
-                    condition={result.indexing.canonical}
-                    trueText={t.present}
-                    falseText={t.missing}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">{t.noIndexFlags}</span>
-                  <Badge
-                    className={
-                      result.indexing.noIndexFlags === 0
-                        ? "border-success/30 bg-success/10 text-success"
-                        : "border-destructive/30 bg-destructive/10 text-destructive"
-                    }
-                  >
-                    {result.indexing.noIndexFlags}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Content Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <BarChart3 className="h-5 w-5 text-primary" />
-                  {t.contentStats}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">{t.wordCount}</span>
-                  <Badge variant="secondary">
-                    {result.contentStats.wordCount.toLocaleString()}
-                  </Badge>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">{t.headings}</div>
-                  <div className="flex gap-2">
-                    <Badge variant="outline">
-                      {t.h1}: {result.contentStats.headings.h1}
-                    </Badge>
-                    <Badge variant="outline">
-                      {t.h2}: {result.contentStats.headings.h2}
-                    </Badge>
-                    <Badge variant="outline">
-                      {t.h3}: {result.contentStats.headings.h3}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">{t.tldr}</span>
-                  <StatusBadge
-                    condition={result.contentStats.tldrPresent}
-                    trueText={t.present}
-                    falseText={t.missing}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+        <div className="mt-6 border-[1.5px] border-foreground bg-card p-6">
+          <div className="text-[13px] font-bold text-foreground">
+            {t.lighthouseSuggestions}
           </div>
-        </TabsContent>
-
-        <TabsContent value="raw">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Code className="h-5 w-5 text-primary" />
-                {t.rawData}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="max-h-96 overflow-auto rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
-                {JSON.stringify(result, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          {/* Desktop: "Hero(위, 자체 판정)와 출처가 다름 — lhr.audits 기반". Mobile:
+           * shorter, reordered "lhr.audits 기반, Hero와 출처 다름" (zine-index intake
+           * §3.5 / §6 결정 1 — verbatim meta-commentary copy, not rewritten). */}
+          <div className="mt-0.5 text-[11px] text-muted-foreground">
+            <span className="hidden sm:inline">{t.lighthouseSuggestionsHint}</span>
+            <span className="sm:hidden">{t.lighthouseSuggestionsHintMobile}</span>
+          </div>
+          <div className="mt-3.5 flex flex-col">
+            {m.suggestions.map((s) => (
+              <div
+                key={s.label}
+                className="flex items-center justify-between border-b-[1.5px] border-border py-2.5 last:border-none"
+              >
+                <span className="text-[12.5px] text-foreground">{s.label}</span>
+                {/* Mobile drops the English lhr.audits source id entirely — not just
+                 * repositioned (zine-index intake §3.5). */}
+                <span className="hidden text-[11px] text-muted-foreground sm:inline">
+                  {s.source}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Globe, Bot, AlertCircle, Scan } from "lucide-react";
+import { AlertCircle, Scan } from "lucide-react";
 import { crrUrlKey, urlPattern } from "@/constans";
 import { setDocumentCookies } from "@/utils/cookies";
 
-export const HeroSection = ({ lang, t }: DefaultPageProps) => {
+export const HeroSection = ({ t }: DefaultPageProps) => {
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [isValidUrl, setIsValidUrl] = useState(true);
@@ -33,61 +32,53 @@ export const HeroSection = ({ lang, t }: DefaultPageProps) => {
     router.push("/request-scan");
   };
   return (
-    <section className="container mx-auto px-4 py-24">
-      <div className="mx-auto max-w-3xl text-center">
-        <Badge
-          variant="secondary"
-          className="mb-6 border-transparent px-3 py-1"
-        >
-          <Bot className="mr-1.5 h-3.5 w-3.5" />
-          AIO・AEO・GEO・SEO Analysis
-        </Badge>
+    // Left-aligned — Main-Zine.png has no centering anywhere in the hero
+    // (eyebrow/headline/subcopy/input all sit flush left in content-frame).
+    <section className="content-frame py-22">
+      <span className="text-xs font-bold uppercase tracking-[.1em] text-muted-foreground">
+        {t.heroEyebrow}
+      </span>
 
-        <h1 className="mb-6 text-5xl font-semibold tracking-tight text-balance text-foreground">
-          {t.heroTitle}
-        </h1>
+      <h1 className="mt-4 max-w-3xl break-keep font-display text-5xl font-black leading-[0.95] tracking-tight text-foreground sm:text-6xl">
+        {t.heroTitleLead}{" "}
+        {/* Headline highlight block — this system's signature emphasis
+         * treatment instead of color-only or bold-only text (design-system.md
+         * §3/§4). */}
+        <span className="bg-accent px-2.5 text-accent-foreground">
+          {t.heroTitleHighlight}
+        </span>{" "}
+        {t.heroTitleTail}
+      </h1>
 
-        <p className="mx-auto mb-14 max-w-xl text-lg text-muted-foreground">
-          {t.heroSubtitle}
-        </p>
+      <p className="mt-6 max-w-xl text-base text-foreground-secondary">
+        {t.heroSubtitle}
+      </p>
 
-        {/* URL Input */}
-        <div className="mx-auto max-w-2xl">
-          <div className="rounded-2xl border border-border bg-card p-2 shadow-md transition-shadow focus-within:border-ring focus-within:shadow-lg">
-            <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-              <div className="flex flex-1 items-center gap-3 rounded-xl px-4 py-3">
-                <Globe className="h-5 w-5 shrink-0 text-muted-foreground" />
-                <Input
-                  type="url"
-                  placeholder={t.urlPlaceholder as string}
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="flex-1 border-0 bg-transparent p-0 text-base shadow-none placeholder:text-muted-foreground focus-visible:ring-0"
-                />
-              </div>
-
-              <Button
-                onClick={handleAnalyze}
-                size="lg"
-                className="h-12 rounded-xl px-6 text-base font-medium"
-              >
-                {t.analyzeButton}
-                <Scan className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {!isValidUrl && (
-            <div className="mt-3 flex items-center justify-center gap-2 text-destructive">
-              <AlertCircle className="h-4 w-4" />
-              <span className="text-sm">
-                {lang === "en"
-                  ? "Please enter a valid URL"
-                  : "유효한 URL을 입력해주세요"}
-              </span>
-            </div>
-          )}
+      {/* URL Input — hard 2px border, sharp corners, no shadow (design-system.md §4) */}
+      <div className="mt-10 max-w-2xl">
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row">
+          <Input
+            type="url"
+            placeholder={t.urlPlaceholder as string}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="h-14 flex-1 border-2 border-foreground bg-card px-5 text-base"
+          />
+          <Button
+            onClick={handleAnalyze}
+            className="h-14 shrink-0 px-8 text-base"
+          >
+            {t.analyzeButton}
+            <Scan className="h-4 w-4" />
+          </Button>
         </div>
+
+        {!isValidUrl && (
+          <div className="mt-3 flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-4 w-4" />
+            <span className="text-sm">{t.urlInvalid}</span>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { allowLanguages, allowTheme, langKey, themeKey } from "@/constans";
 import { setDocumentCookies } from "@/utils/cookies";
 
-export const ToggleSetting = ({ theme, lang }: DefaultProps) => {
+export const ToggleSetting = ({ theme, lang, t }: DefaultPageProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -47,7 +47,7 @@ export const ToggleSetting = ({ theme, lang }: DefaultProps) => {
         className="text-muted-foreground hover:text-foreground"
       >
         <Languages className="h-4 w-4" />
-        {lang === "en" ? "한국어" : "English"}
+        {t.toggleLanguage}
       </Button>
     </>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertOctagon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { defaultLang, langKey } from "@/constans";
 
@@ -17,16 +16,18 @@ const readLangCookie = (): Language => {
 
 const copy: Record<Language, { title: string; description: string; retry: string; home: string }> = {
   ko: {
-    title: "문제가 발생했습니다",
-    description: "요청을 처리하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+    title: "문제가 발생했다",
+    // ProcessScreen/ErrorScreen과 함께 §6 결정 6의 "다/라 자연스럽게 섞기" 대상 —
+    // 상황 설명은 평서형, 행동 권유는 명령형으로 나눠 톤을 기계적으로 통일하지 않았다.
+    description: "일시적인 오류일 수 있다. 다시 시도해 보라.",
     retry: "다시 시도",
-    home: "홈으로 돌아가기",
+    home: "홈으로",
   },
   en: {
     title: "Something went wrong",
-    description: "An error occurred while processing your request. Please try again in a moment.",
+    description: "This may be temporary. Please try again.",
     retry: "Try again",
-    home: "Back to home",
+    home: "Home",
   },
 };
 
@@ -47,23 +48,32 @@ export default function GlobalError({
   const t = copy[lang];
 
   return (
-    <div className="flex items-center justify-center py-24">
-      <div className="mx-auto max-w-md px-4 text-center">
-        <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border border-destructive/30 bg-destructive/10">
-          <AlertOctagon className="h-11 w-11 text-destructive" />
-        </div>
+    <div className="content-frame flex flex-col items-center justify-center gap-4 py-16 text-center sm:py-28">
+      <div className="flex h-14 w-14 items-center justify-center border-[2.5px] border-foreground sm:h-16 sm:w-16">
+        <span className="font-display text-2xl font-black text-foreground sm:text-3xl">
+          !
+        </span>
+      </div>
 
-        <h2 className="mb-3 text-3xl font-semibold text-foreground">
-          {t.title}
-        </h2>
-        <p className="mb-10 text-muted-foreground">{t.description}</p>
+      <h2 className="font-display text-xl font-extrabold text-foreground sm:text-2xl">
+        {t.title}
+      </h2>
+      <p className="max-w-sm text-foreground-secondary">{t.description}</p>
 
-        <div className="flex items-center justify-center gap-3">
-          <Button variant="outline" onClick={() => (window.location.href = `/${lang}`)}>
-            {t.home}
-          </Button>
-          <Button onClick={reset}>{t.retry}</Button>
-        </div>
+      {/* Design order is filled "다시 시도" (retry) first, outline "홈으로" (home)
+       * second — full-width stacked column at mobile, side-by-side row at desktop
+       * (zine-index intake §2.4). */}
+      <div className="mt-3 flex w-full max-w-xs flex-col gap-2.5 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-3">
+        <Button onClick={reset} className="w-full sm:w-auto">
+          {t.retry}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => (window.location.href = `/${lang}`)}
+          className="w-full sm:w-auto"
+        >
+          {t.home}
+        </Button>
       </div>
     </div>
   );

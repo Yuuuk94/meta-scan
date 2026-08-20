@@ -4,28 +4,35 @@ import React from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { MessageCircleWarning } from "lucide-react";
 
 export function ErrorScreen({ t }: DefaultPageProps) {
   const router = useRouter();
 
-  const goBack = () => {
-    router.push("/");
-  };
-
   return (
-    <div className="flex items-center justify-center py-20">
-      <div className="mx-auto max-w-lg px-4 text-center">
-        <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border border-destructive/30 bg-destructive/10">
-          <MessageCircleWarning className="h-11 w-11 text-destructive" />
-        </div>
+    <div className="content-frame flex flex-col items-center justify-center gap-4 py-16 text-center sm:py-28">
+      <div className="flex h-14 w-14 items-center justify-center border-[2.5px] border-foreground sm:h-16 sm:w-16">
+        <span className="font-display text-2xl font-black text-foreground sm:text-3xl">
+          !
+        </span>
+      </div>
 
-        <h2 className="mb-3 text-3xl font-semibold text-foreground">
-          {t.errorTitle}
-        </h2>
-        <p className="mb-10 text-muted-foreground">{t.errorSubtitle}</p>
+      <h2 className="font-display text-xl font-extrabold text-foreground sm:text-2xl">
+        {t.errorTitle}
+      </h2>
+      <p className="max-w-sm text-foreground-secondary">{t.errorSubtitle}</p>
 
-        <Button onClick={goBack} size="lg" className="rounded-xl px-8">
+      {/* Design order is filled "다시 시도" (retry) first, outline "홈으로" (home)
+       * second — full-width stacked column at mobile, side-by-side row at desktop
+       * (zine-index intake §2.4). */}
+      <div className="mt-3 flex w-full max-w-xs flex-col gap-2.5 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-3">
+        <Button onClick={() => router.refresh()} className="w-full sm:w-auto">
+          {t.retryButton}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => router.push("/")}
+          className="w-full sm:w-auto"
+        >
           {t.goBack}
         </Button>
       </div>

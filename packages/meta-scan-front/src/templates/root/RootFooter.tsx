@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Scan } from "lucide-react";
 import { getDictionary } from "@/dictionaries";
 import { ServiceStatus } from "./ServiceStatus";
 
@@ -11,19 +10,20 @@ export const RootFooter = async ({ lang, ready }: RootFooterProps) => {
   const t = (await getDictionary(lang)).footer;
 
   return (
-    <footer className="border-t border-border bg-muted/40">
-      <div className="container mx-auto flex flex-col items-center gap-4 px-4 py-8 sm:flex-row sm:justify-between">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Scan className="h-4 w-4" />
-          <span className="text-sm">{t.copyright}</span>
-        </div>
+    // Hairline top rule, flat background — no elevated "card" footer
+    // (design-system.md §5).
+    <footer className="border-t-[1.5px] border-border">
+      {/* Mobile is a left-aligned two-row stack (no items-center) per every Mobile
+       * artboard (zine-index intake §2.3) — desktop keeps the centered single row. */}
+      <div className="content-frame flex flex-col items-start gap-4 py-8 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-xs text-muted-foreground">{t.copyright}</span>
 
         <div className="flex items-center gap-6">
-          <nav className="flex items-center gap-4 text-sm text-muted-foreground">
-            <Link href={`/${lang}/privacy`} className="hover:text-foreground">
+          <nav className="flex items-center gap-4 text-xs text-muted-foreground">
+            <Link href={`/${lang}/privacy`} className="hover:text-accent">
               {t.privacy}
             </Link>
-            <Link href={`/${lang}/terms`} className="hover:text-foreground">
+            <Link href={`/${lang}/terms`} className="hover:text-accent">
               {t.terms}
             </Link>
           </nav>

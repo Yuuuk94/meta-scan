@@ -4,10 +4,7 @@ import { ErrorScreen } from "@/templates/request-scan/ErrorScreen";
 import { ProcessScreen } from "@/templates/request-scan/ProcessScreen";
 import { getSiteSetting } from "@/utils/siteSetting";
 
-interface ScanPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-export default async function RequestScanPage({ searchParams }: ScanPageProps) {
+export default async function RequestScanPage() {
   const { theme, lang, crrUrl } = await getSiteSetting();
   const t = (await getDictionary(lang)).requestScan;
   try {
@@ -20,6 +17,7 @@ export default async function RequestScanPage({ searchParams }: ScanPageProps) {
       <ProcessScreen theme={theme} lang={lang} t={t} siteStatus={siteStatus} />
     );
   } catch (error) {
+    console.error(error);
     return <ErrorScreen theme={theme} lang={lang} t={t} />;
   }
 }
