@@ -799,6 +799,10 @@
         <code>ui/</code>와 형제 레벨로 최상위에 그대로 둠. 이 결정의 핵심(계층 자체, 기능
         3분리)은 안 바뀌었고 물리적 중첩 위치만 조정 — 상세는
         <code>docs/frontend-atomic-architecture.md</code> 6장.</li>
+      <li>2026-08-21 — 같은 작업에서 <code>api/scanApi.ts</code>의 4개 함수가
+        <code>instance</code>에 이미 있는 <code>baseURL</code>을 무시하고
+        <code>NEXT_PUBLIC_META_SCAN_API</code>를 경로 앞에 또 붙이던 기존 중복(이번 ADR과
+        무관한 pre-existing 이슈)을 발견해 같이 정리 — 상대경로로 통일.</li>
     </ul>
   </div>
 

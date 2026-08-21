@@ -43,10 +43,10 @@ pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next
   `app/[lang]/**/page.tsx`가 겸함(별도 폴더 없음, 라우팅 규칙상 이름을 못 바꿈).
 - `src/api/` — `instance.ts`가 `NEXT_PUBLIC_META_SCAN_API`를 `baseURL`로 하는 공유 `axios`
   인스턴스를 만들고, 도메인별 호출 파일(`scanApi.ts`, `statusApi.ts`)이 `meta-scan-api` 엔드포인트를
-  감쌉니다. **주의할 불일치 지점**: 일부 호출은 공유 `instance`의 `baseURL`만 사용하고
-  (`sitePingApi`), 다른 일부는 같은 인스턴스 위에 `NEXT_PUBLIC_META_SCAN_API`를 경로 앞에 명시적으로
-  다시 붙입니다(`scanRobotsTxtApi` 등) — 새 호출을 추가하기 전에 기존 호출이 어떤 패턴을 따르는지
-  확인하고, `baseURL`만으로 충분하다고 가정하지 마세요.
+  상대경로로 감쌉니다. (2026-08-21 정리: `scanRobotsTxtApi` 등 4개 함수가 `baseURL`이 이미 있는데도
+  `NEXT_PUBLIC_META_SCAN_API`를 경로 앞에 또 문자열로 붙이던 중복이 있었음 — axios는 절대 URL이
+  넘어오면 `baseURL`을 무시하고 그대로 쓰기 때문에 최종 URL은 우연히 같았지만 의미 없는 중복이라
+  제거함. 새 호출을 추가할 땐 `instance`의 `baseURL`만 믿고 상대경로만 넘기면 됩니다.)
 - `src/services/` — 순수 판정/취합 로직 자리(`combineScanResults.ts`, `scanGating.ts`). **둘 다
   아직 TODO 스텁**입니다 — 4-API 취합과 ADR-006 게이팅 로직은 구현되지 않았습니다.
 - `src/hooks/` — 클라이언트 컴포넌트 전용 React Query 훅 자리. **아직 빈 폴더**입니다 —
@@ -118,8 +118,9 @@ pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next
   `RequestScanPage`의 `sitePingApi`)는 단건 `await`으로 직접 호출합니다. 클라이언트 컴포넌트
   (`ProcessScreen`)는 여러 API를 `Promise.allSettled`로 병렬 실행한 뒤 `.then()/.catch()`로 각각
   처리합니다.
-- baseURL 사용이 API 함수마다 다른 불일치는 위 "아키텍처" 절에 이미 설명되어 있습니다 — 새 호출을
-  추가하기 전에 반드시 확인하세요.
+- 예전엔 함수마다 `baseURL` 사용이 달랐지만(2026-08-21 정리, 위 "아키텍처" 절 참고) 지금은 전부
+  상대경로로 통일돼 있습니다 — 새 호출도 `instance`에 절대 URL을 다시 붙이지 말고 상대경로만
+  넘기세요.
 
 ### 네이밍 패턴
 

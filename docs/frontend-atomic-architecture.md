@@ -110,7 +110,7 @@ ui/templates/   (빈 폴더 + TODO 주석만 — HomeTemplate 등은 후속 작�
 pages/          app/[lang]/**/page.tsx 그대로 (Next.js 라우팅 강제, 이름 변경 불가)
 
 api/         instance   ← apis/index.ts (axios 공유 인스턴스)
-             scanApi    ← apis/scan.ts
+             scanApi    ← apis/scan.ts (2026-08-21: baseURL 중복 지정 제거, 상대경로로 통일)
              statusApi  ← apis/status.ts
 
 services/    combineScanResults.ts  (신규 TODO 스텁)
@@ -144,3 +144,8 @@ hooks/       (빈 폴더 + TODO 주석 — React Query 훅 자리, 후속 작업
   "UI vs 기능" 분리를 `src/` 최상위에서 바로 드러내기 위함. `api/`/`services/`/`hooks/`는
   `ui/`와 형제 레벨로 최상위에 그대로 둠. ADR-010의 핵심 결정(계층 자체, 기능 3분리)은
   안 바뀌었고 물리적 중첩 위치만 조정됨.
+- 2026-08-21 — `api/scanApi.ts`의 4개 함수(`scanRobotsTxtApi`/`scanSiteMapApi`/
+  `scanCrawlingApi`/`lsRunApi`)가 `instance`에 이미 있는 `baseURL`을 무시하고
+  `NEXT_PUBLIC_META_SCAN_API`를 경로 앞에 또 문자열로 붙이던 기존 중복을 발견해 제거 —
+  최종 요청 URL은 동일(axios는 절대 URL이 오면 `baseURL`을 무시하므로 우연히 같았음), 상대경로로
+  통일.
