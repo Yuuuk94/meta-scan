@@ -23,7 +23,7 @@ ErrorBoundary):
 All 9 screens exist in both the Zine and Mobile families — full coverage, no ambiguity requiring
 a stop-and-ask on family selection.
 
-Docs cross-checked: `docs/design-system.md` (ADR-008) and `docs/frontend-component-architecture.md`
+Docs cross-checked: `docs/design/design-system.md` (ADR-008) and `docs/case-study/frontend-component-architecture.md`
 (ADR-009, decided but not yet reflected in the actual folder structure — code still lives in
 `src/templates/*` + `src/components/ui/*`, not `shared/`/`features/`).
 
@@ -56,10 +56,10 @@ responsive variant. Every one of the 9 Mobile artboards uses **20px** side paddi
 `padding:… 20px` on their outer containers; `NotFound`/`ErrorBoundary` use `padding:20px` on the
 centered flex column). At a 390px viewport, 56px padding on both sides leaves only ~278px of
 content width vs. the design's ~350px — this single fixed value is likely the biggest blocker to
-any of the Mobile layouts rendering correctly. **Gap**: `docs/design-system.md` §5 documents only
+any of the Mobile layouts rendering correctly. **Gap**: `docs/design/design-system.md` §5 documents only
 the desktop 56px margin figure; the mobile 20px figure is not written down anywhere in the design
 system docs. Recommend `content-frame` gain a `max-sm:px-5` (20px) override, and that
-`docs/design-system.md` §5 be updated to record both values — flagging both the code gap and the
+`docs/design/design-system.md` §5 be updated to record both values — flagging both the code gap and the
 doc gap.
 
 ### 2.2 Header height/content shrinks at mobile, nav link drops (no hamburger)
@@ -70,7 +70,7 @@ doc gap.
   `MainMobile`, that link is **removed entirely** — not moved into a hamburger/menu, just dropped.
   No other screen's header has a nav link to begin with (all others are logo + avatar only,
   unchanged desktop/mobile).
-- **Gap**: `docs/design-system.md` doesn't document a mobile header pattern or a hamburger-menu
+- **Gap**: `docs/design/design-system.md` doesn't document a mobile header pattern or a hamburger-menu
   component at all — this design doesn't introduce one either (it just drops the link), so
   publish-front should do the same (hide the link at mobile width) rather than inventing a menu
   component that isn't in either the design or the docs.
@@ -505,7 +505,7 @@ headings above. **No body copy is specified by the design** — every body line 
 placeholder text, not real copy.
 
 **Tokens**: matches `NumberLabel` component's existing orange-numeral-with-fixed-width pattern
-(`docs/design-system.md` §4's "번호 라벨" motif) — no new tokens.
+(`docs/design/design-system.md` §4's "번호 라벨" motif) — no new tokens.
 
 **Verification vs. existing `privacy/page.tsx`**: the real implementation already ships full,
 real Korean/English privacy copy (7 sections: 수집하는 정보 / 정보 보관 기간 / 제3자 제공 / 쿠키

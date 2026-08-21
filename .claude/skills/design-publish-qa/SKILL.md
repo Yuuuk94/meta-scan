@@ -13,7 +13,7 @@ itself.
 **Default design source**: `https://claude.ai/code/artifact/43c00b5f-73e5-4720-b77f-265dffe7e71c`
 ("meta-scan Wireframes" canvas, "final" page — 18 artboards, Zine Index + orange). If the user
 kicks off this pipeline without pasting a design URL, use this one rather than asking — it's the
-project's standing design source (see `docs/design-system.md`'s header). Only ask if they
+project's standing design source (see `docs/design/design-system.md`'s header). Only ask if they
 indicate they mean a different design.
 
 **Never skip a gate.** Each agent's output is a real decision point — a bad spec produces a bad

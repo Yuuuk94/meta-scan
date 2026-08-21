@@ -11,7 +11,7 @@
 0–100으로 합산하는 방식이 **아닙니다**(2026-08-18 이전엔 그런 스코어링 엔진 기획이 있었지만, 사용자
 본인 기획이 아닌 것으로 확인돼 폐기했습니다). 수익 모델은 Google 애드센스(무료 도구 + 광고 트래픽)이고,
 Lighthouse 4개 점수만 예외적으로 구글 자체 채점이라 숫자 그대로 유지합니다. 기획 배경/체크리스트
-판정 규칙/무엇이 이미 있고 무엇이 없는지는 `docs/meta-scan-plus-prd.md`에 정리되어 있습니다 —
+판정 규칙/무엇이 이미 있고 무엇이 없는지는 `docs/prd/meta-scan-plus-prd.md`에 정리되어 있습니다 —
 스캔/체크리스트 관련 작업을 시작하기 전에 먼저 읽으세요.
 
 **현재 상태(중요, 착각하기 쉬운 지점)**: 백엔드의 개별 스캔 엔드포인트(`ping`/`robotsTxt`/`siteMap`/
@@ -33,14 +33,14 @@ Lighthouse 4개 점수만 예외적으로 구글 자체 채점이라 숫자 그�
 ## 저장소 구조
 
 두 패키지를 `git subtree`로 합친 pnpm workspace 모노레포입니다 (각 패키지는 원본 커밋 히스토리를
-그대로 보존하고 있습니다 — 방법/이유는 `docs/monorepo-dependency-management.md` 참고):
+그대로 보존하고 있습니다 — 방법/이유는 `docs/case-study/monorepo-dependency-management.md` 참고):
 
 - `packages/meta-scan-api` — Express + TypeScript 백엔드. URL을 크롤링/스캔하고(메타 태그,
   robots.txt, sitemap) 헤드리스 Chrome으로 Lighthouse 감사를 실행합니다.
 - `packages/meta-scan-front` — API를 호출해 스캔 결과를 렌더링하는 Next.js 15(App Router) 프론트엔드.
 
 pnpm workspaces를 (Yarn Berry 대신) 선택한 이유와 마이그레이션 적용 과정은
-`docs/monorepo-dependency-management.md`를 참고하세요.
+`docs/case-study/monorepo-dependency-management.md`를 참고하세요.
 
 ## 명령어
 
@@ -190,27 +190,27 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
 
 - `docs/index.html` — 문서 허브. 아래 4개 페이지로 가는 카드 + 원본 md 링크.
 - `docs/prd/index.html` — 제품 컨셉·기획 의도, PRD 요약(현재 구현 상태/스코어링 규칙/스코프 제외),
-  유저 플로우(AS-IS/TO-BE). 원문은 `docs/meta-scan-plus-prd.md`.
+  유저 플로우(AS-IS/TO-BE). 원문은 `docs/prd/meta-scan-plus-prd.md`.
 - `docs/design/index.html` — UI/UX 디자인 시스템(컬러/타이포/스페이싱 토큰, 다크모드 배선, 컴포넌트
-  패턴). 원문은 `docs/design.md` + `docs/design/{colors,typography,spacing,components}.md`.
+  패턴). 원문은 `docs/design/design.md` + `docs/design/{colors,typography,spacing,components}.md`.
 - `docs/architecture/index.html` — 기술 설계: 저장소 구조, 프론트/백엔드 스택·구현 패턴, 공통 영역
   (테스트/Git/CI-CD 현황). "디자인 시스템"과 이름이 헷갈리지 않도록 저장소 구조 쪽은 항상
   "아키텍처"로 부릅니다.
 - `docs/adr/index.html` — 설계 결정 기록(ADR). ADR-001(모노레포 도구 선택, 원문은
-  `docs/monorepo-dependency-management.md`), ADR-002(Git 훅 기반 린트·커밋 컨벤션), ADR-003(4-API
+  `docs/case-study/monorepo-dependency-management.md`), ADR-002(Git 훅 기반 린트·커밋 컨벤션), ADR-003(4-API
   오케스트레이션 + 프론트 판정 유지, 단일 `/analyze` 엔드포인트 기각), ADR-004(디자인 시스템 전환 —
   `Superseded by ADR-008`),
   ADR-005(스코어링 엔진 폐기, 체크리스트(pass/warning/fail/info) 방향으로 전환), ADR-006(robots.txt
   선검사 게이팅 — 비허용 시 전체 스캔 하드 차단, 비용 절감), ADR-007(Lighthouse 개별 감사 `lhr.audits`
   재사용 — 결과 화면 하단 "Lighthouse 개선 제안" 카드, Hero의 자체 판정과 출처 구분), ADR-008(디자인
   시스템 재정립 — "진 인덱스(Zine Index) + 오렌지" 톤, ADR-004 대체, 원문은
-  `docs/design-system.md`), ADR-009(프론트 컴포넌트 아키텍처로 FSD-lite 채택 — 사용자 인터뷰 없이
+  `docs/design/design-system.md`), ADR-009(프론트 컴포넌트 아키텍처로 FSD-lite 채택 — 사용자 인터뷰 없이
   일방적으로 작성된 것으로 확인돼 `Superseded by ADR-010`), ADR-010(프론트 컴포넌트 아키텍처
   재결정 — Atomic Design 5계층 + api/services/hooks 기능 분리, 사용자와 순차 인터뷰를 거쳐 확정,
-  원문은 `docs/frontend-atomic-architecture.md`; 2026-08-21 `meta-scan-front` 코드에 실제 반영
+  원문은 `docs/case-study/frontend-atomic-architecture.md`; 2026-08-21 `meta-scan-front` 코드에 실제 반영
   완료, 이동 중 `ui/`로 재중첩된 소폭 조정 있음), ADR-011(백엔드 아키텍처로 Hexagonal(Ports &
-  Adapters) 3계층 채택 — 전체 후보 조사는 `docs/backend-architecture-survey.md`, 원문은
-  `docs/backend-hexagonal-architecture.md`; entities 계층은 PRD 체크리스트 명세 확인 후
+  Adapters) 3계층 채택 — 전체 후보 조사는 `docs/case-study/backend-architecture-survey.md`, 원문은
+  `docs/case-study/backend-hexagonal-architecture.md`; entities 계층은 PRD 체크리스트 명세 확인 후
   불필요하다고 판단해 안 만듦; 방향만 확정, `meta-scan-api` 코드 반영은 아직). 새 결정이 생기면
   여기 계속 추가. **작성 규칙(페이지 상단 "ADR 작성 규칙" 카드)**: `Accepted`가 된 ADR의 본문(배경/
   결정/대안/결과)과 최초 작성일은 append-only — 다시 쓰지 않습니다. 방향이 바뀌면 새 번호의 ADR을

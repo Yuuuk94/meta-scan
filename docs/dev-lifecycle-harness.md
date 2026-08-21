@@ -9,7 +9,7 @@
 
 지금까지는 디자인 캔버스를 실제 코드로 옮기는 3단 파이프라인
 (`design-intake → publish-front → qa-front-publish`, `.claude/agents/`,
-`docs/git-branching-strategy.md`의 Git Flow)까지만 하네스로 구축돼 있었다. 여기에
+`docs/case-study/git-branching-strategy.md`의 Git Flow)까지만 하네스로 구축돼 있었다. 여기에
 ① TDD 개발 사이클, ② 기획/이슈 슬라이스, ③ E2E/통합 QA, ④ Vercel/GCP CI/CD 배포까지
 이어서, "이슈 발생 → 코드 → 테스트 → 배포"가 하나의 라이프사이클로 연결되게 만들고 싶다는
 요청에서 이 문서를 정리했다. 기존 3단 파이프라인은 그대로 두고, 그걸 이 큰 구조 안의 한
@@ -110,7 +110,7 @@ flowchart LR
 ```
 
 front는 PR 단위로 프리뷰가 공짜로 생기지만, api는 `dev` push를 명시적 트리거로 삼아야
-스테이징이 갱신된다 — `docs/git-branching-strategy.md`의 릴리즈 트리거 미해결 항목과
+스테이징이 갱신된다 — `docs/case-study/git-branching-strategy.md`의 릴리즈 트리거 미해결 항목과
 맞물리는 지점이다.
 
 ### B. qa-backend가 진짜 Lighthouse를 매번 돌릴지

@@ -98,11 +98,11 @@
     ADR-004(화이트/차콜 + 인디고) 톤을 그대로 기록한 것입니다. 이후 체크리스트 결과 화면을 다시
     설계하는 과정에서 이 톤 자체를 폐기하고 <strong>"진 인덱스(Zine Index) + 오렌지"</strong> 톤으로
     전면 교체하기로 결정했습니다(<a href="../adr/index.html#adr-008">ADR-008</a>). 새 토큰·컴포넌트
-    규칙은 <a href="../design-system.md">docs/design-system.md</a>가 최신 소스입니다 — 단,
+    규칙은 <a href="design-system.md">docs/design/design-system.md</a>가 최신 소스입니다 — 단,
     <strong>아직 와이어프레임 단계</strong>이고 <code>meta-scan-front</code>의 실제 토큰
     (<code>globals.css</code>)은 이 페이지가 기록한 인디고 팔레트 그대로입니다(코드 구현은 별도
     작업). 그래서 이 페이지는 일부러 고치지 않고 "코드에 실제로 반영된 것"이라는 원래 성격을
-    유지합니다 — 지금 참고해야 할 디자인 방향은 <code>docs/design-system.md</code> 쪽입니다.
+    유지합니다 — 지금 참고해야 할 디자인 방향은 <code>docs/design/design-system.md</code> 쪽입니다.
   </div>
 
   <!-- 1. 개요 -->
@@ -293,7 +293,7 @@
         목업입니다. 실데이터 연결(<code>crawling</code> 응답 확장 + 프론트 <code>computeChecklist</code>
         판정 — <a href="../adr/index.html#adr-003">ADR-003</a>/<a href="../adr/index.html#adr-005">ADR-005</a>
         결정에 따라 신규 <code>/analyze</code> 엔드포인트는 만들지 않음)은
-        <code>docs/meta-scan-plus-prd.md</code> 스코프이며 이번 디자인 작업과 분리해서 진행하기로
+        <code>docs/prd/meta-scan-plus-prd.md</code> 스코프이며 이번 디자인 작업과 분리해서 진행하기로
         확정했습니다.</li>
       <li><strong>완전 커스텀 루트 404</strong> — <code>/ko/asdf</code>처럼 라우트 자체가 없는 경로는
         여전히 Next.js 기본 404가 뜹니다. 이 저장소에 진짜 루트 <code>app/layout.tsx</code>가 없어서
@@ -309,14 +309,14 @@
       (<code>Superseded by ADR-008</code>), 저장소 구조/스택은
       <a href="../architecture/index.html">아키텍처</a> 페이지를 참고하세요.</p>
     <p class="sub"><strong>최신 디자인 방향</strong>(진 인덱스+오렌지, 아직 코드 미반영)은
-      <a href="../adr/index.html#adr-008">ADR-008</a> · <a href="../design-system.md">docs/design-system.md</a>
+      <a href="../adr/index.html#adr-008">ADR-008</a> · <a href="design-system.md">docs/design/design-system.md</a>
       참고.</p>
-    <a class="footer-link" href="../design.md">→ docs/design.md (인디고 톤 개요 원문, 코드와 일치)</a><br/>
+    <a class="footer-link" href="design.md">→ docs/design/design.md (인디고 톤 개요 원문, 코드와 일치)</a><br/>
     <a class="footer-link" href="colors.md">→ colors.md</a><br/>
     <a class="footer-link" href="typography.md">→ typography.md</a><br/>
     <a class="footer-link" href="spacing.md">→ spacing.md</a><br/>
     <a class="footer-link" href="components.md">→ components.md</a><br/>
-    <a class="footer-link" href="../design-system.md">→ docs/design-system.md (신규 — 진 인덱스+오렌지, ADR-008)</a>
+    <a class="footer-link" href="design-system.md">→ docs/design/design-system.md (신규 — 진 인덱스+오렌지, ADR-008)</a>
     <p class="sub" style="margin-top:2rem;">1~7절은 2026-08-13 기준 작업 결과(코드에 실제 반영된 상태)이며,
       그 이후의 방향 전환은 위 콜아웃과 ADR-008을 참고하세요.</p>
   </section>

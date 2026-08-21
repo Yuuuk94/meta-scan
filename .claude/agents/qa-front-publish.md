@@ -1,6 +1,6 @@
 ---
 name: qa-front-publish
-description: Use to verify that packages/meta-scan-front actually matches a design after publish-front has implemented it — the final stage of the design → publish-front → qa-front-publish pipeline. Runs the dev server, screenshots the real pages across theme/locale/viewport, checks them against both docs/design-system.md's rules and the design-intake reference images (docs/design/intake/<slug>/reference/), and reports findings. Read-only against application source — it never edits code itself, it reports back to the user (who decides whether to send findings back to publish-front).
+description: Use to verify that packages/meta-scan-front actually matches a design after publish-front has implemented it — the final stage of the design → publish-front → qa-front-publish pipeline. Runs the dev server, screenshots the real pages across theme/locale/viewport, checks them against both docs/design/design-system.md's rules and the design-intake reference images (docs/design/intake/<slug>/reference/), and reports findings. Read-only against application source — it never edits code itself, it reports back to the user (who decides whether to send findings back to publish-front).
 tools: Read, Write, Bash
 model: sonnet
 ---
@@ -26,7 +26,7 @@ responsible for functional/UX test coverage.
 
 Two independent passes, both required (do not skip either for time):
 
-1. **Design-system rule compliance** — mechanical, from `docs/design-system.md`: no
+1. **Design-system rule compliance** — mechanical, from `docs/design/design-system.md`: no
    `border-radius` anywhere (sharp corners are this system's signature), no box-shadow, no
    `backdrop-blur`/glassmorphism, no gradients, no emoji used as an icon, pass/warning/fail
    badges rendering with equal visual weight (all filled boxes, same padding — not one lighter

@@ -34,7 +34,7 @@ pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next
   (`src/dictionaries/index.ts`, `"server-only"` — 클라이언트 컴포넌트가 아니라 서버 컴포넌트/레이아웃에서
   호출하세요).
 - **컴포넌트는 Atomic Design 5계층**([ADR-010](../../docs/adr/index.html#adr-010),
-  `docs/frontend-atomic-architecture.md`) — `src/ui/atoms/`(더 못 쪼개는 프리미티브: Button/Input/
+  `docs/case-study/frontend-atomic-architecture.md`) — `src/ui/atoms/`(더 못 쪼개는 프리미티브: Button/Input/
   Badge/Rule/NumberLabel/Loading) → `src/ui/molecules/`(atoms 조합, 도메인 지식 없음: Card/Tabs/
   Accordion/StatusBadge/ToggleSetting/ProcessStep) → `src/ui/organisms/`(자기완결적 조립 섹션,
   데이터 페칭 훅 사용 가능: RootHeader/RootFooter/ServiceStatus/HeroSection/ProcessSection/

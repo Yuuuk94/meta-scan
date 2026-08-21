@@ -24,10 +24,10 @@
 
 이 문서는 전체 개요입니다. 영역별 상세는 아래 문서로 분리돼 있습니다(모두 `docs/design/`):
 
-- [`colors.md`](./design/colors.md) — 컬러 팔레트, 의미별 매핑(primary/secondary/surface/text/state)
-- [`typography.md`](./design/typography.md) — 폰트 패밀리, 크기 스케일, 굵기, 줄 간격
-- [`spacing.md`](./design/spacing.md) — 스페이싱 스케일, 컨테이너/그리드 패턴
-- [`components.md`](./design/components.md) — 재사용 컴포넌트 패턴(버튼/카드/인풋/모달 + 화면 레벨 합성 패턴)
+- [`colors.md`](./colors.md) — 컬러 팔레트, 의미별 매핑(primary/secondary/surface/text/state)
+- [`typography.md`](./typography.md) — 폰트 패밀리, 크기 스케일, 굵기, 줄 간격
+- [`spacing.md`](./spacing.md) — 스페이싱 스케일, 컨테이너/그리드 패턴
+- [`components.md`](./components.md) — 재사용 컴포넌트 패턴(버튼/카드/인풋/모달 + 화면 레벨 합성 패턴)
 
 ## 1. 토큰 (`src/css/globals.css`)
 
@@ -94,7 +94,7 @@
   ·다크모드 배선에 집중했습니다.
 - **`/scan` 결과 데이터** — 여전히 `Math.random()` 목업입니다. 실데이터 연결(`crawling` 응답 확장 +
   프론트 `computeChecklist` 판정, ADR-003/ADR-005 결정에 따라 신규 `/analyze` 엔드포인트는 만들지
-  않음)은 `docs/meta-scan-plus-prd.md` 스코프이며 이번 디자인 작업과 분리해서 진행하기로 확정했습니다.
+  않음)은 `docs/prd/meta-scan-plus-prd.md` 스코프이며 이번 디자인 작업과 분리해서 진행하기로 확정했습니다.
 - **완전 커스텀 루트 404** — `/ko/asdf`처럼 라우트 자체가 없는 경로는 여전히 Next.js 기본 404가
   뜹니다. 이 저장소에 진짜 루트 `app/layout.tsx`가 없어서(`app/[lang]/layout.tsx`가 사실상 루트
   역할) 루트 `app/not-found.tsx`를 추가하려면 레이아웃 구조 자체를 바꿔야 합니다 — 별도 작업으로

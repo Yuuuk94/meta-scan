@@ -1,7 +1,7 @@
 # Design System: meta-scan
 
 > ADR-004(프리미엄 SaaS, 화이트/차콜+인디고)를 대체합니다. 결정 배경은
-> [ADR-008](adr/index.html#adr-008) 참고. 이 문서는 `meta-scan-front`의 실제 컴포넌트/토큰을
+> [ADR-008](../adr/index.html#adr-008) 참고. 이 문서는 `meta-scan-front`의 실제 컴포넌트/토큰을
 > 만들 때 그대로 참조하는 소스 오브 트루스입니다 — Google Stitch의 `DESIGN.md` 문서 정리 방식을
 > 그대로 따르되(섹션 구성·서술 방식), 내용은 meta-scan이 확정한 "진 인덱스"(Zine Index) 톤입니다.
 

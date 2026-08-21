@@ -1,6 +1,6 @@
 # Frontend Component Architecture: Atomic Design + api/services/hooks
 
-> [ADR-010](adr/index.html#adr-010)의 원문입니다. [ADR-009](adr/index.html#adr-009)(FSD-lite)를
+> [ADR-010](../adr/index.html#adr-010)의 원문입니다. [ADR-009](../adr/index.html#adr-009)(FSD-lite)를
 > 대체합니다 — ADR-009는 사용자 인터뷰 없이 AI 세션이 일방적으로 작성한 결정이었던 것으로
 > 확인되어 무효화됐습니다(2026-08-21). 이 문서는 사용자와 단계별 확인(`AskUserQuestion`)을
 > 거쳐 다시 결정한 내용이며, 2026-08-21에 `meta-scan-front` 코드에 실제로 반영됐습니다
@@ -8,7 +8,7 @@
 
 ## 1. 배경
 
-`docs/design-system.md`(ADR-008, 진 인덱스 톤)로 확정된 와이어프레임을 실제
+`docs/design/design-system.md`(ADR-008, 진 인덱스 톤)로 확정된 와이어프레임을 실제
 `meta-scan-front` 코드로 옮기기에 앞서, "UI 컴포넌트"와 "기능(데이터 페칭·판정 취합·상태)"을
 어떻게 분리할지 아키텍처를 정했습니다. 지금 남은 진짜 작업(`ProcessScreen`이 4개 API 응답을
 버리는 것, `/scan`이 `Math.random()` 목업인 것, `combineScanResults` 취합 로직이 없는 것 —

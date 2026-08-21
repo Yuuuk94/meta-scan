@@ -1,5 +1,5 @@
 Empty on purpose — reserved for client-component (`"use client"`) data-fetching/state hooks
-wrapping React Query (`useQuery`/`useMutation`), per ADR-010 (`docs/frontend-atomic-architecture.md`).
+wrapping React Query (`useQuery`/`useMutation`), per ADR-010 (`docs/case-study/frontend-atomic-architecture.md`).
 
 React Query isn't installed yet (`@tanstack/react-query` isn't a dependency) and no
 `QueryClientProvider` exists — installing it and wiring it up is follow-up work, out of scope for

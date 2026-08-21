@@ -2,18 +2,18 @@
 
 > 이 문서는 v1(점수 합산형 "AI Preparedness Index") PRD를 대체합니다. v1의 스코어링 엔진(0–100
 > 가중합산)은 사용자 본인이 낸 기획이 아니라 이전 세션에서 AI가 덧붙인 것으로 확인되어 폐기했습니다
-> ([ADR-005](adr/index.html#adr-005)). 원래 기획 의도는 **크롤링 결과를 SEO/AEO 체크리스트로
+> ([ADR-005](../adr/index.html#adr-005)). 원래 기획 의도는 **크롤링 결과를 SEO/AEO 체크리스트로
 > 보여주는 수동적 진단 도구**이며, 수익 모델은 **Google 애드센스**(무료 도구 + 광고 트래픽)입니다 —
 > 점수를 매겨 유료화하는 방향이 아닙니다. 이 전제가 이번 문서 전체를 관통합니다.
 >
 > 이 문서는 다음 두 ADR의 아키텍처 결정을 그대로 따릅니다:
-> * [ADR-003](adr/index.html#adr-003) — 백엔드 통합 엔드포인트(`/api/v1/scan/analyze`)는 만들지
+> * [ADR-003](../adr/index.html#adr-003) — 백엔드 통합 엔드포인트(`/api/v1/scan/analyze`)는 만들지
 >   않고 기존 4개 API(robots/sitemap/crawling/lighthouse) 호출을 유지합니다. `ProcessScreen`의
 >   단계별 진행 UI가 각 API의 실제 완료 시점에 반응하게 하려는 목적입니다. **판정(pass/warning/
 >   fail/info)은 백엔드가 전부 수행**하고, 프런트는 4개 응답이 다 모이면 이미 판정된 결과를
 >   그룹별로 합치기만 합니다(계산이 아니라 취합 — 최초 초안에서 "프론트가 판정까지 한다"로 잘못
 >   갔다가 대화 중 정정됨).
-> * [ADR-006](adr/index.html#adr-006) — `robotsTxt`를 먼저 단독 실행해 비허용(disallow)이면
+> * [ADR-006](../adr/index.html#adr-006) — `robotsTxt`를 먼저 단독 실행해 비허용(disallow)이면
 >   나머지 3개(sitemap/crawling/lighthouse)를 아예 호출하지 않고 차단 화면만 보여줍니다(비용 절감,
 >   크롤링 윤리).
 
@@ -24,13 +24,13 @@
 | 크롤링 인프라 (Puppeteer 페이지 로드 + DOM 추출) | ✅ 구현됨 | `scanService.getOnloadHtml` |
 | 기본 메타 추출 + 판정 (title/description/keywords/h1/img alt/중복 meta) | ✅ 구현됨(판정까지 포함) | `scanService.crawling` → `runChecks` — 이 패턴을 신규 항목에도 그대로 확장 |
 | robots.txt 파싱 + allow 판정 | ✅ 구현됨 | `scanService.robotsTxt` (자체 파서) |
-| **robots.txt 선검사 게이팅(비허용 시 하드 차단)** | ❌ 미구현 | [ADR-006](adr/index.html#adr-006) — `ProcessScreen`이 아직 4개를 무조건 병렬 호출 |
+| **robots.txt 선검사 게이팅(비허용 시 하드 차단)** | ❌ 미구현 | [ADR-006](../adr/index.html#adr-006) — `ProcessScreen`이 아직 4개를 무조건 병렬 호출 |
 | sitemap.xml 존재 확인(HEAD) | ✅ 구현됨 (URL 개수 카운트는 미구현) | `scanService.siteMap` |
 | Lighthouse 점수 (performance/seo/best-practices/accessibility) | ⚠️ 구현됐지만 **프런트가 2개만 요청 중** | `LighthouseService`는 4개 지원, `apis/scan.ts`의 `lsRunApi`가 `onlyCategories: ["seo","performance"]`만 넘겨서 accessibility/best-practices 누락 — 수정 필요 |
 | **AI 신호(AEO)·구조화 데이터·prompts.txt·hreflang/viewport 등 체크 항목 및 판정** | ❌ 미구현 | 백엔드에 관련 코드 없음. 판정까지 백엔드에서 함께 구현 |
 | **기존에 추출/계산은 되지만 어느 체크리스트 그룹에도 안 걸린 데이터** | ⚠️ 방치 중 | `html.deltaRatio`(JS 렌더링 전후 HTML 차이 비율), `robotsTxt().sitemap`(robots.txt 안에 선언된 sitemap URL 목록) — 3절에서 그룹 배정 |
-| ~~스코어링 엔진(0–100 가중합산)~~ | 폐기 | [ADR-005](adr/index.html#adr-005) |
-| 결과 통합 API (`/api/analyze` 성격) | 계획 취소 ([ADR-003](adr/index.html#adr-003)) | 신규 엔드포인트는 만들지 않음 — 기존 4개 API 유지 + 각 엔드포인트가 판정까지 포함해 확장 |
+| ~~스코어링 엔진(0–100 가중합산)~~ | 폐기 | [ADR-005](../adr/index.html#adr-005) |
+| 결과 통합 API (`/api/analyze` 성격) | 계획 취소 ([ADR-003](../adr/index.html#adr-003)) | 신규 엔드포인트는 만들지 않음 — 기존 4개 API 유지 + 각 엔드포인트가 판정까지 포함해 확장 |
 | 결과 리포트 UI (배지/카드) | ✅ **카드 구조는 이미 체크리스트에 가까움**, ❌ **데이터는 전부 `Math.random()` 목업**, 중앙 Hero는 합산 점수라 교체 필요 | `app/[lang]/scan/page.tsx` |
 | 다국어 카피(한/영) | ✅ 대부분 존재, `aiPreparednessScore` 등 일부는 재정의 필요 | `dictionaries/{ko,en}.json`의 `scan.*` 키 |
 | 분석 진행 화면 | ✅ UI 구현됨, ⚠️ **API 응답을 버림**, ⚠️ **robots.txt 게이팅 없음** | `ProcessScreen.tsx` |
@@ -97,7 +97,7 @@ Content Stats 카드)을 이미 갖고 있고, 각 항목이 이미 `StatusBadge
 
 `robotsTxt().allow["*"]`가 `false`면(와일드카드 `*` 규칙 기준) 여기서 전체 스캔을 중단합니다. 이건
 pass/warning/fail 판정 대상이 아니라 진행 여부를 가르는 게이트라 3.1 이하 표에는 포함하지 않습니다.
-자세한 내용은 [ADR-006](adr/index.html#adr-006). 허용된 경우엔 이 사실 자체를 굳이 배지로 보여줄
+자세한 내용은 [ADR-006](../adr/index.html#adr-006). 허용된 경우엔 이 사실 자체를 굳이 배지로 보여줄
 필요가 없습니다 — `/scan`에 도달했다는 것 자체가 이미 허용됐다는 뜻이기 때문에, 기존 계획에 있던
 "Indexing 카드의 robots.txt 허용 배지"는 뺍니다(3.2 참고).
 
@@ -171,7 +171,7 @@ h1 개수 판정(`h1.none`/`h1.multiple`)은 여기 넣지 않고 3.5 Content St
 | hreflang | 존재=pass, 없음=info | DOM 추출에 추가 |
 | `<meta name="viewport">` | 존재=pass, 없음=warning | DOM 추출에 추가 |
 
-### 3.7 Lighthouse — 4개 점수 유지 + 개별 감사(`lhr.audits`) 하단 카드로 재사용 ([ADR-007](adr/index.html#adr-007))
+### 3.7 Lighthouse — 4개 점수 유지 + 개별 감사(`lhr.audits`) 하단 카드로 재사용 ([ADR-007](../adr/index.html#adr-007))
 
 Performance / SEO / Accessibility / Best Practices 4개 숫자 점수 그대로 유지. 구글 자체 채점
 기준이므로 우리 체크리스트의 pass/warning/fail/info 판정 대상에는 포함하지 않습니다.
@@ -180,7 +180,7 @@ Performance / SEO / Accessibility / Best Practices 4개 숫자 점수 그대로 
 고쳐야 할 것")가 우리 자체 `checks[]`(pass/warning/fail/info) 기반인 것과 출처가 다름을 명확히
 구분합니다. `LighthouseController`가 이미 `lhr` 전체(`audits` 포함)를 그대로 반환하고 있어 **백엔드
 변경 없이** 프런트가 `lhr.audits` 중 점수 낮은 opportunity/diagnostic 항목만 추려 렌더링합니다.
-(이전 버전은 "개별 감사도 재사용하지 않는다"였으나 [ADR-007](adr/index.html#adr-007)로 뒤집힘 —
+(이전 버전은 "개별 감사도 재사용하지 않는다"였으나 [ADR-007](../adr/index.html#adr-007)로 뒤집힘 —
 4-API 오케스트레이션 구조 자체(ADR-003)는 안 바뀜, "이미 받은 응답 중 무엇을 화면에 쓰는가"만
 넓어진 것.)
 
@@ -209,9 +209,9 @@ topIssues: CheckItem[]  // fail 우선, 모자라면 warning으로 채움 (기�
 백엔드에 있습니다. Hero 영역에는 `summary` 대신 `topIssues`를 그대로 노출합니다("지금 고쳐야 할
 것").
 
-> 이 절은 최초 초안에서 "프런트가 판정까지 계산한다"([ADR-003](adr/index.html#adr-003) 원문의
+> 이 절은 최초 초안에서 "프런트가 판정까지 계산한다"([ADR-003](../adr/index.html#adr-003) 원문의
 > "프론트 스코어링" 조항을 체크리스트 모델에 그대로 옮긴 것)로 잘못 갔다가, 대화 중 "판정은 백엔드,
-> 프론트는 결과 취합"으로 정정됐습니다 — [ADR-006](adr/index.html#adr-006) 이전에 발생한 정정이며
+> 프론트는 결과 취합"으로 정정됐습니다 — [ADR-006](../adr/index.html#adr-006) 이전에 발생한 정정이며
 > ADR-003 본문에도 이 정정이 직접 반영돼 있습니다(ADR은 append-only가 원칙이지만, 결정 며칠 안에
 > 발견된 오독은 예외적으로 직접 수정 — ADR 페이지의 "ADR 작성 규칙" 카드 참고).
 
@@ -311,7 +311,7 @@ API로 빼면 5번째 호출이 생겨 `ProcessScreen`의 4단계 구성이 깨�
 * 신규 카드: **기본 SEO**, **국제화/UX**(hreflang, viewport) 카드 추가
 * **Previews 카드**: 체크리스트 배지 외에 실제 OG/Twitter 카드 미리보기 렌더링 추가 (3.3 참고)
 * **Lighthouse 개선 제안 카드(하단)**: 자체 `checks[]` 재노출이 아니라 `lighthouse run` 응답의
-  `lhr.audits`에서 점수 낮은 opportunity/diagnostic 항목을 추려 보여줌([ADR-007](adr/index.html#adr-007)).
+  `lhr.audits`에서 점수 낮은 opportunity/diagnostic 항목을 추려 보여줌([ADR-007](../adr/index.html#adr-007)).
   Hero(자체 판정)와 출처가 다름을 화면에서 구분. 신규 API 필드·백엔드 변경 없음 — `lhr`가 이미
   `audits`를 포함해 응답되고 있음(`LighthouseController`)
 * `interface AnalysisResult`를 스토어가 들고 있는 "4개 원본 응답 + `combineScanResults` 결과" 형태로

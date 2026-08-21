@@ -1,11 +1,11 @@
 # Frontend Component Architecture: FSD-lite
 
-> [ADR-009](adr/index.html#adr-009)의 원문입니다. 이 문서는 아직 **결정만 된 상태**이고
+> [ADR-009](../adr/index.html#adr-009)의 원문입니다. 이 문서는 아직 **결정만 된 상태**이고
 > `meta-scan-front` 코드에는 반영되지 않았습니다 — 실제 컴포넌트/폴더 구현은 별도 작업입니다.
 
 ## 1. 배경
 
-`docs/design-system.md`(ADR-008, 진 인덱스 톤)로 확정된 와이어프레임을 실제
+`docs/design/design-system.md`(ADR-008, 진 인덱스 톤)로 확정된 와이어프레임을 실제
 `meta-scan-front` 코드로 옮기기에 앞서, "UI 컴포넌트"와 "기능(데이터 페칭·판정 취합·상태)"을
 어떻게 분리할지 아키텍처를 정했습니다. 지금 남은 진짜 작업(`ProcessScreen`이 4개 API 응답을
 버리는 것, `/scan`이 `Math.random()` 목업인 것, `combineScanResults` 취합 로직이 없는 것 —
@@ -80,7 +80,7 @@ pages/            — Next.js `app/[lang]/**/page.tsx`가 담당. features의 �
 
 ## 6. 결과 / 아직 안 정한 것
 
-- 아직 구현하지 않았습니다 — 이 문서와 [ADR-009](adr/index.html#adr-009)는 방향 결정만
+- 아직 구현하지 않았습니다 — 이 문서와 [ADR-009](../adr/index.html#adr-009)는 방향 결정만
   기록합니다.
 - 슬라이스 경계(예: `run-scan` 안에 `toggle-checklist-item`을 포함시킬지, 별도 슬라이스로
   뺄지)는 실제 컴포넌트를 만들면서 확정할 예정입니다.

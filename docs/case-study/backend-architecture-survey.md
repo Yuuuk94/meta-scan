@@ -1,13 +1,13 @@
 # Backend Architecture Survey — meta-scan-api
 
 > **상태**: 2026-08-21에 사용자와 순차 인터뷰를 거쳐 **Hexagonal (Ports & Adapters)**로
-> 결정됐습니다 — [ADR-011](adr/index.html#adr-011) + `docs/backend-hexagonal-architecture.md`
+> 결정됐습니다 — [ADR-011](../adr/index.html#adr-011) + `docs/case-study/backend-hexagonal-architecture.md`
 > 참고. 이 문서 자체는 append-only 규칙(ADR 전용) 대상이 아니라, 결정에 이르기까지 압축 없이
 > 검토한 전체 후보 목록으로 계속 남겨두는 조사 자료입니다.
 
 ## 0. 왜 이 문서가 필요한가
 
-프론트엔드 컴포넌트 아키텍처를 [ADR-010](adr/index.html#adr-010)(Atomic Design 5계층 +
+프론트엔드 컴포넌트 아키텍처를 [ADR-010](../adr/index.html#adr-010)(Atomic Design 5계층 +
 api/services/hooks)로 재정리한 것과 같은 맥락으로, `meta-scan-api`도 아키텍처를 다시 볼 시점이
 됐습니다. 단, 프론트 작업 중 확인된 원칙 — **"지금 도메인이 얕아 보인다는 이유로 계층을 미리
 압축하지 않는다"** — 을 그대로 따릅니다. 이 문서는 그 원칙에 따라 특정 패턴을 미리 추천하거나
@@ -145,7 +145,7 @@ NestJS는 TCP/Redis/gRPC/Kafka/RabbitMQ 트랜스포터를 1급 지원해서 "�
 
 2026-08-21에 사용자와 순차 인터뷰(`AskUserQuestion`, 한 번에 하나씩)를 거쳐 **Hexagonal
 (Ports & Adapters)**로 결정됐습니다 — 결정 내용/과정/근거는
-[ADR-011](adr/index.html#adr-011) + `docs/backend-hexagonal-architecture.md` 참고. 이 survey
+[ADR-011](../adr/index.html#adr-011) + `docs/case-study/backend-hexagonal-architecture.md` 참고. 이 survey
 문서는 그 결정에 이르기까지 압축 없이 검토한 전체 후보 목록으로 계속 남겨둡니다.
 
 실제 코드 마이그레이션은 아직 안 했습니다 — 프론트 ADR-010 때와 동일하게 "순수 이동/정리
