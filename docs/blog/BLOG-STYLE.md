@@ -48,7 +48,9 @@
 
 ## 포스트 형식
 
-각 포스트는 `docs/blog/<slug>.md`로 저장하며 다음 프론트매터로 시작합니다:
+각 포스트는 `docs/blog/posts/<slug>.md`로 저장하며 다음 프론트매터로 시작합니다(이 폴더는
+`.gitignore` 대상입니다 — 초안은 로컬 산출물이고, 어떤 원본을 이미 다뤘는지는
+`docs/blog/manifest.json`이 추적합니다):
 
 ```yaml
 ---

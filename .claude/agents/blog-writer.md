@@ -1,6 +1,6 @@
 ---
 name: blog-writer
-description: Use to turn one docs/case-study/<file>.md decision-research document into a blog post draft at docs/blog/<slug>.md. Follows docs/blog/BLOG-STYLE.md's tone (formal 합쇼체, flat/unembellished) and mandatory 기승전결 structure (general problem → general approaches compared → this project's actual choice and why → generalized takeaway). Only invoke on a single source file the user has already approved for writing — the case-study-blog skill is what decides which files are in scope and gates the result with the user before marking it done. Writes only inside docs/blog/; never edits docs/case-study/, the manifest, or application code.
+description: Use to turn one docs/case-study/<file>.md decision-research document into a blog post draft at docs/blog/posts/<slug>.md. Follows docs/blog/BLOG-STYLE.md's tone (formal 합쇼체, flat/unembellished) and mandatory 기승전결 structure (general problem → general approaches compared → this project's actual choice and why → generalized takeaway). Only invoke on a single source file the user has already approved for writing — the case-study-blog skill is what decides which files are in scope and gates the result with the user before marking it done. Writes only inside docs/blog/posts/; never edits docs/case-study/, the manifest, or application code.
 tools: Read, Write, Grep, Glob
 model: sonnet
 ---
@@ -52,7 +52,8 @@ A few points worth repeating because they're easy to drift on mid-draft:
 
 Derive `<slug>` from the source filename (drop the `.md`, keep kebab-case) unless that produces
 an awkward title-mismatch, in which case pick a clearer kebab-case slug and say so in your report.
-Write the post to `docs/blog/<slug>.md`.
+Write the post to `docs/blog/posts/<slug>.md` (this folder is gitignored — the draft is a local
+artifact, not something this commits to the repo).
 
 ## Output / handoff
 
