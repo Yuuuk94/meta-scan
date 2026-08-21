@@ -101,9 +101,10 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
 
 `src/modules/*` 아래 기능별 모듈로 나뉜 레이어드 Express 앱. 각 모듈은
 `*.router.ts`(라우트 연결) → `*Controller.ts`(`BaseController` 상속, 요청/응답만 담당) →
-`*Service.ts`(비즈니스 로직) 구조입니다. 경로 별칭(`@core/*`, `@constant/*`, `@config/*`,
-`@infra/*`, `@modules/*`)은 `tsconfig.json`에 정의되고 빌드 시 `tsc-alias`가 해석합니다 —
-모듈 경계를 넘나들 때는 상대경로가 아니라 항상 별칭으로 import하세요.
+`*Service.ts`(비즈니스 로직) 구조입니다. 경로 별칭은 `meta-scan-front`와 동일하게 `@/*` → `src/*`
+하나입니다(`tsconfig.json`에 정의, 2026-08-21 정리 — 이전엔 `@core/*`/`@constant/*`/`@config/*`/
+`@infra/*`/`@modules/*` 5개였음). 빌드 시 `tsc-alias`가 해석합니다 — 모듈 경계를 넘나들 때는
+상대경로가 아니라 항상 별칭으로 import하세요.
 
 - `src/app.ts` — 앱 엔트리포인트. `routers` 맵을 기반으로 `/api/v1/<key>`에 라우터를 마운트하고,
   `/api/docs`에 Swagger UI를 붙이며, `FRONT_URL`/`FRONT_TEST_URL`/`PUBLIC_URL`로 CORS 허용
@@ -206,8 +207,12 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
   `docs/design-system.md`), ADR-009(프론트 컴포넌트 아키텍처로 FSD-lite 채택 — 사용자 인터뷰 없이
   일방적으로 작성된 것으로 확인돼 `Superseded by ADR-010`), ADR-010(프론트 컴포넌트 아키텍처
   재결정 — Atomic Design 5계층 + api/services/hooks 기능 분리, 사용자와 순차 인터뷰를 거쳐 확정,
-  원문은 `docs/frontend-atomic-architecture.md`; 방향만 확정, `meta-scan-front` 코드 반영은
-  아직). 새 결정이 생기면 여기 계속 추가. **작성 규칙(페이지 상단 "ADR 작성 규칙" 카드)**: `Accepted`가 된 ADR의 본문(배경/
+  원문은 `docs/frontend-atomic-architecture.md`; 2026-08-21 `meta-scan-front` 코드에 실제 반영
+  완료, 이동 중 `ui/`로 재중첩된 소폭 조정 있음), ADR-011(백엔드 아키텍처로 Hexagonal(Ports &
+  Adapters) 3계층 채택 — 전체 후보 조사는 `docs/backend-architecture-survey.md`, 원문은
+  `docs/backend-hexagonal-architecture.md`; entities 계층은 PRD 체크리스트 명세 확인 후
+  불필요하다고 판단해 안 만듦; 방향만 확정, `meta-scan-api` 코드 반영은 아직). 새 결정이 생기면
+  여기 계속 추가. **작성 규칙(페이지 상단 "ADR 작성 규칙" 카드)**: `Accepted`가 된 ADR의 본문(배경/
   결정/대안/결과)과 최초 작성일은 append-only — 다시 쓰지 않습니다. 방향이 바뀌면 새 번호의 ADR을
   추가하고, 기존 ADR은 상태 배지 변경 + 카드 맨 아래 "변경 이력"에 날짜와 사유만 한 줄 추가하세요.
 

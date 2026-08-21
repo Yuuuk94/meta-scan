@@ -806,6 +806,93 @@
     </ul>
   </div>
 
+  <div class="card" id="adr-011">
+    <h3 style="margin-top:0;">ADR-011 — 백엔드 아키텍처: Hexagonal (Ports &amp; Adapters) 채택</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-21 — 원문은 <code>docs/backend-hexagonal-architecture.md</code>(전체 후보 조사는 <code>docs/backend-architecture-survey.md</code>), 구현은 아직 착수 전</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p><a href="#adr-010">ADR-010</a>(프론트 Atomic Design + api/services/hooks)와 같은 맥락으로
+      <code>meta-scan-api</code>도 아키텍처를 재검토했습니다. 현재 구조(레이어드
+      router→controller→service)의 아픈 지점: <code>scanService.ts</code>가 ping/robotsTxt/
+      siteMap/crawling/checks를 전부 떠안은 "God 서비스"인 것, <code>scanService</code>가
+      <code>Puppeteer</code>/<code>ChromeLauncher</code> 구체 클래스에 직접 의존해 infra
+      교체·단위테스트 목킹이 어려운 것, 파일명 케이싱 불일치, <code>lighthouse</code> 모듈만
+      응답 규약을 깨는 것, 에러 원본을 삼키는 <code>catch</code>, 라우터마다 반복되는 수동
+      DI(패키지 <code>CLAUDE.md</code>에 이미 기록된 항목들).</p>
+    <p>ADR-009가 사용자 승인 없이 일방적으로 작성됐던 것이 확인된 뒤([ADR-010](#adr-010) 변경
+      이력 참고), "지금 도메인이 얕아 보인다는 이유로 계층을 미리 압축하지 않는다"는 원칙을
+      명시적으로 세우고 진행했습니다. 경로 별칭 스타일부터
+      (<code>@core/*</code>/<code>@constant/*</code>/<code>@config/*</code>/<code>@infra/*</code>/
+      <code>@modules/*</code> 5개 → <code>meta-scan-front</code>와 동일한 <code>@/*</code> 하나로
+      통일, 이 ADR과 무관한 선행 정리) 정리한 뒤, 7개 아키텍처 패턴(NestJS 기본 구조, Clean/
+      Onion, Hexagonal, DDD 모듈러 모놀리스, CQRS, Vertical Slice, 마이크로서비스)을 압축 없이
+      전부 조사(<code>docs/backend-architecture-survey.md</code>)했습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li><strong>계층/의존성 역전 축</strong>으로 확정 — CQRS(쓰기 경로 없음)와 DDD 모듈러
+        모놀리스(바운디드 컨텍스트가 사실상 1개)는 이 시점에 배제.</li>
+      <li>같은 축 안에서 Clean/Onion(4계층: entities/use cases/interface adapters/frameworks)과
+        Hexagonal(3계층: 도메인+포트/애플리케이션/어댑터)을 실제 코드 예시로 구체 비교한 뒤,
+        <strong>"entities 계층이 얕아 보인다"는 이유로 미리 기각하지 않고</strong> PRD
+        (<code>docs/meta-scan-plus-prd.md</code> 3~4장)의 체크리스트 명세를 실제로 읽어 사실관계
+        확인 — 모든 체크 항목이 <code>{id, group, label, status, detail?}</code> 형태의 독립적·
+        무상태 분류 결과이며, 항목 간 관계 규칙·상태 변화·불변식이 명세 어디에도 없음을 확인(4장:
+        프론트 <code>combineScanResults</code>도 "계산이 아니라 취합"이라고 명시).</li>
+      <li>이 사실을 근거로 <strong>Hexagonal (Ports &amp; Adapters), 3계층</strong> 채택 —
+        <code>domain/</code>(포트 인터페이스 + 순수 판정 로직) / <code>application/</code>
+        (유스케이스, 포트 호출 + 도메인 로직 조합) / <code>adapters/</code>(inbound: HTTP
+        컨트롤러, outbound: <code>PuppeteerAdapter</code>/<code>ChromeLauncherAdapter</code>가
+        기존 <code>infra/Puppeteer.ts</code>/<code>infra/ChromeLauncher.ts</code>를 감쌈).
+        entities 별도 계층은 만들지 않음 — 위 사실 확인 근거.</li>
+      <li>구현은 이번 ADR 범위 밖 — 방향만 확정, 세부(포트 세분화 수준, inbound 어댑터가 기존
+        <code>modules/*</code> 폴더링을 어떻게 흡수할지)는 실제 마이그레이션 시점에 확정. 상세는
+        <code>docs/backend-hexagonal-architecture.md</code> 5장.</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각 사유</th></tr>
+      <tr><td>Clean/Onion Architecture (4계층)</td><td>Hexagonal과 철학은 거의 동일하나 entities 계층을 별도로 요구함 — PRD 확인 결과 체크 항목에 관계/불변식/상태변화가 없어, entities를 만들어도 기존 ambient 타입을 클래스 셸로 한 번 더 감싸는 것 이상의 실익이 없다고 판단</td></tr>
+      <tr><td>CQRS (+ 선택적 Event Sourcing)</td><td>DB 없음, 상태 변경(write) 엔드포인트가 사실상 없음 — 이 패턴이 풀려는 문제(읽기/쓰기 분리) 자체가 이 앱에 존재하지 않음</td></tr>
+      <tr><td>DDD 모듈러 모놀리스 (Bounded Context)</td><td>바운디드 컨텍스트가 사실상 "URL 하나 스캔" 1개뿐 — 컨텍스트 간 통신이라는 개념 자체가 성립 안 함</td></tr>
+      <tr><td>Vertical Slice / Screaming Architecture</td><td><code>src/modules/*</code>가 이미 기능 단위 폴더링이라 방향은 겹치나, "레이어를 없앤다"는 핵심 주장과 달리 지금도 controller/service 레이어 분리를 유지하고 있어 정체성이 애매해짐</td></tr>
+      <tr><td>NestJS 기본 구조로 프레임워크 전환</td><td>아키텍처 패턴이 아니라 프레임워크(Express→NestJS) 교체 문제라 이번 결정과 층위가 다름 — 이번 범위에서 배제</td></tr>
+      <tr><td>마이크로서비스 / 이벤트 기반</td><td>단일 API·단일 배포 대상(Cloud Run 컨테이너 하나) 구조와는 별개 논의라 이번 범위 밖</td></tr>
+      <tr><td>현재 레이어드 구조 유지 + 컨벤션 정리만</td><td>아픈 지점(<code>scanService</code>의 infra 직접 의존)을 구조적으로 풀지 못함 — 컨벤션만 정리하면 같은 문제가 반복될 위험</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li><code>Puppeteer</code>/<code>ChromeLauncher</code> 교체·단위테스트 목킹이 포트
+            인터페이스 뒤로 숨겨져 쉬워짐 — <code>docs/dev-lifecycle-harness.md</code> 1순위인
+            테스트 인프라 작업과 직결</li>
+          <li><code>scanService</code> God 서비스가 유스케이스별로 자연히 쪼개짐</li>
+          <li>프론트 ADR-010의 "순수 로직(<code>services/</code>) vs I/O(<code>api/</code>)" 분리
+            철학과 백엔드가 같은 축(도메인 vs 어댑터)으로 맞춰짐</li>
+          <li>"도메인이 얕아 보인다"는 지레짐작이 아니라 PRD 명세를 실제로 읽고 확인한 사실
+            근거로 entities 계층 여부를 결정 — ADR-009 재발 방지 원칙 준수</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>포트를 얼마나 세분화할지 정답이 없어 설계자 재량에 좌우됨 — 실제 코드 작성 시점에
+            검증 전</li>
+          <li>entities 계층이 없어서, 나중에 체크 항목 간 관계/상태 규칙이 실제로 추가되면
+            재검토가 필요함(<code>docs/backend-hexagonal-architecture.md</code> 5장)</li>
+          <li>에러 처리·파일명 케이싱·응답 규약 정리는 이 아키텍처 결정과 별개 이슈로 남겨둠 —
+            마이그레이션 실행 시점에 스코프를 따로 정해야 함</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
 </main>
 </body>
 </html>
