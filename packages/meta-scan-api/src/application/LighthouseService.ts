@@ -1,11 +1,15 @@
 import lighthouse from "lighthouse";
-import type { RunBody } from "./dto.js";
-import type { ChromeProcess } from "@/infra/ChromeLauncher.js";
-import { ChromeLauncher } from "@/infra/ChromeLauncher.js";
+// NOTE(ADR-011): application importing an inbound-adapter DTO type is a known impurity this
+// migration pass didn't resolve — see docs/case-study/backend-hexagonal-architecture.md §5.
+import type { RunBody } from "@/adapters/inbound/http/lighthouse/dto.js";
+import type {
+  ChromeProcess,
+  LighthouseRunnerPort,
+} from "@/domain/ports/LighthouseRunnerPort.js";
 import { ApiError } from "@/core/http/ApiError.js";
 
 export class LighthouseService {
-  constructor(private readonly chrome: ChromeLauncher) {}
+  constructor(private readonly chrome: LighthouseRunnerPort) {}
 
   async run({ url, formFactor, onlyCategories, format }: RunBody) {
     let proc: ChromeProcess | undefined;

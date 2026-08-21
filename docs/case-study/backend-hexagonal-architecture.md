@@ -2,9 +2,8 @@
 
 > [ADR-011](../adr/index.html#adr-011)의 원문입니다. 전체 후보 비교는
 > `docs/case-study/backend-architecture-survey.md`(7개 패턴 조사) 참고 — 이 문서는 그중 최종 채택된
-> Hexagonal만 상세히 다룹니다. **결정만 확정된 상태이고 `meta-scan-api` 코드에는 아직
-> 반영되지 않았습니다** — 실제 마이그레이션은 별도 실행 단계입니다(프론트 ADR-010과 동일한
-> 순서: 방향 확정 → 사용자 승인 → 코드 이동).
+> Hexagonal만 상세히 다룹니다. 2026-08-21에 `meta-scan-api` 코드에 실제로 반영됐습니다(프론트
+> ADR-010과 동일한 순서: 방향 확정 → 사용자 승인 → 코드 이동) — 상세는 6장 "변경 이력".
 
 ## 1. 배경
 
@@ -84,12 +83,31 @@ adapters/
 
 ## 5. 결과 / 아직 안 정한 것
 
-- 아직 구현하지 않았습니다 — 방향만 확정.
-- 포트를 얼마나 세분화할지(예: `BrowserAutomationPort` 하나로 Puppeteer의 여러 메서드를 다
-  덮을지, 메서드별로 쪼갤지)는 실제 코드 작성 시점에 확정합니다.
-- `adapters/inbound/http/`가 기존 `modules/*` 구조를 어떻게 흡수할지(모듈별 폴더를 유지한 채
-  그 안에 inbound만 둘지, 전역 `adapters/inbound/http/`로 다 모을지)는 이번에 정하지 않았습니다.
-- 에러 처리(원본 에러를 삼키는 `catch`), 파일명 케이싱 통일, 응답 규약(`lighthouse` 모듈 예외)
-  정리는 이 아키텍처 결정과 별개 이슈로, 마이그레이션 실행 시점에 스코프를 따로 정합니다.
+- 2026-08-21에 실제로 이동 완료했습니다(`typecheck`/`build`/`lint` 통과, `dist/` 클린 리빌드로
+  경로 확인, 로컬 `pnpm dev:api`로 `healthz`/`scan/ping`/`scan/robotsTxt`/`scan/crawling`/
+  `lighthouse/run` 전부 실제 호출까지 확인 — `crawling`과 `lighthouse/run`은 각각
+  `PuppeteerAdapter`/`ChromeLauncherAdapter`가 포트를 통해 실제로 브라우저를 띄우는 경로라 가장
+  중요한 검증이었음).
+- 포트 세분화는 최소로 시작 — `BrowserAutomationPort`(`launch`/`close`)와
+  `LighthouseRunnerPort`(`launch`/`safeKill`) 둘 다 기존 infra 클래스의 공개 메서드 2개를 그대로
+  옮긴 것뿐입니다. 다만 `PuppeteerProcess`(`= puppeteer.Browser`)는 여전히 구체 라이브러리
+  타입이라 완전히 순수한 포트는 아닙니다 — `ScanService`가 `launch()`로 받은 브라우저 객체로
+  `newPage()`/`goto()`/`evaluate()` 등 Puppeteer 전체 API를 그대로 쓰기 때문(포트 파일 상단
+  주석에 명시).
+- `adapters/inbound/http/`는 기존 `modules/*` 폴더링(scan/lighthouse/health 서브폴더)을 그대로
+  흡수하는 쪽으로 확정.
+- **알려진 불순물, 이번에 의도적으로 안 고침**: `ScanService`/`LighthouseService`가 여전히 유스케이스별로
+  안 쪼개진 통짜 클래스(`runChecks`도 `ScanService` private 메서드로 그대로 있음), `application/`이
+  인바운드 어댑터의 `dto.ts` 타입을 직접 `import`하는 것(순수 Hexagonal이라면 어색한 지점), 에러
+  처리(원본 에러를 삼키는 `catch`), 응답 규약(`lighthouse` 모듈 예외) — 전부 각 파일에
+  `// NOTE(ADR-011): ...` 주석으로 표시해뒀습니다. 다음 패스 후보.
+- **이번에 우발적으로 같이 고친 것**: `application/`으로 옮기며 `scanService.ts`가
+  `ScanService.ts`가 된 김에 `scanController.ts`도 `ScanController.ts`로 맞춰, 마이그레이션 전
+  있었던 파일명 케이싱 불일치(`scan`만 소문자 시작)가 해소됐습니다.
 - entities 계층을 나중에 도입할 기준: PRD에 체크 항목 간 관계 규칙이나 상태 변화, 불변식이
   실제로 추가되면(예: "그룹 A가 fail이면 그룹 B 체크를 건너뛴다" 같은 규칙) 그때 재검토합니다.
+
+## 6. 변경 이력
+
+- 2026-08-21 — 실제 마이그레이션 실행. 파일 매핑은 이 문서 3장 그대로 따름. 위 5장에 검증 방법과
+  두 가지 사이드이펙트(포트의 남은 불순물, 파일명 케이싱 우발적 통일)를 추가.

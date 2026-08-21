@@ -1,11 +1,16 @@
 import { ApiError } from "@/core/http/ApiError.js";
-import type { UrlBody } from "./dto.js";
-import type { PuppeteerProcess, Puppeteer } from "@/infra/Puppeteer.js";
+// NOTE(ADR-011): application importing an inbound-adapter DTO type is a known impurity this
+// migration pass didn't resolve — see docs/case-study/backend-hexagonal-architecture.md §5.
+import type { UrlBody } from "@/adapters/inbound/http/scan/dto.js";
+import type {
+  BrowserAutomationPort,
+  PuppeteerProcess,
+} from "@/domain/ports/BrowserAutomationPort.js";
 import crypto from "node:crypto";
 import { DESC_MAX, DESC_MIN, TITLE_MAX, TITLE_MIN } from "@/constant/meta.js";
 
 export class ScanService {
-  constructor(private readonly chrome: Puppeteer) {}
+  constructor(private readonly chrome: BrowserAutomationPort) {}
   private timeOut = 5000;
 
   async ping({ url }: UrlBody) {

@@ -99,34 +99,39 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
 
 ### meta-scan-api
 
-`src/modules/*` 아래 기능별 모듈로 나뉜 레이어드 Express 앱. 각 모듈은
-`*.router.ts`(라우트 연결) → `*Controller.ts`(`BaseController` 상속, 요청/응답만 담당) →
-`*Service.ts`(비즈니스 로직) 구조입니다. 경로 별칭은 `meta-scan-front`와 동일하게 `@/*` → `src/*`
-하나입니다(`tsconfig.json`에 정의, 2026-08-21 정리 — 이전엔 `@core/*`/`@constant/*`/`@config/*`/
-`@infra/*`/`@modules/*` 5개였음). 빌드 시 `tsc-alias`가 해석합니다 — 모듈 경계를 넘나들 때는
-상대경로가 아니라 항상 별칭으로 import하세요.
+**2026-08-21, [ADR-011](docs/adr/index.html#adr-011)에 따라 Hexagonal(Ports & Adapters) 3계층으로
+마이그레이션했습니다** — `domain/`(포트 인터페이스 + 도메인 로직) / `application/`(유스케이스 —
+아직 `ScanService`/`LighthouseService` 통짜 클래스, 세분화는 후속) / `adapters/`(inbound: HTTP
+컨트롤러·라우터, outbound: `PuppeteerAdapter`/`ChromeLauncherAdapter`). 이전 `src/modules/*`
+레이어드 구조는 대체됐습니다. 상세는 패키지 `CLAUDE.md`와
+`docs/case-study/backend-hexagonal-architecture.md` 참고. 경로 별칭은 `meta-scan-front`와
+동일하게 `@/*` → `src/*` 하나입니다(`tsconfig.json`에 정의, 2026-08-21 정리 — 이전엔
+`@core/*`/`@constant/*`/`@config/*`/`@infra/*`/`@modules/*` 5개였음). 빌드 시 `tsc-alias`가
+해석합니다 — 계층 경계를 넘나들 때는 상대경로가 아니라 항상 별칭으로 import하세요.
 
-- `src/app.ts` — 앱 엔트리포인트. `routers` 맵을 기반으로 `/api/v1/<key>`에 라우터를 마운트하고,
-  `/api/docs`에 Swagger UI를 붙이며, `FRONT_URL`/`FRONT_TEST_URL`/`PUBLIC_URL`로 CORS 허용
-  목록을 구성합니다.
+- `src/app.ts` — 앱 엔트리포인트. `routers` 맵을 기반으로 `/api/v1/<key>`에
+  `adapters/inbound/http/**/**.router.ts`를 마운트하고, `/api/docs`에 Swagger UI를 붙이며,
+  `FRONT_URL`/`FRONT_TEST_URL`/`PUBLIC_URL`로 CORS 허용 목록을 구성합니다.
 - `src/core/http/` — `BaseController`(응답 헬퍼 + 에러를 `next`로 넘기는 async 핸들러 래퍼),
   `ApiError`(static factory가 있는 타입 있는 HTTP 에러), 전역 `errorHandler`/`notFound` 미들웨어.
-- `src/core/validation/validator.ts` — 얇은 Zod 래퍼; 각 모듈 `dto.ts`의 DTO가 요청 타입의
+  Hexagonal 3계층 밖의 공통 유틸이라 이동하지 않았습니다.
+- `src/core/validation/validator.ts` — 얇은 Zod 래퍼; 각 인바운드 어댑터의 `dto.ts`가 요청 타입의
   소스 오브 트루스입니다.
-- `src/infra/` — 생명주기가 서로 다른 두 개의 브라우저 자동화 래퍼:
-  `Puppeteer.ts`(완전한 `puppeteer` 브라우저, `scan` 모듈이 페이지를 로드해 DOM/메타 데이터를
-  추출할 때 사용)와 `ChromeLauncher.ts`(`chrome-launcher`, `lighthouse`가 DevTools 프로토콜로
-  제어할 디버그 가능한 Chrome 인스턴스를 띄움). 이 둘을 혼동하지 마세요 — Lighthouse는 Puppeteer
-  `Browser`가 아니라 순수 Chrome 프로세스 + 포트가 필요합니다.
-  `Puppeteer.launch()`가 `--no-sandbox`를 넘기는 이유는 배포 대상인 Cloud Run(`dockerfile` 참고)
-  컨테이너에 샌드박스가 없기 때문입니다.
+- `src/adapters/outbound/` — 생명주기가 서로 다른 두 개의 브라우저 자동화 어댑터:
+  `PuppeteerAdapter.ts`(완전한 `puppeteer` 브라우저, `ScanService`가 페이지를 로드해 DOM/메타
+  데이터를 추출할 때 사용, `domain/ports/BrowserAutomationPort.ts` 구현)와
+  `ChromeLauncherAdapter.ts`(`chrome-launcher`, `lighthouse`가 DevTools 프로토콜로 제어할 디버그
+  가능한 Chrome 인스턴스를 띄움, `domain/ports/LighthouseRunnerPort.ts` 구현). 이 둘을 혼동하지
+  마세요 — Lighthouse는 Puppeteer `Browser`가 아니라 순수 Chrome 프로세스 + 포트가 필요합니다.
+  `PuppeteerAdapter.launch()`가 `--no-sandbox`를 넘기는 이유는 배포 대상인 Cloud Run
+  (`dockerfile` 참고) 컨테이너에 샌드박스가 없기 때문입니다.
   scan/lighthouse 호출은 매번 새 프로세스를 `launch()`하고 `finally` 블록에서 닫거나 kill합니다 —
   브라우저 풀링은 없습니다.
-- `src/modules/scan/scanService.ts` — 핵심 스캔 로직: `ping`(HEAD 요청), `robotsTxt`(외부 라이브러리
+- `src/application/ScanService.ts` — 핵심 스캔 로직: `ping`(HEAD 요청), `robotsTxt`(외부 라이브러리
   없이 직접 만든 robots.txt 파서/매처로 fetch), `siteMap`(sitemap.xml HEAD 체크), `crawling`(원본
-  HTML을 먼저 fetch한 뒤 같은 URL을 Puppeteer로 로드해 JS 실행 후 HTML을 얻고, 둘을 비교(diff)하고,
-  `page.evaluate`로 meta/OG/Twitter 태그와 이미지 alt 커버리지를 추출하고, 고정된 SEO `checks` 세트를
-  실행 — `runChecks` 참고). API에서 가장 복잡한 모듈입니다.
+  HTML을 먼저 fetch한 뒤 같은 URL을 `BrowserAutomationPort`로 로드해 JS 실행 후 HTML을 얻고, 둘을
+  비교(diff)하고, `page.evaluate`로 meta/OG/Twitter 태그와 이미지 alt 커버리지를 추출하고, 고정된
+  SEO `checks` 세트를 실행 — `runChecks` 참고). API에서 가장 복잡한 클래스입니다(아직 안 쪼갬).
 - `src/config/swagger.ts` — 라우트/DTO에서 자동 생성되지 않는, 손으로 작성한 OpenAPI 3.1 스펙
   객체이며 `/api/docs`에서 서빙됩니다; 라우트를 추가/변경할 때 수동으로 함께 갱신해야 합니다.
 - Cloud Run에 컨테이너로 배포됩니다(`dockerfile`); `lighthouse`의 `chrome-launcher`가 브라우저
@@ -211,7 +216,8 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
   완료, 이동 중 `ui/`로 재중첩된 소폭 조정 있음), ADR-011(백엔드 아키텍처로 Hexagonal(Ports &
   Adapters) 3계층 채택 — 전체 후보 조사는 `docs/case-study/backend-architecture-survey.md`, 원문은
   `docs/case-study/backend-hexagonal-architecture.md`; entities 계층은 PRD 체크리스트 명세 확인 후
-  불필요하다고 판단해 안 만듦; 방향만 확정, `meta-scan-api` 코드 반영은 아직). 새 결정이 생기면
+  불필요하다고 판단해 안 만듦; 2026-08-21 `meta-scan-api` 코드에 실제 반영 완료 — `ScanService`
+  등 God 클래스 분리·`runChecks` 도메인 추출은 후속 작업으로 남음). 새 결정이 생기면
   여기 계속 추가. **작성 규칙(페이지 상단 "ADR 작성 규칙" 카드)**: `Accepted`가 된 ADR의 본문(배경/
   결정/대안/결과)과 최초 작성일은 append-only — 다시 쓰지 않습니다. 방향이 바뀌면 새 번호의 ADR을
   추가하고, 기존 ADR은 상태 배지 변경 + 카드 맨 아래 "변경 이력"에 날짜와 사유만 한 줄 추가하세요.

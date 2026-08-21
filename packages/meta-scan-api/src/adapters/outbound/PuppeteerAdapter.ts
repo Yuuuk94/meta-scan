@@ -1,9 +1,11 @@
 import puppeteer from "puppeteer";
+import type {
+  BrowserAutomationPort,
+  PuppeteerProcess,
+} from "@/domain/ports/BrowserAutomationPort.js";
 
-export type PuppeteerProcess = puppeteer.Browser;
-
-export class Puppeteer {
-  async launch(): Promise<puppeteer.Browser> {
+export class PuppeteerAdapter implements BrowserAutomationPort {
+  async launch(): Promise<PuppeteerProcess> {
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"], // Cloud Run 등 컨테이너 환경에서 필수
@@ -12,7 +14,7 @@ export class Puppeteer {
     return browser;
   }
 
-  async close(proc?: puppeteer.Browser) {
+  async close(proc?: PuppeteerProcess) {
     if (!proc) return;
     try {
       proc.close();

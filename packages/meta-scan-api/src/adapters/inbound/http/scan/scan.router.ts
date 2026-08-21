@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { ScanController } from "./scanController.js";
-import { ScanService } from "./scanService.js";
-import { Puppeteer } from "@/infra/Puppeteer.js";
+import { ScanController } from "./ScanController.js";
+import { ScanService } from "@/application/ScanService.js";
+import { PuppeteerAdapter } from "@/adapters/outbound/PuppeteerAdapter.js";
 
 const router = Router();
 
-const launcher = new Puppeteer();
+const launcher = new PuppeteerAdapter();
 
 const service = new ScanService(launcher);
 const controller = new ScanController(service);

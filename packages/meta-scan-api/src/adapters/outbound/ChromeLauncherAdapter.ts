@@ -1,9 +1,11 @@
 import * as chromeLauncher from "chrome-launcher";
+import type {
+  ChromeProcess,
+  LighthouseRunnerPort,
+} from "@/domain/ports/LighthouseRunnerPort.js";
 
-export type ChromeProcess = chromeLauncher.LaunchedChrome;
-
-export class ChromeLauncher {
-  async launch(): Promise<chromeLauncher.LaunchedChrome> {
+export class ChromeLauncherAdapter implements LighthouseRunnerPort {
+  async launch(): Promise<ChromeProcess> {
     const chrome = await chromeLauncher.launch({
       ...(process.env.CHROME_PATH
         ? { chromePath: process.env.CHROME_PATH }

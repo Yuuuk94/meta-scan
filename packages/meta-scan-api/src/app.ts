@@ -5,9 +5,9 @@ import morgan from "morgan";
 import { errorHandler } from "@/core/http/errorHandler.js";
 import { notFound } from "@/core/http/notFound.js";
 import { swaggerUi, swaggerSpec } from "@/config/swagger.js";
-import healthRouter from "@/modules/health/health.router.js";
-import scanRouter from "@/modules/scan/scan.router.js";
-import lighthouseRouter from "@/modules/lighthouse/lighthouse.router.js";
+import healthRouter from "@/adapters/inbound/http/health/health.router.js";
+import scanRouter from "@/adapters/inbound/http/scan/scan.router.js";
+import lighthouseRouter from "@/adapters/inbound/http/lighthouse/lighthouse.router.js";
 
 const app = express();
 
