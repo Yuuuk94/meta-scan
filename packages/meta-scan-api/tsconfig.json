@@ -14,11 +14,7 @@
     "types": ["node"],
     "baseUrl": "src",
     "paths": {
-      "@core/*": ["core/*"],
-      "@constant/*": ["constant/*"],
-      "@config/*": ["config/*"],
-      "@infra/*": ["infra/*"],
-      "@modules/*": ["modules/*"]
+      "@/*": ["*"]
     }
   },
   "include": ["src"]

@@ -24,9 +24,11 @@ pnpm --filter meta-scan-api build:docker  # Docker 이미지 빌드 (아래 "Doc
 
 `src/modules/*` 아래 기능별 모듈로 나뉜 레이어드 Express 앱. 각 모듈은
 `*.router.ts`(라우트 연결) → `*Controller.ts`(`BaseController` 상속, 요청/응답만 담당) →
-`*Service.ts`(비즈니스 로직) 구조입니다. 경로 별칭(`@core/*`, `@constant/*`, `@config/*`,
-`@infra/*`, `@modules/*`, `tsconfig.json`에 정의)은 빌드 시 `tsc-alias`가 해석합니다 —
-모듈 경계를 넘나들 때는 상대경로가 아니라 별칭으로 import하세요.
+`*Service.ts`(비즈니스 로직) 구조입니다. 경로 별칭은 `@/*` → `src/*` 하나입니다(`tsconfig.json`).
+빌드 시 `tsc-alias`가 해석합니다 — 모듈 경계를 넘나들 때는 상대경로가 아니라 별칭으로
+import하세요. (2026-08-21: `@core/*`/`@constant/*`/`@config/*`/`@infra/*`/`@modules/*` 5개
+개별 별칭을 `meta-scan-front`의 `@/*` 스타일과 통일해 단일 별칭으로 정리했습니다 — 예:
+`@core/http/BaseController.js` → `@/core/http/BaseController.js`.)
 
 - `src/app.ts` — 엔트리포인트. `routers` 맵을 기반으로 `/api/v1/<key>`에 라우터를 마운트하고,
   `/api/docs`에 Swagger UI를 붙이며, `FRONT_URL`/`FRONT_TEST_URL`/`PUBLIC_URL`로 CORS 허용

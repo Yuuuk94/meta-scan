@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ChromeLauncher } from "@infra/ChromeLauncher.js";
+import { ChromeLauncher } from "@/infra/ChromeLauncher.js";
 import { LighthouseService } from "./LighthouseService.js";
 import { LighthouseController } from "./LighthouseController.js";
 

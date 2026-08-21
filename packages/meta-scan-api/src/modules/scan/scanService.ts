@@ -1,8 +1,8 @@
-import { ApiError } from "@core/http/ApiError.js";
+import { ApiError } from "@/core/http/ApiError.js";
 import type { UrlBody } from "./dto.js";
-import type { PuppeteerProcess, Puppeteer } from "@infra/Puppeteer.js";
+import type { PuppeteerProcess, Puppeteer } from "@/infra/Puppeteer.js";
 import crypto from "node:crypto";
-import { DESC_MAX, DESC_MIN, TITLE_MAX, TITLE_MIN } from "@constant/meta.js";
+import { DESC_MAX, DESC_MIN, TITLE_MAX, TITLE_MIN } from "@/constant/meta.js";
 
 export class ScanService {
   constructor(private readonly chrome: Puppeteer) {}

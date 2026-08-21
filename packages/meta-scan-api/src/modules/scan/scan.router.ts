@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ScanController } from "./scanController.js";
 import { ScanService } from "./scanService.js";
-import { Puppeteer } from "@infra/Puppeteer.js";
+import { Puppeteer } from "@/infra/Puppeteer.js";
 
 const router = Router();
 

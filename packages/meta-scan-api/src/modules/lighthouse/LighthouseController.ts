@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { BaseController } from "@core/http/BaseController.js";
-import { validate } from "@core/validation/validator.js";
+import { BaseController } from "@/core/http/BaseController.js";
+import { validate } from "@/core/validation/validator.js";
 import { RunBody, RunBodySchema } from "./dto.js";
 import { LighthouseService } from "./LighthouseService.js";
 
