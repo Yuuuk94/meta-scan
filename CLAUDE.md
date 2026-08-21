@@ -203,7 +203,11 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
   선검사 게이팅 — 비허용 시 전체 스캔 하드 차단, 비용 절감), ADR-007(Lighthouse 개별 감사 `lhr.audits`
   재사용 — 결과 화면 하단 "Lighthouse 개선 제안" 카드, Hero의 자체 판정과 출처 구분), ADR-008(디자인
   시스템 재정립 — "진 인덱스(Zine Index) + 오렌지" 톤, ADR-004 대체, 원문은
-  `docs/design-system.md`). 새 결정이 생기면 여기 계속 추가. **작성 규칙(페이지 상단 "ADR 작성 규칙" 카드)**: `Accepted`가 된 ADR의 본문(배경/
+  `docs/design-system.md`), ADR-009(프론트 컴포넌트 아키텍처로 FSD-lite 채택 — 사용자 인터뷰 없이
+  일방적으로 작성된 것으로 확인돼 `Superseded by ADR-010`), ADR-010(프론트 컴포넌트 아키텍처
+  재결정 — Atomic Design 5계층 + api/services/hooks 기능 분리, 사용자와 순차 인터뷰를 거쳐 확정,
+  원문은 `docs/frontend-atomic-architecture.md`; 방향만 확정, `meta-scan-front` 코드 반영은
+  아직). 새 결정이 생기면 여기 계속 추가. **작성 규칙(페이지 상단 "ADR 작성 규칙" 카드)**: `Accepted`가 된 ADR의 본문(배경/
   결정/대안/결과)과 최초 작성일은 append-only — 다시 쓰지 않습니다. 방향이 바뀌면 새 번호의 ADR을
   추가하고, 기존 ADR은 상태 배지 변경 + 카드 맨 아래 "변경 이력"에 날짜와 사유만 한 줄 추가하세요.
 

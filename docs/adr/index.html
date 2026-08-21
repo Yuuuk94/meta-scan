@@ -629,7 +629,7 @@
   <div class="card" id="adr-009">
     <h3 style="margin-top:0;">ADR-009 — 프론트 컴포넌트 아키텍처: FSD-lite로 UI/기능 분리</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — 원문은 <code>docs/frontend-component-architecture.md</code>, 구현은 아직 착수 전</td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge none">Superseded by ADR-010</span> · 2026-08-18 — 원문은 <code>docs/frontend-component-architecture.md</code></td></tr>
     </table>
 
     <h4>배경 (Context)</h4>
@@ -701,6 +701,91 @@
             만들면서 조정될 수 있음</li>
           <li><code>src/components/ui/</code>(기존 shadcn 프리미티브)와 새
             <code>shared/</code>의 관계(완전 대체 vs 공존)는 이번에 정하지 않음</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>변경 이력</h4>
+    <ul>
+      <li>2026-08-21 — 이 결정이 실제로는 사용자와 함께 진행되지 않고 AI 세션이 일방적으로
+        작성한 것으로 확인됨(사용자 확인: "이러한 결정을 같이 진행한 바가 없어"). 사용자와
+        단계별 확인(<code>AskUserQuestion</code>)을 거쳐 다시 결정한
+        <a href="#adr-010">ADR-010</a>(Atomic Design 5계층)으로 대체 — 이 카드의 본문(배경/
+        결정/대안/결과)은 원 기록으로 그대로 두고 상태 배지만 변경.</li>
+    </ul>
+  </div>
+
+  <div class="card" id="adr-010">
+    <h3 style="margin-top:0;">ADR-010 — 프론트 컴포넌트 아키텍처: Atomic Design 5계층 + api/services/hooks로 재결정</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-21 — 원문은 <code>docs/frontend-atomic-architecture.md</code>, 구현은 아직 착수 전. <a href="#adr-009">ADR-009</a>를 대체</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p><a href="#adr-009">ADR-009</a>(FSD-lite)가 사용자 인터뷰 없이 AI 세션이 일방적으로 작성한
+      결정이었던 것으로 확인되어 무효화됐습니다. 다뤄야 할 문제 자체(와이어프레임을 실제 코드로
+      옮길 때 "UI 컴포넌트"와 "기능(데이터 페칭·판정 취합·상태)"을 어떻게 분리할지)는 동일하지만,
+      이번엔 사용자와 <code>AskUserQuestion</code>으로 한 번에 하나씩 확인하는 순차 인터뷰를 거쳐
+      다시 결정했습니다. 인터뷰 도중 FSD-lite 압축(<code>features</code>+<code>widgets</code>
+      통합)이 "이 컴포넌트가 어느 계층인지" 애매함을 반복적으로 유발한다는 게 실제로 확인돼
+      (<code>RootHeader</code>/<code>HeroSection</code> 배치를 두고 세 차례 옵션 비교),
+      계층을 압축하지 않는 방향으로 바뀌었습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li>정석 Atomic Design 5계층(<code>atoms</code>/<code>molecules</code>/<code>organisms</code>/
+        <code>templates</code>/<code>pages</code>)을 압축 없이 그대로 채택 — <code>pages</code>는
+        Next.js App Router의 <code>app/[lang]/**/page.tsx</code>가 겸함(별도 폴더 안 만듦)</li>
+      <li>Atomic Design은 "기능이 어디 사는지"를 정의하지 않으므로, 별도로
+        <code>api/</code>(네트워크 I/O, 목킹 필요) / <code>services/</code>(순수 로직 —
+        <code>combineScanResults</code>, <a href="#adr-006">ADR-006</a> 게이팅, 목킹 불필요) /
+        <code>hooks/</code>(클라이언트 컴포넌트 전용 React 상태·React Query 자리) 3계층을 얹음</li>
+      <li><strong>서버 컴포넌트는 훅을 못 쓴다는 사실 확인</strong>: <code>request-scan/page.tsx</code>·
+        <code>scan/page.tsx</code>는 서버 컴포넌트라 애초에 React 훅 사용이 불가능함(반면
+        <code>ProcessScreen.tsx</code>는 <code>"use client"</code>) — <code>loaders/</code> 같은
+        대칭 폴더를 새로 만들지 않고, 서버 컴포넌트는 지금처럼 <code>api/</code>를 직접 호출하는
+        Next.js 관용 패턴을 유지하기로 함</li>
+      <li>React Query 도입 방향은 확정했지만 실제 설치 + <code>QueryClientProvider</code> 배선은
+        새 인프라 작업이라 이번 스코프 밖 — <code>hooks/</code> 폴더 자리만 예약</li>
+      <li><strong>이번 마이그레이션 패스의 범위는 "순수 이동 + 빈 세그먼트 TODO 스텁"으로 한정</strong>:
+        <code>ProcessScreen.tsx</code>처럼 UI와 API 호출이 이미 섞여 있는 기존 파일은 쪼개지 않고
+        통째로 이동하고, <code>templates/</code>(Atomic) 계층의 실제 조립 파일(예:
+        <code>HomeTemplate</code>)은 이번엔 만들지 않고 빈 폴더로 남김 — 둘 다 후속 작업</li>
+      <li>구체적 파일 이동 매핑은 <code>docs/frontend-atomic-architecture.md</code> 4장 참고</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각/보류 사유</th></tr>
+      <tr><td>FSD 계열 4계층 압축판 (<a href="#adr-009">ADR-009</a> 원안)</td><td>승인 절차 문제와 별개로, 압축 자체가 "이 컴포넌트가 어느 계층인지" 애매함을 반복 유발함이 이번 인터뷰 중 재확인됨</td></tr>
+      <tr><td>정석 FSD 6계층</td><td>사용자가 "6계층이 모두 필요할 것 같다"는 문제의식으로 이 재논의를 시작했으나, 최종적으로는 Atomic Design 쪽을 선택 — FSD는 "기능이 어디 사는가"엔 강하지만 이번 팀 규모·도메인엔 Atomic의 UI 세분화 축이 더 필요하다고 판단</td></tr>
+      <tr><td>가벼운 궁합(계층 프레임워크 없이 container/presentational만)</td><td>폴더 체계를 새로 안 배우는 대신, 기능이 늘어나면 경계가 다시 흐트러질 위험 — 지금 시점에 명시적 계층을 두는 쪽을 선택</td></tr>
+      <tr><td>기능 코드를 커스텀 훅 단일 계층에만 두기</td><td>순수 로직(<code>combineScanResults</code> 등)과 React 상태 로직이 섞여, 순수 함수만 목킹 없이 단위테스트하려는 목표(<code>docs/dev-lifecycle-harness.md</code>의 테스트 인프라 우선순위)와 어긋남</td></tr>
+      <tr><td>얕은 <code>features/</code> 폴더를 Atomic과 혼용</td><td>한 슬라이스만 다른 패러다임(FSD풍)을 쓰면 "이건 어디 있지" 혼란이 재발할 가능성 — Atomic 채택 결정과 직접 모순</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li>계층을 압축하지 않아 "이 컴포넌트가 어느 계층인지" 판단 규칙이 명확함(복잡도 기준)</li>
+          <li><code>api</code>/<code>services</code>/<code>hooks</code> 분리로 테스트 전략이 계층별로
+            갈림 — <code>services</code>는 목킹 없이, <code>hooks</code>는 통합 테스트로</li>
+          <li>서버/클라이언트 컴포넌트가 React 훅 가용 여부부터 다르다는 사실을 폴더 구조에
+            반영해, 나중에 "왜 이 페이지엔 훅이 없지"라는 혼란을 방지</li>
+          <li>실제 사용자 순차 인터뷰를 거쳐 결정 — ADR-009가 겪은 승인 절차 문제 재발 방지</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>정석 5계층이라 폴더 수가 FSD-lite보다 많음 — 이번 앱 규모(단일 스캔 도메인)엔
+            과할 수 있다는 우려가 여전히 남음(3장 참고)</li>
+          <li><code>templates/</code>(Atomic) 계층과 <code>hooks/</code>의 React Query 배선은
+            이번에 비워둬서, 실제로 잘 맞는 경계인지는 다음 패스에서 검증 전</li>
+          <li><code>services/combineScanResults.ts</code>·<code>scanGating.ts</code>는 TODO
+            스텁만 있고 실제 판정 로직은 여전히 없음 — 폴더 구조만 준비된 상태</li>
         </ul>
       </div>
     </div>
