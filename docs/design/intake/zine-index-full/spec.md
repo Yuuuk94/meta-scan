@@ -14,8 +14,8 @@
 | 페이지 | 파일들 | 판정 |
 |---|---|---|
 | `wireframes`(기본, `page` 필드 없음) | `Main.dc.html`, `RequestScanProcess.dc.html`, `RequestScanError.dc.html`, `RequestScanBlocked.dc.html`, `Scan.dc.html`, `Privacy.dc.html`, `Terms.dc.html`, `NotFound.dc.html`, `ErrorBoundary.dc.html` | **폐기** — 회색조 로우파이 와이어프레임. 구조 참고용으로만 훑어봄(아래 1장 참고, 여기 안에 구현 지시 문구가 섞여 있었음) |
-| `explore` | `DirectionsIntro.dc.html`, `ConceptLabReport.dc.html`, `ConceptNeonScanner.dc.html`, `ConceptZineIndex.dc.html`, `ConceptZineIndexBlue/Yellow/Pink.dc.html` | **폐기** — 3가지 톤 탐색(①인쇄 랩 리포트 ②다크 네온 스캐너 ③진 인덱스) + 진 인덱스의 포인트컬러 4색 실험. `canvas.json`의 `color-note` 주석("3번 진 인덱스 — 포인트 컬러 3안 ... → 오렌지로 확정")이 명시적으로 오렌지 확정을 기록. `docs/design-system.md`(ADR-008)도 오렌지 단일 액센트를 못박고 있어 결정과 일치 |
-| `final` | `MainZine`, `RequestScanProcessZine`, `RequestScanErrorZine`, `RequestScanBlockedZine`, `ScanZine`, `PrivacyZine`, `TermsZine`, `NotFoundZine`, `ErrorBoundaryZine` (데스크톱 9) + 각각의 `*Mobile.dc.html` (모바일 9) | **채택** — `canvas.json`의 `final-note` 주석이 "최종 디자인 — 진 인덱스 + 오렌지(ADR-008, docs/design-system.md)"라고 명시. 토큰·타이포·컴포넌트 스타일링이 `docs/design-system.md`와 실측 일치(4장 참고) |
+| `explore` | `DirectionsIntro.dc.html`, `ConceptLabReport.dc.html`, `ConceptNeonScanner.dc.html`, `ConceptZineIndex.dc.html`, `ConceptZineIndexBlue/Yellow/Pink.dc.html` | **폐기** — 3가지 톤 탐색(①인쇄 랩 리포트 ②다크 네온 스캐너 ③진 인덱스) + 진 인덱스의 포인트컬러 4색 실험. `canvas.json`의 `color-note` 주석("3번 진 인덱스 — 포인트 컬러 3안 ... → 오렌지로 확정")이 명시적으로 오렌지 확정을 기록. `docs/design/design-system.md`(ADR-008)도 오렌지 단일 액센트를 못박고 있어 결정과 일치 |
+| `final` | `MainZine`, `RequestScanProcessZine`, `RequestScanErrorZine`, `RequestScanBlockedZine`, `ScanZine`, `PrivacyZine`, `TermsZine`, `NotFoundZine`, `ErrorBoundaryZine` (데스크톱 9) + 각각의 `*Mobile.dc.html` (모바일 9) | **채택** — `canvas.json`의 `final-note` 주석이 "최종 디자인 — 진 인덱스 + 오렌지(ADR-008, docs/design/design-system.md)"라고 명시. 토큰·타이포·컴포넌트 스타일링이 `docs/design/design-system.md`와 실측 일치(4장 참고) |
 
 총 **18개 아트보드**(데스크톱 9 + 모바일 9)를 스펙에 포함.
 
@@ -41,7 +41,7 @@
 
 이 라벨들은 파일 경로(`HeroSection.tsx`, `templates/request-scan/BlockedScreen.tsx` 등)와 구현 관련 메모(ADR 번호, PRD 절 번호)를 직접 지시하고 있어 "디자인이 아닌 내용"에 해당한다. 채택한 `final` 패밀리(`MainZine.dc.html` 등)에는 이 클래스/문구가 전혀 없음을 `grep`으로 확인했다 — 즉 실제로 채택한 스펙 내용에는 섞여 들어가지 않았지만, 요청대로 발견 사실을 보고한다.
 
-(참고로 `canvas.json`의 `annotations` 배열에도 비슷한 성격의 캔버스 메모— 예: `"메인 유저 플로우: 메인 → /request-scan → /scan\n체크리스트 PRD(docs/meta-scan-plus-prd.md) 기준 재설계 대상은..."` — 가 있지만, 이건 아트보드 본문이 아니라 캔버스 도구의 별도 주석 레이어라 애초에 화면 카피로 오인될 여지가 없어 별도 처리 없이 무시했다.)
+(참고로 `canvas.json`의 `annotations` 배열에도 비슷한 성격의 캔버스 메모— 예: `"메인 유저 플로우: 메인 → /request-scan → /scan\n체크리스트 PRD(docs/prd/meta-scan-plus-prd.md) 기준 재설계 대상은..."` — 가 있지만, 이건 아트보드 본문이 아니라 캔버스 도구의 별도 주석 레이어라 애초에 화면 카피로 오인될 여지가 없어 별도 처리 없이 무시했다.)
 
 ---
 
@@ -289,19 +289,19 @@ Privacy와 동일 레이아웃 패턴. 섹션 제목 01~06: `목적` / `정의` 
 
 ### 4.1 확인(문서와 정확히 일치, 참고용)
 - 카드: 그림자 없음, `1.5px solid #141311` 하드라인, 모서리 없음 — 전 아트보드 일관.
-- 배지: pass/warn/fail 동일 무게 채움 박스, info만 얇은 아웃라인 — `docs/design-system.md` §8 규칙과 정확히 일치.
+- 배지: pass/warn/fail 동일 무게 채움 박스, info만 얇은 아웃라인 — `docs/design/design-system.md` §8 규칙과 정확히 일치.
 - 번호 라벨(01~04): `Big Shoulders Display` + 오렌지 — 반복 모티프 규칙과 일치.
 - 헤더 하단 4px / 푸터 상단 1.5px 룰, 컨테이너 좌우 여백 56px(데스크톱) — 문서 §5 수치와 정확히 일치.
 - 프로세스 스텝 4up·Lighthouse 점수 4up·"지금 고쳐야 할 것" 리스트는 갭 없이 1px 룰로 셀 구분 — §4 "갭 대신 룰 라인" 규칙 준수.
 - 타이포: 헤드라인/숫자 `Big Shoulders Display`, 본문 `IBM Plex Sans` — 세리프·Inter 없음, 규칙 준수.
 
 ### 4.2 충돌(사용자/publish-front 판단 필요)
-1. **체크리스트 4카드 그리드 + Previews 2카드 그리드가 "갭 대신 룰 라인" 규칙을 어김.** `ScanZine.dc.html`의 기본 SEO/Indexing/Content Stats/국제화·UX 4카드(67행)와 Previews 안의 OG/Twitter 미리보기 2카드(106행)는 개별 하드라인 카드(`.card`)를 **20px 실제 `gap`** 으로 띄워 배치한다 — `docs/design-system.md` §4의 "카드 그룹(그리드) 사이는 1px 검정 룰로 셀을 구분... 갭 대신 룰 라인"과 정면으로 다르다. 같은 화면 안에서 프로세스 스텝/Lighthouse 점수/"지금 고쳐야 할 것"은 전부 룰 라인 패턴을 쓰는데 이 두 그리드만 다르다 — 의도적 예외인지, 그냥 놓친 것인지 결정 필요.
+1. **체크리스트 4카드 그리드 + Previews 2카드 그리드가 "갭 대신 룰 라인" 규칙을 어김.** `ScanZine.dc.html`의 기본 SEO/Indexing/Content Stats/국제화·UX 4카드(67행)와 Previews 안의 OG/Twitter 미리보기 2카드(106행)는 개별 하드라인 카드(`.card`)를 **20px 실제 `gap`** 으로 띄워 배치한다 — `docs/design/design-system.md` §4의 "카드 그룹(그리드) 사이는 1px 검정 룰로 셀을 구분... 갭 대신 룰 라인"과 정면으로 다르다. 같은 화면 안에서 프로세스 스텝/Lighthouse 점수/"지금 고쳐야 할 것"은 전부 룰 라인 패턴을 쓰는데 이 두 그리드만 다르다 — 의도적 예외인지, 그냥 놓친 것인지 결정 필요.
 2. **도트 패턴 장식(halftone 텍스처).** `MainZine.dc.html`(34행)의 Hero 우상단 `radial-gradient(#141311 22%, transparent 23%) 0 0/10px 10px` 반복 텍스처 — CSS 속성명이 `radial-gradient`라 §7 "그라디언트 배경... 전부 금지" 문구를 문자 그대로 적용하면 위반처럼 보이지만, 실제로는 색 블렌드가 아니라 인쇄 하프톤 도트 텍스처를 만드는 용도다("진 인덱스"의 인쇄물 모티프와는 잘 맞음). 금지 규칙이 "부드러운 색 그라디언트"를 겨냥한 것인지 "`radial-gradient` 함수 사용 자체"를 겨냥한 것인지 문서에 명시가 없어 판단이 필요하다.
 3. **헤더 원형 아바타 placeholder.** 전 아트보드 헤더 우측의 `border-radius:50%` 원형 배지(`#E4DECB`) — §7은 "카드에 둥근 모서리 금지"라고 카드에 한정해 말하지만, 이 원형 요소가 무엇을 나타내는지(테마 토글? 다국어 스위치? 아바타?) 디자인 파일 안에 라벨이 전혀 없다. 프로젝트에 이미 `templates/root/ToggleSetting.tsx`/`ServiceStatus.tsx`가 있어 그 자리로 추정되지만 확정은 아니다 — 아래 4.3 공백과 함께 확인 필요.
 
 ### 4.3 공백(문서에 없는 것 — 임의로 채우지 않음)
-1. **Ink Secondary(`#4A473F`) 토큰이 코드에 없다.** `docs/design-system.md` §2에 "서브 카피, 본문 설명" 색으로 정의돼 있고 이번 디자인의 거의 모든 서브카피(Hero 서브카피, FAQ 답변 본문, 에러 화면 서브카피 등)에 실제로 쓰이는데, `packages/meta-scan-front/src/css/globals.css`의 CSS 변수 목록(`--background`~`--sidebar-ring`)에는 대응 변수가 없다(`grep`으로 미검출 확인). `--muted-foreground`(`#8A8577`, Ink Tertiary)와는 다른 색이라 대체 불가 — 새 토큰(예: `--foreground-secondary`)을 추가해야 하는지 publish-front가 확인 필요.
+1. **Ink Secondary(`#4A473F`) 토큰이 코드에 없다.** `docs/design/design-system.md` §2에 "서브 카피, 본문 설명" 색으로 정의돼 있고 이번 디자인의 거의 모든 서브카피(Hero 서브카피, FAQ 답변 본문, 에러 화면 서브카피 등)에 실제로 쓰이는데, `packages/meta-scan-front/src/css/globals.css`의 CSS 변수 목록(`--background`~`--sidebar-ring`)에는 대응 변수가 없다(`grep`으로 미검출 확인). `--muted-foreground`(`#8A8577`, Ink Tertiary)와는 다른 색이라 대체 불가 — 새 토큰(예: `--foreground-secondary`)을 추가해야 하는지 publish-front가 확인 필요.
 2. **헤더 원형 요소의 정체.** 위 4.2-③과 동일 — 컴포넌트 패턴으로 문서화된 적이 없다.
 3. **URL 입력 필드에 아이콘/버튼 결합 여부.** 문서 §4는 "라벨 없이 플레이스홀더만"이라고만 규정하고, 이 디자인처럼 입력창과 CTA 버튼을 나란히 배치하는 조합 패턴 자체는 문서에 없다(단일 필드 스타일만 규정). 이번 배치가 그대로 컴포넌트 패턴이 되는 것인지 확인 필요.
 
@@ -332,7 +332,7 @@ Privacy와 동일 레이아웃 패턴. 섹션 제목 01~06: `목적` / `정의` 
   4. §4.3-① `#4A473F`(Ink Secondary) 토큰이 코드에 없음 — 추가 필요.
   5. §5의 메타 노트 4건 재작성안 확정(또는 문구 자체 삭제, 특히 #4).
   6. §2 톤 전환 중 두 갈래로 제시한 곳(예: "잠시 기다린다" vs "잠시 대기하라")은 평서형/명령형 중 하나로 통일 확정.
-- publish-front는 이 스펙과 함께 `docs/design-system.md`(ADR-008), `docs/frontend-component-architecture.md`(ADR-009, FSD-lite)를 그대로 따르되, 위 6가지는 구현 착수 전에 사용자 확인을 받을 것.
+- publish-front는 이 스펙과 함께 `docs/design/design-system.md`(ADR-008), `docs/case-study/frontend-component-architecture.md`(ADR-009, FSD-lite)를 그대로 따르되, 위 6가지는 구현 착수 전에 사용자 확인을 받을 것.
 
 ---
 

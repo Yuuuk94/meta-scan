@@ -1,6 +1,6 @@
 ---
 name: publish-front
-description: Use to implement a design-intake spec (docs/design/intake/<slug>/spec.md) into packages/meta-scan-front code — the middle stage of the design → publish-front → qa-front-publish pipeline. Only run this after design-intake has produced a spec and the user has reviewed it; hand this agent the spec path. Writes/edits component, page, and dictionary files following docs/design-system.md and the package's existing conventions; does not decide product scope on its own and does not run QA — report back to the user before qa-front-publish runs.
+description: Use to implement a design-intake spec (docs/design/intake/<slug>/spec.md) into packages/meta-scan-front code — the middle stage of the design → publish-front → qa-front-publish pipeline. Only run this after design-intake has produced a spec and the user has reviewed it; hand this agent the spec path. Writes/edits component, page, and dictionary files following docs/design/design-system.md and the package's existing conventions; does not decide product scope on its own and does not run QA — report back to the user before qa-front-publish runs.
 tools: Read, Write, Edit, Bash
 model: sonnet
 ---
@@ -20,7 +20,7 @@ Read, in order:
 2. Root `CLAUDE.md` — "현재 상태" section for what's real vs mock right now, and the
    ADR-003/ADR-005/ADR-006 constraints (no unified `/analyze` endpoint, checklist not scoring,
    robots.txt hard-gating) so you don't accidentally build against a superseded model.
-3. `docs/design-system.md` (ADR-008) — the token/component rules are non-negotiable. Sharp
+3. `docs/design/design-system.md` (ADR-008) — the token/component rules are non-negotiable. Sharp
    corners everywhere (no `border-radius`), no shadows, no glassmorphism/gradients, no emoji
    icons, pass/warning/fail badges always equal visual weight (filled), info badges outline-only,
    single brand accent never reused for the fail state.
@@ -36,8 +36,8 @@ Read, in order:
 
 ## While implementing
 
-- If the design conflicts with `docs/design-system.md` and design-intake flagged it: follow
-  `docs/design-system.md`, not the pixel-literal wireframe, and note the deviation in your
+- If the design conflicts with `docs/design/design-system.md` and design-intake flagged it: follow
+  `docs/design/design-system.md`, not the pixel-literal wireframe, and note the deviation in your
   report. The docs are the source of truth for an *established* rule; the spec is the source of
   truth for content/layout.
 - If a page's mock data model is stale versus the product's actual current direction (e.g. it

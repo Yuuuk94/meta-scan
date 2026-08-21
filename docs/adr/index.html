@@ -93,7 +93,7 @@
   <div class="card" id="adr-001">
     <h3 style="margin-top:0;">ADR-001 — 모노레포 의존성 관리 도구: pnpm workspaces</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 상세 원문은 <code>docs/monorepo-dependency-management.md</code></td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 상세 원문은 <code>docs/case-study/monorepo-dependency-management.md</code></td></tr>
     </table>
 
     <h4>배경 (Context)</h4>
@@ -127,7 +127,7 @@
       <tr><td>Next.js 호환성</td><td>공식 지원, 이슈 적음</td><td>PnP 모드에서 과거 이슈 다수 리포트됨</td></tr>
       <tr><td>학습/마이그레이션 비용</td><td>낮음 — npm/yarn과 사용법 거의 동일</td><td>상대적으로 높음 — <code>.yarnrc.yml</code>, zero-install, PnP 개념 학습 필요</td></tr>
     </table>
-    <p class="sub">전체 비교표와 마이그레이션 6단계는 <code>docs/monorepo-dependency-management.md</code>에 원문 그대로 있습니다.</p>
+    <p class="sub">전체 비교표와 마이그레이션 6단계는 <code>docs/case-study/monorepo-dependency-management.md</code>에 원문 그대로 있습니다.</p>
 
     <h4>결과 (Consequences)</h4>
     <div class="grid-2">
@@ -365,7 +365,7 @@
   <div class="card" id="adr-005">
     <h3 style="margin-top:0;">ADR-005 — 스코어링 엔진 폐기, 체크리스트(pass/warning/fail/info)로 전환</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — <code>docs/meta-scan-plus-prd.md</code>·<a href="../prd/index.html">PRD 페이지</a>에 결과 반영</td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — <code>docs/prd/meta-scan-plus-prd.md</code>·<a href="../prd/index.html">PRD 페이지</a>에 결과 반영</td></tr>
     </table>
 
     <h4>배경 (Context)</h4>
@@ -514,7 +514,7 @@
       <li>신규 백엔드 엔드포인트·필드 불필요 — <code>lhr.audits</code>가 이미 응답에 포함돼 있어
         프론트가 그중 일부만 골라 렌더링</li>
       <li>PRD 3.7절의 "개별 감사(<code>lhr.audits</code>)도 재사용하지 않습니다" 문구는 이 결정으로
-        뒤집힘 — PRD 원문(<code>docs/meta-scan-plus-prd.md</code>, <a href="../prd/index.html">PRD
+        뒤집힘 — PRD 원문(<code>docs/prd/meta-scan-plus-prd.md</code>, <a href="../prd/index.html">PRD
         페이지</a>)에 직접 반영(PRD는 ADR과 달리 append-only 대상이 아님)</li>
       <li><a href="#adr-003">ADR-003</a>의 핵심 결정(4개 API 오케스트레이션, 신규 <code>/analyze</code>
         엔드포인트 없음)은 그대로 유지 — <code>crawling</code>/<code>lighthouse</code>는 여전히 별도
@@ -554,7 +554,7 @@
   <div class="card" id="adr-008">
     <h3 style="margin-top:0;">ADR-008 — 디자인 시스템 재정립: "진 인덱스(Zine Index) + 오렌지" 톤, ADR-004 대체</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — <code>docs/design-system.md</code>에 결과 반영</td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — <code>docs/design/design-system.md</code>에 결과 반영</td></tr>
     </table>
 
     <h4>배경 (Context)</h4>
@@ -583,7 +583,7 @@
       <li>디자인 시스템 문서는 Google Stitch의 <code>DESIGN.md</code> 문서 정리 방식(섹션 구성:
         분위기 → 컬러 → 타이포 → 컴포넌트 → 레이아웃 → 모션 → 안티패턴)을 그대로 따르되, 내용은
         Stitch 자체 스타일이 아니라 meta-scan이 확정한 진 인덱스 톤으로 채움 —
-        <code>docs/design-system.md</code>. 기존 <code>docs/design.md</code> +
+        <code>docs/design/design-system.md</code>. 기존 <code>docs/design/design.md</code> +
         <code>docs/design/{colors,typography,spacing,components}.md</code> 분할 구조는 이 단일
         문서로 대체(재구성은 다음 라운드)</li>
       <li>메인/결과 화면(Main·Scan) 데스크톱+모바일에 우선 적용, 나머지 7개 화면(ProcessScreen 계열
@@ -606,7 +606,7 @@
         <ul>
           <li>제품 톤(무료·애드센스·진단 도구)과 시각 언어가 다시 일치</li>
           <li>판정 배지 3종(pass/warn/fail)의 시각적 위계가 동등해져 체크리스트 가독성 개선</li>
-          <li>디자인 결정이 <code>docs/design-system.md</code> 한 문서에 정리돼 향후 컴포넌트
+          <li>디자인 결정이 <code>docs/design/design-system.md</code> 한 문서에 정리돼 향후 컴포넌트
             구현 시 참조하기 쉬움</li>
         </ul>
       </div>
@@ -616,7 +616,7 @@
           <li>9개 화면 중 2개(Main, Scan)만 데스크톱 우선 적용됨 — 나머지 7개 화면 + 전 화면
             모바일 버전은 아직 미완료</li>
           <li><code>docs/design/index.html</code>(시각화 페이지)과 기존 분할 md 문서들은 아직
-            갱신 전 — <code>docs/design-system.md</code>가 최신 소스이니 그 사이 이 문서를
+            갱신 전 — <code>docs/design/design-system.md</code>가 최신 소스이니 그 사이 이 문서를
             우선 참고할 것</li>
           <li>실제 <code>meta-scan-front</code> 컴포넌트(Tailwind 토큰, `globals.css`)로의
             반영은 이번 ADR 범위 밖 — 와이어프레임 확정 이후 별도 구현 작업</li>
@@ -629,11 +629,11 @@
   <div class="card" id="adr-009">
     <h3 style="margin-top:0;">ADR-009 — 프론트 컴포넌트 아키텍처: FSD-lite로 UI/기능 분리</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-18 — 원문은 <code>docs/frontend-component-architecture.md</code>, 구현은 아직 착수 전</td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge none">Superseded by ADR-010</span> · 2026-08-18 — 원문은 <code>docs/case-study/frontend-component-architecture.md</code></td></tr>
     </table>
 
     <h4>배경 (Context)</h4>
-    <p><code>docs/design-system.md</code>(<a href="#adr-008">ADR-008</a>, 진 인덱스 톤)로 확정된
+    <p><code>docs/design/design-system.md</code>(<a href="#adr-008">ADR-008</a>, 진 인덱스 톤)로 확정된
       와이어프레임 캔버스를 실제 <code>meta-scan-front</code> 코드로 옮기기에 앞서, "UI 컴포넌트"와
       "기능(데이터 페칭·판정 취합·상태)"을 어떻게 분리할지가 정해지지 않은 상태였습니다. 지금 남은
       진짜 작업(<code>ProcessScreen</code>이 4개 API 응답을 버리는 것, <code>/scan</code>이
@@ -704,6 +704,204 @@
         </ul>
       </div>
     </div>
+
+    <h4>변경 이력</h4>
+    <ul>
+      <li>2026-08-21 — 이 결정이 실제로는 사용자와 함께 진행되지 않고 AI 세션이 일방적으로
+        작성한 것으로 확인됨(사용자 확인: "이러한 결정을 같이 진행한 바가 없어"). 사용자와
+        단계별 확인(<code>AskUserQuestion</code>)을 거쳐 다시 결정한
+        <a href="#adr-010">ADR-010</a>(Atomic Design 5계층)으로 대체 — 이 카드의 본문(배경/
+        결정/대안/결과)은 원 기록으로 그대로 두고 상태 배지만 변경.</li>
+    </ul>
+  </div>
+
+  <div class="card" id="adr-010">
+    <h3 style="margin-top:0;">ADR-010 — 프론트 컴포넌트 아키텍처: Atomic Design 5계층 + api/services/hooks로 재결정</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-21 — 원문은 <code>docs/case-study/frontend-atomic-architecture.md</code>, 같은 날 구현 완료(아래 변경 이력 참고). <a href="#adr-009">ADR-009</a>를 대체</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p><a href="#adr-009">ADR-009</a>(FSD-lite)가 사용자 인터뷰 없이 AI 세션이 일방적으로 작성한
+      결정이었던 것으로 확인되어 무효화됐습니다. 다뤄야 할 문제 자체(와이어프레임을 실제 코드로
+      옮길 때 "UI 컴포넌트"와 "기능(데이터 페칭·판정 취합·상태)"을 어떻게 분리할지)는 동일하지만,
+      이번엔 사용자와 <code>AskUserQuestion</code>으로 한 번에 하나씩 확인하는 순차 인터뷰를 거쳐
+      다시 결정했습니다. 인터뷰 도중 FSD-lite 압축(<code>features</code>+<code>widgets</code>
+      통합)이 "이 컴포넌트가 어느 계층인지" 애매함을 반복적으로 유발한다는 게 실제로 확인돼
+      (<code>RootHeader</code>/<code>HeroSection</code> 배치를 두고 세 차례 옵션 비교),
+      계층을 압축하지 않는 방향으로 바뀌었습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li>정석 Atomic Design 5계층(<code>atoms</code>/<code>molecules</code>/<code>organisms</code>/
+        <code>templates</code>/<code>pages</code>)을 압축 없이 그대로 채택 — <code>pages</code>는
+        Next.js App Router의 <code>app/[lang]/**/page.tsx</code>가 겸함(별도 폴더 안 만듦)</li>
+      <li>Atomic Design은 "기능이 어디 사는지"를 정의하지 않으므로, 별도로
+        <code>api/</code>(네트워크 I/O, 목킹 필요) / <code>services/</code>(순수 로직 —
+        <code>combineScanResults</code>, <a href="#adr-006">ADR-006</a> 게이팅, 목킹 불필요) /
+        <code>hooks/</code>(클라이언트 컴포넌트 전용 React 상태·React Query 자리) 3계층을 얹음</li>
+      <li><strong>서버 컴포넌트는 훅을 못 쓴다는 사실 확인</strong>: <code>request-scan/page.tsx</code>·
+        <code>scan/page.tsx</code>는 서버 컴포넌트라 애초에 React 훅 사용이 불가능함(반면
+        <code>ProcessScreen.tsx</code>는 <code>"use client"</code>) — <code>loaders/</code> 같은
+        대칭 폴더를 새로 만들지 않고, 서버 컴포넌트는 지금처럼 <code>api/</code>를 직접 호출하는
+        Next.js 관용 패턴을 유지하기로 함</li>
+      <li>React Query 도입 방향은 확정했지만 실제 설치 + <code>QueryClientProvider</code> 배선은
+        새 인프라 작업이라 이번 스코프 밖 — <code>hooks/</code> 폴더 자리만 예약</li>
+      <li><strong>이번 마이그레이션 패스의 범위는 "순수 이동 + 빈 세그먼트 TODO 스텁"으로 한정</strong>:
+        <code>ProcessScreen.tsx</code>처럼 UI와 API 호출이 이미 섞여 있는 기존 파일은 쪼개지 않고
+        통째로 이동하고, <code>templates/</code>(Atomic) 계층의 실제 조립 파일(예:
+        <code>HomeTemplate</code>)은 이번엔 만들지 않고 빈 폴더로 남김 — 둘 다 후속 작업</li>
+      <li>구체적 파일 이동 매핑은 <code>docs/case-study/frontend-atomic-architecture.md</code> 4장 참고</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각/보류 사유</th></tr>
+      <tr><td>FSD 계열 4계층 압축판 (<a href="#adr-009">ADR-009</a> 원안)</td><td>승인 절차 문제와 별개로, 압축 자체가 "이 컴포넌트가 어느 계층인지" 애매함을 반복 유발함이 이번 인터뷰 중 재확인됨</td></tr>
+      <tr><td>정석 FSD 6계층</td><td>사용자가 "6계층이 모두 필요할 것 같다"는 문제의식으로 이 재논의를 시작했으나, 최종적으로는 Atomic Design 쪽을 선택 — FSD는 "기능이 어디 사는가"엔 강하지만 이번 팀 규모·도메인엔 Atomic의 UI 세분화 축이 더 필요하다고 판단</td></tr>
+      <tr><td>가벼운 궁합(계층 프레임워크 없이 container/presentational만)</td><td>폴더 체계를 새로 안 배우는 대신, 기능이 늘어나면 경계가 다시 흐트러질 위험 — 지금 시점에 명시적 계층을 두는 쪽을 선택</td></tr>
+      <tr><td>기능 코드를 커스텀 훅 단일 계층에만 두기</td><td>순수 로직(<code>combineScanResults</code> 등)과 React 상태 로직이 섞여, 순수 함수만 목킹 없이 단위테스트하려는 목표(<code>docs/case-study/dev-lifecycle-harness.md</code>의 테스트 인프라 우선순위)와 어긋남</td></tr>
+      <tr><td>얕은 <code>features/</code> 폴더를 Atomic과 혼용</td><td>한 슬라이스만 다른 패러다임(FSD풍)을 쓰면 "이건 어디 있지" 혼란이 재발할 가능성 — Atomic 채택 결정과 직접 모순</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li>계층을 압축하지 않아 "이 컴포넌트가 어느 계층인지" 판단 규칙이 명확함(복잡도 기준)</li>
+          <li><code>api</code>/<code>services</code>/<code>hooks</code> 분리로 테스트 전략이 계층별로
+            갈림 — <code>services</code>는 목킹 없이, <code>hooks</code>는 통합 테스트로</li>
+          <li>서버/클라이언트 컴포넌트가 React 훅 가용 여부부터 다르다는 사실을 폴더 구조에
+            반영해, 나중에 "왜 이 페이지엔 훅이 없지"라는 혼란을 방지</li>
+          <li>실제 사용자 순차 인터뷰를 거쳐 결정 — ADR-009가 겪은 승인 절차 문제 재발 방지</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>정석 5계층이라 폴더 수가 FSD-lite보다 많음 — 이번 앱 규모(단일 스캔 도메인)엔
+            과할 수 있다는 우려가 여전히 남음(3장 참고)</li>
+          <li><code>templates/</code>(Atomic) 계층과 <code>hooks/</code>의 React Query 배선은
+            이번에 비워둬서, 실제로 잘 맞는 경계인지는 다음 패스에서 검증 전</li>
+          <li><code>services/combineScanResults.ts</code>·<code>scanGating.ts</code>는 TODO
+            스텁만 있고 실제 판정 로직은 여전히 없음 — 폴더 구조만 준비된 상태</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>변경 이력</h4>
+    <ul>
+      <li>2026-08-21 — 실제 이동 실행 중 사용자 제안으로 <code>atoms</code>/<code>molecules</code>/
+        <code>organisms</code>/<code>templates</code> 4개를 <code>ui/</code> 하위로 재중첩
+        (<code>ui/atoms/</code> 등) — "UI vs 기능" 분리를 <code>src/</code> 최상위에서 바로
+        드러내기 위함. <code>api/</code>/<code>services/</code>/<code>hooks/</code>는
+        <code>ui/</code>와 형제 레벨로 최상위에 그대로 둠. 이 결정의 핵심(계층 자체, 기능
+        3분리)은 안 바뀌었고 물리적 중첩 위치만 조정 — 상세는
+        <code>docs/case-study/frontend-atomic-architecture.md</code> 6장.</li>
+      <li>2026-08-21 — 같은 작업에서 <code>api/scanApi.ts</code>의 4개 함수가
+        <code>instance</code>에 이미 있는 <code>baseURL</code>을 무시하고
+        <code>NEXT_PUBLIC_META_SCAN_API</code>를 경로 앞에 또 붙이던 기존 중복(이번 ADR과
+        무관한 pre-existing 이슈)을 발견해 같이 정리 — 상대경로로 통일.</li>
+    </ul>
+  </div>
+
+  <div class="card" id="adr-011">
+    <h3 style="margin-top:0;">ADR-011 — 백엔드 아키텍처: Hexagonal (Ports &amp; Adapters) 채택</h3>
+    <table>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-21 — 원문은 <code>docs/case-study/backend-hexagonal-architecture.md</code>(전체 후보 조사는 <code>docs/case-study/backend-architecture-survey.md</code>), 같은 날 구현 완료(원문 6장 "변경 이력" 참고)</td></tr>
+    </table>
+
+    <h4>배경 (Context)</h4>
+    <p><a href="#adr-010">ADR-010</a>(프론트 Atomic Design + api/services/hooks)와 같은 맥락으로
+      <code>meta-scan-api</code>도 아키텍처를 재검토했습니다. 현재 구조(레이어드
+      router→controller→service)의 아픈 지점: <code>scanService.ts</code>가 ping/robotsTxt/
+      siteMap/crawling/checks를 전부 떠안은 "God 서비스"인 것, <code>scanService</code>가
+      <code>Puppeteer</code>/<code>ChromeLauncher</code> 구체 클래스에 직접 의존해 infra
+      교체·단위테스트 목킹이 어려운 것, 파일명 케이싱 불일치, <code>lighthouse</code> 모듈만
+      응답 규약을 깨는 것, 에러 원본을 삼키는 <code>catch</code>, 라우터마다 반복되는 수동
+      DI(패키지 <code>CLAUDE.md</code>에 이미 기록된 항목들).</p>
+    <p>ADR-009가 사용자 승인 없이 일방적으로 작성됐던 것이 확인된 뒤([ADR-010](#adr-010) 변경
+      이력 참고), "지금 도메인이 얕아 보인다는 이유로 계층을 미리 압축하지 않는다"는 원칙을
+      명시적으로 세우고 진행했습니다. 경로 별칭 스타일부터
+      (<code>@core/*</code>/<code>@constant/*</code>/<code>@config/*</code>/<code>@infra/*</code>/
+      <code>@modules/*</code> 5개 → <code>meta-scan-front</code>와 동일한 <code>@/*</code> 하나로
+      통일, 이 ADR과 무관한 선행 정리) 정리한 뒤, 7개 아키텍처 패턴(NestJS 기본 구조, Clean/
+      Onion, Hexagonal, DDD 모듈러 모놀리스, CQRS, Vertical Slice, 마이크로서비스)을 압축 없이
+      전부 조사(<code>docs/case-study/backend-architecture-survey.md</code>)했습니다.</p>
+
+    <h4>결정 (Decision)</h4>
+    <ul>
+      <li><strong>계층/의존성 역전 축</strong>으로 확정 — CQRS(쓰기 경로 없음)와 DDD 모듈러
+        모놀리스(바운디드 컨텍스트가 사실상 1개)는 이 시점에 배제.</li>
+      <li>같은 축 안에서 Clean/Onion(4계층: entities/use cases/interface adapters/frameworks)과
+        Hexagonal(3계층: 도메인+포트/애플리케이션/어댑터)을 실제 코드 예시로 구체 비교한 뒤,
+        <strong>"entities 계층이 얕아 보인다"는 이유로 미리 기각하지 않고</strong> PRD
+        (<code>docs/prd/meta-scan-plus-prd.md</code> 3~4장)의 체크리스트 명세를 실제로 읽어 사실관계
+        확인 — 모든 체크 항목이 <code>{id, group, label, status, detail?}</code> 형태의 독립적·
+        무상태 분류 결과이며, 항목 간 관계 규칙·상태 변화·불변식이 명세 어디에도 없음을 확인(4장:
+        프론트 <code>combineScanResults</code>도 "계산이 아니라 취합"이라고 명시).</li>
+      <li>이 사실을 근거로 <strong>Hexagonal (Ports &amp; Adapters), 3계층</strong> 채택 —
+        <code>domain/</code>(포트 인터페이스 + 순수 판정 로직) / <code>application/</code>
+        (유스케이스, 포트 호출 + 도메인 로직 조합) / <code>adapters/</code>(inbound: HTTP
+        컨트롤러, outbound: <code>PuppeteerAdapter</code>/<code>ChromeLauncherAdapter</code>가
+        기존 <code>infra/Puppeteer.ts</code>/<code>infra/ChromeLauncher.ts</code>를 감쌈).
+        entities 별도 계층은 만들지 않음 — 위 사실 확인 근거.</li>
+      <li>구현은 이번 ADR 범위 밖 — 방향만 확정, 세부(포트 세분화 수준, inbound 어댑터가 기존
+        <code>modules/*</code> 폴더링을 어떻게 흡수할지)는 실제 마이그레이션 시점에 확정. 상세는
+        <code>docs/case-study/backend-hexagonal-architecture.md</code> 5장.</li>
+    </ul>
+
+    <h4>고려한 대안 (Alternatives Considered)</h4>
+    <table>
+      <tr><th>대안</th><th>기각 사유</th></tr>
+      <tr><td>Clean/Onion Architecture (4계층)</td><td>Hexagonal과 철학은 거의 동일하나 entities 계층을 별도로 요구함 — PRD 확인 결과 체크 항목에 관계/불변식/상태변화가 없어, entities를 만들어도 기존 ambient 타입을 클래스 셸로 한 번 더 감싸는 것 이상의 실익이 없다고 판단</td></tr>
+      <tr><td>CQRS (+ 선택적 Event Sourcing)</td><td>DB 없음, 상태 변경(write) 엔드포인트가 사실상 없음 — 이 패턴이 풀려는 문제(읽기/쓰기 분리) 자체가 이 앱에 존재하지 않음</td></tr>
+      <tr><td>DDD 모듈러 모놀리스 (Bounded Context)</td><td>바운디드 컨텍스트가 사실상 "URL 하나 스캔" 1개뿐 — 컨텍스트 간 통신이라는 개념 자체가 성립 안 함</td></tr>
+      <tr><td>Vertical Slice / Screaming Architecture</td><td><code>src/modules/*</code>가 이미 기능 단위 폴더링이라 방향은 겹치나, "레이어를 없앤다"는 핵심 주장과 달리 지금도 controller/service 레이어 분리를 유지하고 있어 정체성이 애매해짐</td></tr>
+      <tr><td>NestJS 기본 구조로 프레임워크 전환</td><td>아키텍처 패턴이 아니라 프레임워크(Express→NestJS) 교체 문제라 이번 결정과 층위가 다름 — 이번 범위에서 배제</td></tr>
+      <tr><td>마이크로서비스 / 이벤트 기반</td><td>단일 API·단일 배포 대상(Cloud Run 컨테이너 하나) 구조와는 별개 논의라 이번 범위 밖</td></tr>
+      <tr><td>현재 레이어드 구조 유지 + 컨벤션 정리만</td><td>아픈 지점(<code>scanService</code>의 infra 직접 의존)을 구조적으로 풀지 못함 — 컨벤션만 정리하면 같은 문제가 반복될 위험</td></tr>
+    </table>
+
+    <h4>결과 (Consequences)</h4>
+    <div class="grid-2">
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--ok);">얻은 것</strong>
+        <ul>
+          <li><code>Puppeteer</code>/<code>ChromeLauncher</code> 교체·단위테스트 목킹이 포트
+            인터페이스 뒤로 숨겨져 쉬워짐 — <code>docs/case-study/dev-lifecycle-harness.md</code> 1순위인
+            테스트 인프라 작업과 직결</li>
+          <li><code>scanService</code> God 서비스가 유스케이스별로 자연히 쪼개짐</li>
+          <li>프론트 ADR-010의 "순수 로직(<code>services/</code>) vs I/O(<code>api/</code>)" 분리
+            철학과 백엔드가 같은 축(도메인 vs 어댑터)으로 맞춰짐</li>
+          <li>"도메인이 얕아 보인다"는 지레짐작이 아니라 PRD 명세를 실제로 읽고 확인한 사실
+            근거로 entities 계층 여부를 결정 — ADR-009 재발 방지 원칙 준수</li>
+        </ul>
+      </div>
+      <div class="card" style="margin:0;">
+        <strong style="color:var(--warn);">트레이드오프</strong>
+        <ul>
+          <li>포트를 얼마나 세분화할지 정답이 없어 설계자 재량에 좌우됨 — 실제 코드 작성 시점에
+            검증 전</li>
+          <li>entities 계층이 없어서, 나중에 체크 항목 간 관계/상태 규칙이 실제로 추가되면
+            재검토가 필요함(<code>docs/case-study/backend-hexagonal-architecture.md</code> 5장)</li>
+          <li>에러 처리·파일명 케이싱·응답 규약 정리는 이 아키텍처 결정과 별개 이슈로 남겨둠 —
+            마이그레이션 실행 시점에 스코프를 따로 정해야 함</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>변경 이력</h4>
+    <ul>
+      <li>2026-08-21 — 실제 마이그레이션 실행 완료. <code>typecheck</code>/<code>build</code>/
+        <code>lint</code> 통과 + 로컬 <code>pnpm dev:api</code>로 <code>healthz</code>/
+        <code>scan/ping</code>/<code>scan/robotsTxt</code>/<code>scan/crawling</code>/
+        <code>lighthouse/run</code> 전부 실제 호출 확인(뒤 둘은 포트를 통해 실제 브라우저를
+        띄우는 경로). 부수적으로 <code>scanController.ts</code>/<code>scanService.ts</code>의
+        파일명 케이싱 불일치(트레이드오프 항목 참고)가 이동 중 자연히 해소됨. 상세는
+        <code>docs/case-study/backend-hexagonal-architecture.md</code> 5~6장.</li>
+    </ul>
   </div>
 
 </main>

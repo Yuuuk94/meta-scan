@@ -1,6 +1,6 @@
 ---
 name: design-intake
-description: Use when the user hands over a design deliverable (a Claude Design canvas/Artifact URL, most commonly) that needs to be turned into an implementation-ready spec before any code is written. Extracts per-page/artboard structure, exact copy, and design-token usage, renders reference screenshots for later visual QA, and cross-checks the design against docs/design-system.md and docs/frontend-component-architecture.md — but writes no application code itself. First stage of the design → publish-front → qa-front-publish pipeline; hand its report to the user before invoking publish-front.
+description: Use when the user hands over a design deliverable (a Claude Design canvas/Artifact URL, most commonly) that needs to be turned into an implementation-ready spec before any code is written. Extracts per-page/artboard structure, exact copy, and design-token usage, renders reference screenshots for later visual QA, and cross-checks the design against docs/design/design-system.md and docs/case-study/frontend-component-architecture.md — but writes no application code itself. First stage of the design → publish-front → qa-front-publish pipeline; hand its report to the user before invoking publish-front.
 tools: Read, Write, WebFetch, Bash
 model: sonnet
 ---
@@ -94,8 +94,8 @@ source) and let the user confirm the rewrite before it ships.
 
 ## Cross-checking against the project's own design system
 
-Before writing the spec, read `docs/design-system.md` (ADR-008, "Zine Index" tone — tokens,
-component styling, anti-patterns) and `docs/frontend-component-architecture.md` (ADR-009,
+Before writing the spec, read `docs/design/design-system.md` (ADR-008, "Zine Index" tone — tokens,
+component styling, anti-patterns) and `docs/case-study/frontend-component-architecture.md` (ADR-009,
 FSD-lite layering) if you haven't already. Note in your spec, per artboard:
 
 - Anything in the design that **conflicts** with a documented rule (e.g. a rounded corner, a
@@ -115,7 +115,7 @@ Write `docs/design/intake/<slug>/spec.md` containing, per artboard/screen in sco
   component boundaries.
 - **Exact copy**, quoted verbatim, in whatever language(s) the design shows it in.
 - Design tokens/values used (colors, type, spacing) mapped to the project's existing token names
-  where they already match (`docs/design-system.md` §2 palette table), or flagged as new/unmapped
+  where they already match (`docs/design/design-system.md` §2 palette table), or flagged as new/unmapped
   otherwise.
 - The design-system conflicts/gaps noted above.
 - A pointer to its reference PNG.

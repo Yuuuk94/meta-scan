@@ -33,28 +33,44 @@ pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next
 - `src/dictionaries/` — `en.json`/`ko.json`을 `getDictionary(locale)`로 로케일별 지연 로딩
   (`src/dictionaries/index.ts`, `"server-only"` — 클라이언트 컴포넌트가 아니라 서버 컴포넌트/레이아웃에서
   호출하세요).
-- `src/apis/` — `index.ts`가 `NEXT_PUBLIC_META_SCAN_API`를 `baseURL`로 하는 공유 `axios` 인스턴스를
-  만들고, 도메인별 호출 파일(예: `scan.ts`)이 `meta-scan-api` 엔드포인트를 감쌉니다. **주의할 불일치
-  지점**: 일부 호출은 공유 `instance`의 `baseURL`만 사용하고(`sitePingApi`), 다른 일부는 같은
-  인스턴스 위에 `NEXT_PUBLIC_META_SCAN_API`를 경로 앞에 명시적으로 다시 붙입니다(`scanRobotsTxtApi`
-  등) — 새 호출을 추가하기 전에 기존 호출이 어떤 패턴을 따르는지 확인하고, `baseURL`만으로 충분하다고
-  가정하지 마세요.
-- `src/stores/scanStore.ts` — 이전에 요청한 스캔 URL을 `localStorage`에 영속화하는 Zustand 스토어.
-- `src/templates/` — 페이지/기능별로 묶은 페이지 섹션 컴포넌트(`main/`, `request-scan/`, `root/`)이며,
-  `src/components/ui/`의 범용적이고 대체로 shadcn 스타일인 프리미티브와는 구분됩니다.
+- **컴포넌트는 Atomic Design 5계층**([ADR-010](../../docs/adr/index.html#adr-010),
+  `docs/case-study/frontend-atomic-architecture.md`) — `src/ui/atoms/`(더 못 쪼개는 프리미티브: Button/Input/
+  Badge/Rule/NumberLabel/Loading) → `src/ui/molecules/`(atoms 조합, 도메인 지식 없음: Card/Tabs/
+  Accordion/StatusBadge/ToggleSetting/ProcessStep) → `src/ui/organisms/`(자기완결적 조립 섹션,
+  데이터 페칭 훅 사용 가능: RootHeader/RootFooter/ServiceStatus/HeroSection/ProcessSection/
+  FAQSection/ProcessScreen/ErrorScreen/BlockedScreen) → `src/ui/templates/`(organisms를 배치만
+  하는 라우트별 뼈대 — **아직 빈 폴더**, 후속 작업) → `pages`는 Next.js
+  `app/[lang]/**/page.tsx`가 겸함(별도 폴더 없음, 라우팅 규칙상 이름을 못 바꿈).
+- `src/api/` — `instance.ts`가 `NEXT_PUBLIC_META_SCAN_API`를 `baseURL`로 하는 공유 `axios`
+  인스턴스를 만들고, 도메인별 호출 파일(`scanApi.ts`, `statusApi.ts`)이 `meta-scan-api` 엔드포인트를
+  상대경로로 감쌉니다. (2026-08-21 정리: `scanRobotsTxtApi` 등 4개 함수가 `baseURL`이 이미 있는데도
+  `NEXT_PUBLIC_META_SCAN_API`를 경로 앞에 또 문자열로 붙이던 중복이 있었음 — axios는 절대 URL이
+  넘어오면 `baseURL`을 무시하고 그대로 쓰기 때문에 최종 URL은 우연히 같았지만 의미 없는 중복이라
+  제거함. 새 호출을 추가할 땐 `instance`의 `baseURL`만 믿고 상대경로만 넘기면 됩니다.)
+- `src/services/` — 순수 판정/취합 로직 자리(`combineScanResults.ts`, `scanGating.ts`). **둘 다
+  아직 TODO 스텁**입니다 — 4-API 취합과 ADR-006 게이팅 로직은 구현되지 않았습니다.
+- `src/hooks/` — 클라이언트 컴포넌트 전용 React Query 훅 자리. **아직 빈 폴더**입니다 —
+  React Query가 설치돼 있지 않고(`@tanstack/react-query` 의존성 없음), `ProcessScreen.tsx`는
+  여전히 수작업 `useEffect`/`Promise.allSettled`로 fetch합니다. 서버 컴포넌트
+  (`app/[lang]/**/page.tsx`)는 애초에 훅을 못 쓰므로 `src/hooks/`를 거치지 않고 `src/api/`를
+  직접 호출합니다.
+- `zustand`는 `package.json` 의존성으로 남아있지만 실제 스토어 파일은 저장소에 존재하지 않습니다 —
+  "이전 요청 URL 저장"은 쿠키(`crrUrlKey`, 아래 상태관리 절 참고)로 이미 구현되어 있습니다. 이
+  의존성을 실제로 쓰려면 스토어를 새로 만들어야 합니다.
 - 경로 별칭 `@/*` → `src/*` (`tsconfig.json` 참고).
 
 ## 구현 패턴
 
 ### 컴포넌트 구현 패턴
 
-- **선언 방식이 계층별로 갈립니다**: `templates/`의 프레젠테이션 컴포넌트(`HeroSection`,
-  `FAQSection`, `ProcessSection`, `RootHeader`, `RootFooter`, `ToggleSetting`, `ServiceStatus`,
-  `ProcessStep`)와 `components/Loading.tsx`는 전부 `export const Xxx = (props) => {...}` 화살표
-  함수 상수입니다. 반면 페이지급 컴포넌트(`RootLayout`, `RequestScanPage`, `ScanPage`)와
-  `/request-scan` 화면의 `ProcessScreen`/`ErrorScreen`은 `export function Xxx(props) {...}`
-  function 선언을 씁니다. 새 컴포넌트를 추가할 때 "섹션/프리젠테이션"이면 화살표 상수,
-  "페이지 또는 화면 전환 단위"면 function 선언을 따르세요.
+- **선언 방식이 계층별로 갈립니다**: `ui/organisms/`의 프레젠테이션 컴포넌트(`HeroSection`,
+  `FAQSection`, `ProcessSection`, `RootHeader`, `RootFooter`, `ServiceStatus`)와
+  `ui/molecules/ToggleSetting.tsx`, `ui/molecules/ProcessStep.tsx`, `ui/atoms/Loading.tsx`는 전부
+  `export const Xxx = (props) => {...}` 화살표 함수 상수입니다. 반면 페이지급 컴포넌트
+  (`RootLayout`, `RequestScanPage`, `ScanPage`)와 `ui/organisms/ProcessScreen`/
+  `ui/organisms/ErrorScreen`(화면 전환 단위)은 `export function Xxx(props) {...}` function
+  선언을 씁니다. 새 컴포넌트를 추가할 때 "섹션/프리젠테이션"이면 화살표 상수, "페이지 또는
+  화면 전환 단위"면 function 선언을 따르세요.
 - **`theme`/`lang`을 props로 계속 내려주는 프롭 드릴링**: 전역 테마 Context/Provider가 없고, 서버
   컴포넌트(`RootLayout`)에서 쿠키로 읽은 `theme`/`lang`을 모든 하위 컴포넌트에 `DefaultProps`
   (`theme`, `lang`) 또는 `DefaultPageProps`(`+ t`: 사전 객체)로 계속 전달합니다. 새 컴포넌트도 이
@@ -63,9 +79,10 @@ pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next
   않고 `` className={`... ${theme === "dark" ? "bg-x" : "bg-y"}`} ``를 요소마다 반복합니다
   (`HeroSection`, `ProcessScreen`, `scan/page.tsx` 등 전 영역에서 지배적인 스타일). 기존 파일을
   고칠 때는 이 패턴을 따라야 일관됩니다.
-- **`components/ui/*`는 shadcn 골격**: `cva`로 variant/size 정의 → `cn()`(`clsx` + `tailwind-merge`,
-  `components/ui/utils.ts`)으로 className 병합 → `data-slot` 속성 → named export
-  (`export { Button, buttonVariants }`). 새 범용 프리미티브를 추가할 때 이 뼈대를 그대로 복제하세요.
+- **`ui/atoms/`·`ui/molecules/`의 shadcn 계열 컴포넌트는 shadcn 골격**: `cva`로 variant/size 정의 →
+  `cn()`(`clsx` + `tailwind-merge`, `utils/cn.ts`)으로 className 병합 → `data-slot` 속성 →
+  named export(`export { Button, buttonVariants }`). 새 범용 프리미티브를 추가할 때 이 뼈대를
+  그대로 복제하세요.
 - **다국어 카피가 두 갈래**: 정식 카피는 `t.xxx`(사전에서 로드)를 쓰지만, 일부 화면(`HeroSection`의
   URL 유효성 에러 문구, `RootFooter`의 카피라이트, `FAQSection`의 CTA 문구)은 사전에 없는 임시 문구를
   `lang === "en" ? "..." : "..."` 하드코딩 삼항으로 처리합니다. 새 문구는 가능하면
@@ -89,9 +106,10 @@ pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next
 
 ### API 호출 패턴
 
-- `src/apis/<domain>.ts`에 `export const xxxApi = async (data) => await instance.post<ResponseType>
-  (path, data)` 형태의 얇은 axios 래퍼 함수를 나열합니다. 함수 내부에 `try/catch`가 없고 프로미스를
-  그대로 반환하므로, 에러 처리는 항상 호출부(페이지/컴포넌트)의 책임입니다.
+- `src/api/<domain>Api.ts`(예: `scanApi.ts`, `statusApi.ts`)에 `export const xxxApi = async (data) =>
+  await instance.post<ResponseType>(path, data)` 형태의 얇은 axios 래퍼 함수를 나열합니다. 함수
+  내부에 `try/catch`가 없고 프로미스를 그대로 반환하므로, 에러 처리는 항상 호출부(페이지/컴포넌트)의
+  책임입니다. `instance`는 `src/api/instance.ts`에서 가져옵니다.
 - 응답 제네릭은 `src/types/*.d.ts`의 전역 인터페이스(`SiteStatusData`, `RobotsTxtData`,
   `SiteMapData`, `OkStatus`)를 그대로 사용합니다. 다만 백엔드 반환 타입이 아직 안정되지 않은
   `scanCrawlingApi`/`lsRunApi`는 응답 타입을 `unknown`으로 열어둡니다 — 위 "현재 상태"에서 설명한
@@ -100,14 +118,16 @@ pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next
   `RequestScanPage`의 `sitePingApi`)는 단건 `await`으로 직접 호출합니다. 클라이언트 컴포넌트
   (`ProcessScreen`)는 여러 API를 `Promise.allSettled`로 병렬 실행한 뒤 `.then()/.catch()`로 각각
   처리합니다.
-- baseURL 사용이 API 함수마다 다른 불일치는 위 "아키텍처" 절에 이미 설명되어 있습니다 — 새 호출을
-  추가하기 전에 반드시 확인하세요.
+- 예전엔 함수마다 `baseURL` 사용이 달랐지만(2026-08-21 정리, 위 "아키텍처" 절 참고) 지금은 전부
+  상대경로로 통일돼 있습니다 — 새 호출도 `instance`에 절대 URL을 다시 붙이지 말고 상대경로만
+  넘기세요.
 
 ### 네이밍 패턴
 
-- **컴포넌트 파일명은 PascalCase = 컴포넌트 이름과 1:1** (`HeroSection.tsx` → `HeroSection`).
-  `components/ui/*`만 예외로 kebab-case/소문자 파일명(`button.tsx`, `alert-dialog.tsx`)을 쓰는데,
-  이는 shadcn CLI가 생성한 파일들이라 그 컨벤션을 그대로 유지하는 것입니다.
+- **컴포넌트 파일명은 PascalCase = 컴포넌트 이름과 1:1** (`HeroSection.tsx` → `HeroSection`,
+  `ui/atoms/Button.tsx` → `Button`). ADR-010 마이그레이션 이전엔 `components/ui/*`가 shadcn CLI
+  기본값인 kebab-case(`button.tsx`)를 예외로 유지했었지만, `ui/atoms/`·`ui/molecules/`로 옮기면서 이
+  예외를 없애고 나머지 컴포넌트와 동일하게 PascalCase로 통일했습니다.
 - **API 함수명은 `<도메인><동사>Api`**가 원칙입니다(`sitePingApi`, `scanRobotsTxtApi`,
   `scanSiteMapApi`, `scanCrawlingApi`). 유일한 예외는 `lsRunApi`(Lighthouse 실행) — 다른 함수들처럼
   `scan`/`site` 접두어를 쓰지 않고 `ls`(lighthouse 축약)를 씁니다. 새 lighthouse 관련 API를 추가할

@@ -13,6 +13,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
 
+# Puppeteer's own bundled Chromium download is skipped — the runtime stage's `pnpm deploy`
+# output never includes it (that download lands in ~/.cache/puppeteer, outside node_modules),
+# so it was dead weight in the build stage. The runtime stage's apt-installed chromium
+# (PUPPETEER_EXECUTABLE_PATH below) is what Puppeteer actually uses.
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
 # Workspace manifests first for better layer caching
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY packages/meta-scan-api/package.json ./packages/meta-scan-api/package.json
@@ -48,8 +54,13 @@ ENV NODE_ENV=production
 ENV PUBLIC_URL=https://meta-scan-api-752797429874.us-central1.run.app
 ENV FRONT_URL=https://meta-scan.vercel.app
 ENV FRONT_TEST_URL=https://meta-scan.vercel.app
-# chrome-launcher가 사용할 경로 지정 (배포 이미지 내 Chromium 경로)
+# chrome-launcher(Lighthouse)가 사용할 경로 지정 (배포 이미지 내 Chromium 경로)
 ENV CHROME_PATH=/usr/bin/chromium
+# Puppeteer(scan/crawling)도 같은 apt 설치 Chromium을 쓰도록 지정 — 이게 없으면 Puppeteer는
+# 자기 번들 브라우저를 찾다가 못 찾아서 launch()가 실패한다(빌드 스테이지에서 다운로드는 되지만
+# 런타임 스테이지엔 그 캐시가 안 넘어옴 — pnpm deploy 결과물에는 없는 경로라서).
+# 2026-08-21: 실제 컨테이너 기동 테스트에서 scan/crawling이 500 나는 걸 이걸로 확인·수정.
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # 헬스체크/로그에 타임존 필요 시
 # ENV TZ=Asia/Seoul

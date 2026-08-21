@@ -1,6 +1,6 @@
 import { getDictionary } from "@/dictionaries";
 import { getSiteSetting } from "@/utils/siteSetting";
-import { StatusBadge, type StatusBadgeProps } from "@/components/ui/status-badge";
+import { StatusBadge, type StatusBadgeProps } from "@/ui/molecules/StatusBadge";
 
 type Status = StatusBadgeProps["status"];
 
