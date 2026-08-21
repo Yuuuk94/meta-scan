@@ -1,12 +1,12 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/ui/atoms/Button";
+import { Card, CardContent } from "@/ui/molecules/Card";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/ui/molecules/Accordion";
 import { Bot, HelpCircle } from "lucide-react";
 
 export const FAQSection = ({ t }: DefaultPageProps) => {
@@ -30,7 +30,7 @@ export const FAQSection = ({ t }: DefaultPageProps) => {
             <p className="text-foreground-secondary">{t.faqSubtitle}</p>
           </div>
 
-          {/* Uses the shared Accordion primitive (components/ui/accordion.tsx)
+          {/* Uses the shared Accordion primitive (molecules/Accordion.tsx)
            * instead of hand-rolled open/close state, so this list picks up
            * the design system's +/- toggle and instant transition for free
            * instead of duplicating it here. */}

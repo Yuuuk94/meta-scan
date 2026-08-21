@@ -1,7 +1,7 @@
 import { getDictionary } from "@/dictionaries";
-import { FAQSection } from "@/templates/main/FAQSection";
-import { HeroSection } from "@/templates/main/HeroSection";
-import { ProcessSection } from "@/templates/main/ProcessSection";
+import { FAQSection } from "@/ui/organisms/FAQSection";
+import { HeroSection } from "@/ui/organisms/HeroSection";
+import { ProcessSection } from "@/ui/organisms/ProcessSection";
 import { getSiteSetting } from "@/utils/siteSetting";
 
 export default async function HomePage() {

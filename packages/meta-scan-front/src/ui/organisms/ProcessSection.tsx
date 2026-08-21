@@ -1,4 +1,4 @@
-import { NumberLabel } from "@/components/ui/number-label";
+import { NumberLabel } from "@/ui/atoms/NumberLabel";
 
 export const ProcessSection = ({ t }: DefaultPageProps) => {
   const steps = [

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Slot } from "radix-ui";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "./utils";
+import { cn } from "@/utils/cn";
 
 const badgeVariants = cva(
   // Sharp corners, letter-spacing per design-system.md §4 ("배지 안 라벨은

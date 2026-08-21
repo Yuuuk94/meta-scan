@@ -1,4 +1,4 @@
-import { instance } from ".";
+import { instance } from "./instance";
 
 export const sitePingApi = async (data: UrlData) =>
   await instance.post<SiteStatusData>("/api/v1/scan/ping", data);

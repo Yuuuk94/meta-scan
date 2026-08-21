@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/atoms/Button";
 
 // Presentational counterpart to ADR-006's robots.txt pre-check gating
 // (docs/adr/index.html#adr-006): when robots.txt disallows the target, the

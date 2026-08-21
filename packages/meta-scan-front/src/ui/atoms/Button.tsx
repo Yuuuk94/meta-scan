@@ -2,7 +2,7 @@ import * as React from "react";
 import { Slot } from "radix-ui";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "./utils";
+import { cn } from "@/utils/cn";
 
 const buttonVariants = cva(
   // Sharp corners (no radius utility at all — this system's signature),

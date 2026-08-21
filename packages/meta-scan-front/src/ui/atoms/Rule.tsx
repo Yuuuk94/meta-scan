@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "./utils";
+import { cn } from "@/utils/cn";
 
 /**
  * The rule line this system uses instead of card shadows/gaps to separate

@@ -2,11 +2,11 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Big_Shoulders, IBM_Plex_Sans } from "next/font/google";
 import { okStatus, pageTitle } from "@/constans";
-import { RootHeader } from "@/templates/root/RootHeader";
-import { RootFooter } from "@/templates/root/RootFooter";
-import { Loading } from "@/components/Loading";
+import { RootHeader } from "@/ui/organisms/RootHeader";
+import { RootFooter } from "@/ui/organisms/RootFooter";
+import { Loading } from "@/ui/atoms/Loading";
 import { getSiteSetting } from "@/utils/siteSetting";
-import { pingApi } from "@/apis/status";
+import { pingApi } from "@/api/statusApi";
 
 import "@/css/globals.css";
 

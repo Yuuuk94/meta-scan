@@ -8,8 +8,8 @@ import {
   scanCrawlingApi,
   scanRobotsTxtApi,
   scanSiteMapApi,
-} from "@/apis/scan";
-import { ProcessStep } from "./ProcessStep";
+} from "@/api/scanApi";
+import { ProcessStep } from "@/ui/molecules/ProcessStep";
 
 const promistList = [
   scanRobotsTxtApi,

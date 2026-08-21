@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Languages, Moon, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/atoms/Button";
 import { allowLanguages, allowTheme, langKey, themeKey } from "@/constans";
 import { setDocumentCookies } from "@/utils/cookies";
 

@@ -1,7 +1,7 @@
-import { sitePingApi } from "@/apis/scan";
+import { sitePingApi } from "@/api/scanApi";
 import { getDictionary } from "@/dictionaries";
-import { ErrorScreen } from "@/templates/request-scan/ErrorScreen";
-import { ProcessScreen } from "@/templates/request-scan/ProcessScreen";
+import { ErrorScreen } from "@/ui/organisms/ErrorScreen";
+import { ProcessScreen } from "@/ui/organisms/ProcessScreen";
 import { getSiteSetting } from "@/utils/siteSetting";
 
 export default async function RequestScanPage() {

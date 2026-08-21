@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Accordion as AccordionPrimitive } from "radix-ui";
 
-import { cn } from "./utils";
+import { cn } from "@/utils/cn";
 
 function Accordion({
   ...props

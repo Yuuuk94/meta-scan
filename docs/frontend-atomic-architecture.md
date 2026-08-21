@@ -3,8 +3,8 @@
 > [ADR-010](adr/index.html#adr-010)의 원문입니다. [ADR-009](adr/index.html#adr-009)(FSD-lite)를
 > 대체합니다 — ADR-009는 사용자 인터뷰 없이 AI 세션이 일방적으로 작성한 결정이었던 것으로
 > 확인되어 무효화됐습니다(2026-08-21). 이 문서는 사용자와 단계별 확인(`AskUserQuestion`)을
-> 거쳐 다시 결정한 내용입니다. 결정만 확정된 상태이고 `meta-scan-front` 코드에는 아직
-> 반영되지 않았습니다 — 실제 폴더 이동은 별도 실행 단계입니다.
+> 거쳐 다시 결정한 내용이며, 2026-08-21에 `meta-scan-front` 코드에 실제로 반영됐습니다
+> (6장 "변경 이력" 참고 — 이동 도중 `ui/` 재중첩 등 소폭 조정 있었음).
 
 ## 1. 배경
 
@@ -24,20 +24,26 @@
 정의하지 않으므로, 별도로 `api/`/`services/`/`hooks/` 3계층을 얹습니다.
 
 ```
-atoms/       가장 작은 단위, 더 쪼갤 수 없는 프리미티브 (Button, Input, Badge, Rule, NumberLabel, Loading)
+ui/          Atomic Design 4계층을 전부 담는 상위 폴더(2026-08-21 추가) — "기능"(api/services/
+             hooks)과 최상위에서 시각적으로 분리하기 위해 atoms/molecules/organisms/templates를
+             ui/ 밑으로 묶음. ADR-010 원 결정(계층 자체)은 안 바뀌고 물리적 위치만 한 단계 더
+             중첩됨 — 상세는 6장 "변경 이력" 참고.
 
-molecules/   atoms를 조합한 작은 단위, 도메인 지식 없음 (Card, Tabs, Accordion, StatusBadge,
-             ToggleSetting, ProcessStep)
+ui/atoms/       가장 작은 단위, 더 쪼갤 수 없는 프리미티브 (Button, Input, Badge, Rule,
+                NumberLabel, Loading)
 
-organisms/   자기완결적인 조립 섹션. 데이터 페칭 훅을 쓸 수 있음 (RootHeader, RootFooter,
-             ServiceStatus, HeroSection, ProcessSection, FAQSection, ProcessScreen, ErrorScreen,
-             BlockedScreen)
+ui/molecules/   atoms를 조합한 작은 단위, 도메인 지식 없음 (Card, Tabs, Accordion, StatusBadge,
+                ToggleSetting, ProcessStep)
 
-templates/   organisms를 배치만 하는 라우트별 뼈대(실제 데이터 없는 레이아웃). 이번 마이그레이션
-             패스에서는 빈 폴더로만 만들고 채우지 않음 — 후속 작업
+ui/organisms/   자기완결적인 조립 섹션. 데이터 페칭 훅을 쓸 수 있음 (RootHeader, RootFooter,
+                ServiceStatus, HeroSection, ProcessSection, FAQSection, ProcessScreen, ErrorScreen,
+                BlockedScreen)
 
-pages/       Next.js App Router의 app/[lang]/**/page.tsx가 이 역할을 겸함. 별도 폴더를 만들지
-             않음 — Next.js가 이미 라우팅 규칙으로 이 이름을 강제하기 때문
+ui/templates/   organisms를 배치만 하는 라우트별 뼈대(실제 데이터 없는 레이아웃). 이번 마이그레이션
+                패스에서는 빈 폴더로만 만들고 채우지 않음 — 후속 작업
+
+pages/          Next.js App Router의 app/[lang]/**/page.tsx가 이 역할을 겸함. 별도 폴더를 만들지
+                않음 — Next.js가 이미 라우팅 규칙으로 이 이름을 강제하기 때문
 
 api/         axios로 실제 네트워크 I/O를 하는 함수 (scanApi, statusApi, 공유 axios 인스턴스).
              목킹이 필요한 계층
@@ -87,21 +93,21 @@ hooks/       클라이언트 컴포넌트 전용 데이터 연결/상태 계층.
 ## 4. 파일 이동 매핑 (이번 마이그레이션 패스)
 
 ```
-atoms/       Button, Input, Badge, Rule, NumberLabel  ← components/ui/*
-             Loading                                    ← components/Loading.tsx
+ui/atoms/       Button, Input, Badge, Rule, NumberLabel  ← components/ui/*
+                Loading                                    ← components/Loading.tsx
 
-molecules/   Card, Tabs, Accordion, StatusBadge         ← components/ui/*
-             ToggleSetting                               ← templates/root/ToggleSetting.tsx
-             ProcessStep                                 ← templates/request-scan/ProcessStep.tsx
+ui/molecules/   Card, Tabs, Accordion, StatusBadge         ← components/ui/*
+                ToggleSetting                               ← templates/root/ToggleSetting.tsx
+                ProcessStep                                 ← templates/request-scan/ProcessStep.tsx
 
-organisms/   RootHeader, RootFooter, ServiceStatus       ← templates/root/*
-             HeroSection, ProcessSection, FAQSection     ← templates/main/*
-             ProcessScreen, ErrorScreen, BlockedScreen   ← templates/request-scan/*
-             (ProcessScreen은 "use client" + API 호출 그대로, 통째 이동)
+ui/organisms/   RootHeader, RootFooter, ServiceStatus       ← templates/root/*
+                HeroSection, ProcessSection, FAQSection     ← templates/main/*
+                ProcessScreen, ErrorScreen, BlockedScreen   ← templates/request-scan/*
+                (ProcessScreen은 "use client" + API 호출 그대로, 통째 이동)
 
-templates/   (빈 폴더 + TODO 주석만 — HomeTemplate 등은 후속 작업)
+ui/templates/   (빈 폴더 + TODO 주석만 — HomeTemplate 등은 후속 작업)
 
-pages/       app/[lang]/**/page.tsx 그대로 (Next.js 라우팅 강제, 이름 변경 불가)
+pages/          app/[lang]/**/page.tsx 그대로 (Next.js 라우팅 강제, 이름 변경 불가)
 
 api/         instance   ← apis/index.ts (axios 공유 인스턴스)
              scanApi    ← apis/scan.ts
@@ -112,8 +118,11 @@ services/    combineScanResults.ts  (신규 TODO 스텁)
 
 hooks/       (빈 폴더 + TODO 주석 — React Query 훅 자리, 후속 작업)
 
-그대로 유지: utils/, constans/, css/, dictionaries/, types/, middleware.ts
+그대로 유지: utils/(cn.ts 추가), constans/, css/, dictionaries/, types/, middleware.ts
 ```
+
+`api/`, `services/`, `hooks/`는 `ui/`와 형제 레벨로 `src/` 최상위에 남습니다 — "기능"과 "UI"의
+분리를 최상위 폴더에서 바로 드러내는 게 목적입니다(6장 참고).
 
 이동 후 비는 `components/`, 구 `templates/`, `apis/` 폴더는 삭제합니다. `@/templates/...`,
 `@/apis/...`, `@/components/...` 경로를 참조하는 모든 import를 새 경로로 갱신해야 하며,
@@ -121,9 +130,17 @@ hooks/       (빈 폴더 + TODO 주석 — React Query 훅 자리, 후속 작업
 
 ## 5. 결과 / 아직 안 정한 것
 
-- 아직 구현하지 않았습니다 — 이 문서와 [ADR-010](adr/index.html#adr-010)은 방향 결정만
-  기록합니다.
-- `templates/`(Atomic) 계층의 실제 내용(`HomeTemplate` 등)과 `hooks/`의 React Query 배선은
+- 2026-08-21에 실제로 이동 완료했습니다(`pnpm --filter meta-scan-front lint`/`build` 통과,
+  로컬 `pnpm dev:api`+`pnpm dev:front`로 전 라우트 200 확인).
+- `ui/templates/`(Atomic) 계층의 실제 내용(`HomeTemplate` 등)과 `hooks/`의 React Query 배선은
   의도적으로 이번 범위 밖 — 후속 작업으로 남습니다.
 - `services/combineScanResults.ts`, `services/scanGating.ts`의 실제 판정 로직은 TODO 스텁만
   만들고 채우지 않습니다 — 이번은 폴더 구조 이동이지 기능 구현이 아닙니다.
+
+## 6. 변경 이력
+
+- 2026-08-21 — 이동 실행 중 사용자 제안으로 `atoms/molecules/organisms/templates` 4개를
+  `ui/` 하위로 재중첩(`ui/atoms/`, `ui/molecules/`, `ui/organisms/`, `ui/templates/`) —
+  "UI vs 기능" 분리를 `src/` 최상위에서 바로 드러내기 위함. `api/`/`services/`/`hooks/`는
+  `ui/`와 형제 레벨로 최상위에 그대로 둠. ADR-010의 핵심 결정(계층 자체, 기능 3분리)은
+  안 바뀌었고 물리적 중첩 위치만 조정됨.

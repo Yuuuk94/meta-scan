@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "./utils";
+import { cn } from "@/utils/cn";
 
 /**
  * "01" / "02" / "03" style numbering — this system's recurring motif for

@@ -718,7 +718,7 @@
   <div class="card" id="adr-010">
     <h3 style="margin-top:0;">ADR-010 — 프론트 컴포넌트 아키텍처: Atomic Design 5계층 + api/services/hooks로 재결정</h3>
     <table>
-      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-21 — 원문은 <code>docs/frontend-atomic-architecture.md</code>, 구현은 아직 착수 전. <a href="#adr-009">ADR-009</a>를 대체</td></tr>
+      <tr><td style="width:110px;"><strong>상태</strong></td><td><span class="badge ok">Accepted</span> · 2026-08-21 — 원문은 <code>docs/frontend-atomic-architecture.md</code>, 같은 날 구현 완료(아래 변경 이력 참고). <a href="#adr-009">ADR-009</a>를 대체</td></tr>
     </table>
 
     <h4>배경 (Context)</h4>
@@ -789,6 +789,17 @@
         </ul>
       </div>
     </div>
+
+    <h4>변경 이력</h4>
+    <ul>
+      <li>2026-08-21 — 실제 이동 실행 중 사용자 제안으로 <code>atoms</code>/<code>molecules</code>/
+        <code>organisms</code>/<code>templates</code> 4개를 <code>ui/</code> 하위로 재중첩
+        (<code>ui/atoms/</code> 등) — "UI vs 기능" 분리를 <code>src/</code> 최상위에서 바로
+        드러내기 위함. <code>api/</code>/<code>services/</code>/<code>hooks/</code>는
+        <code>ui/</code>와 형제 레벨로 최상위에 그대로 둠. 이 결정의 핵심(계층 자체, 기능
+        3분리)은 안 바뀌었고 물리적 중첩 위치만 조정 — 상세는
+        <code>docs/frontend-atomic-architecture.md</code> 6장.</li>
+    </ul>
   </div>
 
 </main>

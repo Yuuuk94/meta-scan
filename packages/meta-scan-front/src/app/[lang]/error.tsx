@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/atoms/Button";
 import { defaultLang, langKey } from "@/constans";
 
 // Next.js requires error boundaries to be Client Components, so this can't

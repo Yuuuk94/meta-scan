@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/atoms/Button";
 import { getDictionary } from "@/dictionaries";
 import { getSiteSetting } from "@/utils/siteSetting";
 

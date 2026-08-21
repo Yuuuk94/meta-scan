@@ -1,6 +1,6 @@
 import { getDictionary } from "@/dictionaries";
 import { getSiteSetting } from "@/utils/siteSetting";
-import { NumberLabel } from "@/components/ui/number-label";
+import { NumberLabel } from "@/ui/atoms/NumberLabel";
 
 const lastUpdated = "2026-08-13";
 

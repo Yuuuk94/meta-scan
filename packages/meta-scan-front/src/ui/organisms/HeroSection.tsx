@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/ui/atoms/Button";
+import { Input } from "@/ui/atoms/Input";
 import { AlertCircle, Scan } from "lucide-react";
 import { crrUrlKey, urlPattern } from "@/constans";
 import { setDocumentCookies } from "@/utils/cookies";

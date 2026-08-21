@@ -1,5 +1,5 @@
 import { getDictionary } from "@/dictionaries";
-import { ToggleSetting } from "./ToggleSetting";
+import { ToggleSetting } from "@/ui/molecules/ToggleSetting";
 import { ServiceStatus } from "./ServiceStatus";
 import Link from "next/link";
 
