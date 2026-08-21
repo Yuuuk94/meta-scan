@@ -35,7 +35,7 @@ types/*.d.ts         export 없는 ambient 전역 타입
 
 - `scanService.ts`가 ping/robotsTxt/siteMap/crawling/checks를 전부 떠안은 "God 서비스"
 - `scanService`가 `Puppeteer`/`ChromeLauncher` 구체 클래스에 직접 의존 — infra 교체·단위테스트
-  목킹이 어려움 (`docs/dev-lifecycle-harness.md`가 1순위로 둔 테스트 인프라 작업과 직결)
+  목킹이 어려움 (`docs/case-study/dev-lifecycle-harness.md`가 1순위로 둔 테스트 인프라 작업과 직결)
 - 파일명 케이싱 불일치(`scanController.ts` vs `HealthController.ts`)
 - `lighthouse` 모듈만 응답 스프레드 규약(`{ ...statusOk, ...result }`)을 깨는 것
 - `catch (e) { throw ApiError.internal() }`이 원본 에러를 삼킴 — 디버깅 정보 손실

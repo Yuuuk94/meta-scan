@@ -74,7 +74,7 @@ hooks/       클라이언트 컴포넌트 전용 데이터 연결/상태 계층.
    채택.
 2. **기능 코드 위치**: Container/Presentational, 커스텀 훅 단일 계층, `services+hooks` 분리,
    얕은 `features/` 폴더 혼용 4개 옵션 비교 → 테스트 전략이 계층별로 명확히 갈리는
-   `services`(순수, 목킹 불필요) + `hooks`(React, 목킹 필요) 분리 채택. (`docs/dev-lifecycle-harness.md`가
+   `services`(순수, 목킹 불필요) + `hooks`(React, 목킹 필요) 분리 채택. (`docs/case-study/dev-lifecycle-harness.md`가
    "테스트 러너 인프라 구축"을 1순위로 두고 있어 이 방향과 맞음)
 3. **네트워크 I/O 위치**: `services/`와 별개로 `api/` 폴더를 분리 — I/O가 있는 코드와 순수
    함수를 한 폴더에 섞으면 "services는 목킹 없이 테스트 가능"이라는 전제가 깨지기 때문.

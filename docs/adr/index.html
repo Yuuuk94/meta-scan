@@ -760,7 +760,7 @@
       <tr><td>FSD 계열 4계층 압축판 (<a href="#adr-009">ADR-009</a> 원안)</td><td>승인 절차 문제와 별개로, 압축 자체가 "이 컴포넌트가 어느 계층인지" 애매함을 반복 유발함이 이번 인터뷰 중 재확인됨</td></tr>
       <tr><td>정석 FSD 6계층</td><td>사용자가 "6계층이 모두 필요할 것 같다"는 문제의식으로 이 재논의를 시작했으나, 최종적으로는 Atomic Design 쪽을 선택 — FSD는 "기능이 어디 사는가"엔 강하지만 이번 팀 규모·도메인엔 Atomic의 UI 세분화 축이 더 필요하다고 판단</td></tr>
       <tr><td>가벼운 궁합(계층 프레임워크 없이 container/presentational만)</td><td>폴더 체계를 새로 안 배우는 대신, 기능이 늘어나면 경계가 다시 흐트러질 위험 — 지금 시점에 명시적 계층을 두는 쪽을 선택</td></tr>
-      <tr><td>기능 코드를 커스텀 훅 단일 계층에만 두기</td><td>순수 로직(<code>combineScanResults</code> 등)과 React 상태 로직이 섞여, 순수 함수만 목킹 없이 단위테스트하려는 목표(<code>docs/dev-lifecycle-harness.md</code>의 테스트 인프라 우선순위)와 어긋남</td></tr>
+      <tr><td>기능 코드를 커스텀 훅 단일 계층에만 두기</td><td>순수 로직(<code>combineScanResults</code> 등)과 React 상태 로직이 섞여, 순수 함수만 목킹 없이 단위테스트하려는 목표(<code>docs/case-study/dev-lifecycle-harness.md</code>의 테스트 인프라 우선순위)와 어긋남</td></tr>
       <tr><td>얕은 <code>features/</code> 폴더를 Atomic과 혼용</td><td>한 슬라이스만 다른 패러다임(FSD풍)을 쓰면 "이건 어디 있지" 혼란이 재발할 가능성 — Atomic 채택 결정과 직접 모순</td></tr>
     </table>
 
@@ -870,7 +870,7 @@
         <strong style="color:var(--ok);">얻은 것</strong>
         <ul>
           <li><code>Puppeteer</code>/<code>ChromeLauncher</code> 교체·단위테스트 목킹이 포트
-            인터페이스 뒤로 숨겨져 쉬워짐 — <code>docs/dev-lifecycle-harness.md</code> 1순위인
+            인터페이스 뒤로 숨겨져 쉬워짐 — <code>docs/case-study/dev-lifecycle-harness.md</code> 1순위인
             테스트 인프라 작업과 직결</li>
           <li><code>scanService</code> God 서비스가 유스케이스별로 자연히 쪼개짐</li>
           <li>프론트 ADR-010의 "순수 로직(<code>services/</code>) vs I/O(<code>api/</code>)" 분리
