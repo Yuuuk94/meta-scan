@@ -134,9 +134,12 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
   SEO `checks` 세트를 실행 — `runChecks` 참고). API에서 가장 복잡한 클래스입니다(아직 안 쪼갬).
 - `src/config/swagger.ts` — 라우트/DTO에서 자동 생성되지 않는, 손으로 작성한 OpenAPI 3.1 스펙
   객체이며 `/api/docs`에서 서빙됩니다; 라우트를 추가/변경할 때 수동으로 함께 갱신해야 합니다.
-- Cloud Run에 컨테이너로 배포됩니다(`dockerfile`); `lighthouse`의 `chrome-launcher`가 브라우저
-  바이너리를 필요로 하므로(런타임 이미지에 `apt-get install chromium`으로 설치) 런타임 이미지에
-  `CHROME_PATH`가 필요하며, 이는 Puppeteer 자체의 번들 Chromium과는 별개입니다.
+- Cloud Run에 컨테이너로 배포됩니다(`dockerfile`); 런타임 이미지는 `apt-get install chromium`으로
+  시스템 Chromium 하나만 설치하고, `chrome-launcher`(Lighthouse)용 `CHROME_PATH`와
+  Puppeteer(`scan/crawling`)용 `PUPPETEER_EXECUTABLE_PATH`를 둘 다 그 경로로 설정해 공유합니다.
+  (2026-08-21: `PUPPETEER_EXECUTABLE_PATH`가 없어 Puppeteer가 자기 번들 Chromium — 빌드
+  스테이지에만 다운로드되고 런타임 스테이지엔 안 넘어감 — 을 찾다 실패해 `scan/crawling`이
+  컨테이너에서 500 나던 것을 실제 컨테이너 기동 테스트로 발견·수정.)
 
 #### Docker 빌드
 
@@ -179,8 +182,9 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
 ## 환경 변수
 
 - `meta-scan-api`: `PORT`(기본 8080), `FRONT_URL`, `FRONT_TEST_URL`, `PUBLIC_URL`(CORS 허용 목록 +
-  Swagger 서버 URL), `CHROME_PATH`(`chrome-launcher`용 Chromium 바이너리, 컨테이너 이미지에서는
-  `dockerfile`에서 설정).
+  Swagger 서버 URL), `CHROME_PATH`(`chrome-launcher`용)·`PUPPETEER_EXECUTABLE_PATH`(Puppeteer용)
+  Chromium 바이너리 경로(같은 시스템 Chromium을 가리킴), 컨테이너 이미지에서는 `dockerfile`에서
+  설정).
 - `meta-scan-front`: `NEXT_PUBLIC_META_SCAN_API`(`meta-scan-api`의 base URL).
 
 로컬 개발 시 `meta-scan-front`는 로컬에서 실행 중인 `meta-scan-api`(`pnpm dev:api`)에 접속하기 위해

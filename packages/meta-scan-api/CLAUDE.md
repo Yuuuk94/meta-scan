@@ -145,11 +145,20 @@ God 서비스인 것도, `runChecks`가 그 안에 묻혀 있는 것도, DTO 타
 내부 의존성이 없기 때문입니다(pnpm 10의 순정 `pnpm deploy`는 inject 대상이 없는 워크스페이스를
 거부합니다).
 
-런타임 이미지는 `apt-get`으로 시스템 Chromium도 설치하고 `chrome-launcher`/Lighthouse용
-`CHROME_PATH`를 설정합니다 — Puppeteer 자체의 번들 Chromium과는 별개입니다.
+런타임 이미지는 `apt-get`으로 시스템 Chromium을 설치하고, `chrome-launcher`/Lighthouse용
+`CHROME_PATH`와 Puppeteer(`scan/crawling`)용 `PUPPETEER_EXECUTABLE_PATH`를 **둘 다** 이 apt
+Chromium(`/usr/bin/chromium`)으로 설정합니다 — 하나의 시스템 Chromium을 두 라이브러리가 같이
+씁니다. (2026-08-21 수정: 이전엔 `PUPPETEER_EXECUTABLE_PATH`가 없어서 Puppeteer가 자기 번들
+Chromium을 찾다 실패해 `scan/crawling`이 컨테이너에서 500이 났습니다 — 빌드 스테이지에서
+`pnpm install` 중 Puppeteer가 다운로드하는 브라우저는 `~/.cache/puppeteer`에 저장되는데, 런타임
+스테이지는 `pnpm deploy` 결과물만 복사해서 이 캐시가 넘어가지 않았기 때문. 실제 컨테이너를
+띄워 `scan/crawling`을 호출해보고 나서야 발견됨 — CI/테스트가 없어 지금까지 안 걸렸던 지점.
+빌드 스테이지의 `PUPPETEER_SKIP_DOWNLOAD=true`로 이제 이 불필요한 다운로드 자체를 건너뜁니다.)
 
 ## 환경 변수
 
 `PORT`(기본 8080), `FRONT_URL`, `FRONT_TEST_URL`, `PUBLIC_URL`(CORS 허용 목록 + Swagger 서버 URL),
-`CHROME_PATH`(`chrome-launcher`용 Chromium 바이너리 경로, 컨테이너 이미지에서는 `dockerfile`에서
+`CHROME_PATH`(`chrome-launcher`용 Chromium 바이너리 경로), `PUPPETEER_EXECUTABLE_PATH`
+(Puppeteer용 Chromium 바이너리 경로 — Puppeteer 라이브러리가 자동으로 읽는 표준 환경변수라 코드
+에서 따로 참조하지 않음), 컨테이너 이미지에서는 `dockerfile`에서
 설정).
