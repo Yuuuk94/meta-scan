@@ -135,19 +135,29 @@ graph TD
       <tr><td>UI 프리미티브</td><td>radix-ui, class-variance-authority, clsx, tailwind-merge</td><td>shadcn 스타일</td></tr>
       <tr><td>아이콘</td><td>lucide-react</td><td>^0.541.0</td></tr>
       <tr><td>HTTP 클라이언트</td><td>axios</td><td>^1.13.2</td></tr>
-      <tr><td>상태관리 라이브러리</td><td>zustand</td><td>^5.0.8 <span class="badge none">설치됨, 미사용</span></td></tr>
-      <tr><td>차트</td><td>recharts</td><td>^3.5.1 <span class="badge none">import 흔적 없음(주석 처리됨)</span></td></tr>
+      <tr><td>상태관리 라이브러리</td><td>zustand</td><td>^5.0.8 <span class="badge none">설치됨, 미사용</span> — 2026-08-21 ADR-010 마이그레이션에서 유일하게 쓰던 <code>stores/scanStore.ts</code> 자체가 삭제됨(의존성만 화석처럼 남음)</td></tr>
     </table>
+    <p class="sub">recharts는 같은 마이그레이션에서 <code>package.json</code>에서도 완전히 제거됐습니다(이전엔 설치돼 있었으나 미사용).</p>
+
+    <div class="callout info">
+      <strong>2026-08-21, <a href="../adr/index.html#adr-010">ADR-010</a>에 따라 Atomic Design
+      5계층으로 마이그레이션</strong> — <code>src/ui/{atoms,molecules,organisms,templates}/</code> +
+      <code>src/{api,services,hooks}/</code>로 재구성됐습니다. 이전 <code>components/</code>/
+      <code>templates/</code>/<code>apis/</code>/<code>stores/</code> 구조는 대체됐습니다. 이 마이그레이션은
+      "구조 이동 + 스텁"까지만 스코프였다는 점이 중요합니다 — <code>services/</code>(취합/게이팅
+      로직)와 <code>hooks/</code>(React Query 래핑)와 <code>ui/templates/</code>(라우트 스켈레톤)
+      셋 다 아직 빈 자리이거나 <code>export {}</code>만 있는 스텁입니다(아래 "API 호출 패턴" 참고).
+    </div>
 
     <h4>컴포넌트 구현 패턴</h4>
     <table>
       <tr><th>항목</th><th>확인된 패턴</th></tr>
-      <tr><td>파일당 컴포넌트 수</td><td>1개 (컴포넌트명과 파일명 1:1)</td></tr>
-      <tr><td>export 방식</td><td>전부 named export. 예외: <code>page.tsx</code>/<code>layout.tsx</code>는 Next.js 규약상 default export</td></tr>
-      <tr><td>선언 방식 (화살표 vs function)</td><td><strong>둘로 갈림</strong> — <code>templates/</code>의 프레젠테이션 컴포넌트(HeroSection, FAQSection, ProcessSection, RootHeader, RootFooter, ToggleSetting, ServiceStatus, ProcessStep)와 <code>components/Loading.tsx</code>는 <code>export const X = (props) =&gt; {}</code>. 페이지급(RootLayout, RequestScanPage, ScanPage)과 화면 전환 컴포넌트(ProcessScreen, ErrorScreen)는 <code>export function X(props) {}</code></td></tr>
+      <tr><td>파일당 컴포넌트 수</td><td>1개가 원칙(컴포넌트명과 파일명 1:1). 예외: shadcn 유래 프리미티브(<code>Accordion.tsx</code>, <code>Tabs.tsx</code>)는 컴파운드 컴포넌트라 서브 컴포넌트 여럿을 한 파일에 둠</td></tr>
+      <tr><td>export 방식</td><td><code>ui/atoms</code>/<code>ui/molecules</code>의 shadcn 유래 프리미티브(Badge, Button, Input, Card, Accordion, Tabs)는 <code>function X() {}</code> 선언 후 파일 하단에서 named export. 그 외는 아래 "선언 방식" 참고. 예외: <code>page.tsx</code>/<code>layout.tsx</code>는 Next.js 규약상 default export</td></tr>
+      <tr><td>선언 방식 (화살표 vs function)</td><td><strong>둘로 갈림</strong> — <code>ui/organisms/</code>의 프레젠테이션 컴포넌트(HeroSection, FAQSection, ProcessSection, RootHeader, RootFooter, ServiceStatus)와 <code>ui/molecules/ToggleSetting.tsx</code>·<code>ProcessStep.tsx</code>·<code>ui/atoms/Loading.tsx</code>는 <code>export const X = (props) =&gt; {}</code>. 화면 전환 컴포넌트(ProcessScreen, ErrorScreen, <a href="../adr/index.html#adr-006">ADR-006</a>용으로 신설된 BlockedScreen)는 <code>export function X(props) {}</code></td></tr>
       <tr><td>클래스형 컴포넌트</td><td>없음</td></tr>
-      <tr><td>props 전달 방식</td><td>Context 없이 <code>theme</code>/<code>lang</code>(+ <code>t</code> 사전 객체)을 모든 하위 컴포넌트에 계속 내려주는 props drilling. 공통 타입은 <code>DefaultProps</code>/<code>DefaultPageProps</code></td></tr>
-      <tr><td>UI 프리미티브 골격</td><td><code>components/ui/*</code>: <code>cva</code> variant 정의 → <code>cn()</code>(clsx+tailwind-merge)로 className 병합 → <code>data-slot</code> 속성 → named export</td></tr>
+      <tr><td>props 전달 방식</td><td>Context 없이 <code>theme</code>/<code>lang</code>(+ <code>t</code> 사전 객체)을 모든 하위 컴포넌트에 계속 내려주는 props drilling. 공통 타입은 <code>DefaultProps</code>/<code>DefaultPageProps</code> — ADR-010 이후에도 안 바뀜</td></tr>
+      <tr><td>UI 프리미티브 골격</td><td><code>ui/atoms/*</code>·<code>ui/molecules/*</code>: <code>cva</code> variant 정의 → <code>cn()</code>(<code>utils/cn.ts</code>, clsx+tailwind-merge)로 className 병합 → <code>data-slot</code> 속성 → named export. 디자인 시스템 §를 가리키는 JSDoc 주석이 붙어있는 경우가 많음(예: <code>Rule.tsx</code>가 §5, <code>StatusBadge.tsx</code>가 §2/§8) — <a href="../design/index.html#components">디자인 시스템 페이지 5절</a> 참고</td></tr>
     </table>
 
     <h4>상태관리 방식</h4>
@@ -165,51 +175,68 @@ flowchart LR
   GSS -->|"props: theme, lang, t"| COMP["템플릿 / 페이지 컴포넌트"]
   COMP -->|"클라이언트에서 변경 시"| SDC["setDocumentCookies()<br/>document.cookie 직접 조작"]
   SDC --> COOKIE
-  ZS["zustand useBearStore<br/>(stores/scanStore.ts)"]:::unused
-  classDef unused stroke-dasharray: 5 5, color:#888
       </pre>
     </div>
     <table>
       <tr><th>확인된 사실</th><th>근거</th></tr>
       <tr><td><strong>실사용 중인 상태관리는 <code>useState</code>/<code>useEffect</code>/<code>useRef</code>(로컬) + 쿠키(전역 공유)뿐</strong></td><td>HeroSection, ProcessScreen, ToggleSetting, FAQSection 등</td></tr>
-      <tr><td>Zustand 스토어는 설치돼 있으나 <strong>어디서도 import되지 않는 미사용 코드</strong></td><td><code>stores/scanStore.ts</code> — 스토어명도 <code>useBearStore</code>/persist 키 <code>"food-storage"</code>로 공식 예제 보일러플레이트 그대로</td></tr>
+      <tr><td>Zustand는 <code>package.json</code>엔 남아있지만 <strong>실제 사용 파일 자체가 없음</strong></td><td>유일하게 쓰던 <code>stores/scanStore.ts</code>(<code>useBearStore</code>/persist 키 <code>"food-storage"</code> — 공식 예제 보일러플레이트 그대로였음)가 2026-08-21 ADR-010 마이그레이션에서 삭제됨. 의존성만 화석처럼 남은 상태</td></tr>
       <tr><td>Context API 사용</td><td><span class="badge none">없음</span></td></tr>
-      <tr><td>쿠키 읽기/쓰기 책임 분리</td><td>읽기는 항상 서버(<code>getSiteSetting</code>), 쓰기는 항상 클라이언트(<code>setDocumentCookies</code>)</td></tr>
+      <tr><td>쿠키 읽기/쓰기 책임 분리</td><td>읽기는 항상 서버(<code>getSiteSetting</code>, <code>utils/siteSetting.ts</code>), 쓰기는 항상 클라이언트(<code>setDocumentCookies</code>, <code>utils/cookies.ts</code>)</td></tr>
     </table>
 
     <h4>API 호출 패턴</h4>
-    <p><code>apis/index.ts</code>가 <code>axios.create({ baseURL: NEXT_PUBLIC_META_SCAN_API })</code>로
-      공유 인스턴스를 만들고, <code>apis/scan.ts</code>(<code>sitePingApi</code>/
-      <code>scanRobotsTxtApi</code>/<code>scanSiteMapApi</code>/<code>scanCrawlingApi</code>/
-      <code>lsRunApi</code>)와 <code>apis/status.ts</code>(<code>pingApi</code>)가 이 위에서
-      엔드포인트별 함수를 노출합니다. 호출 방식은 컨텍스트별로 다릅니다: 서버 컴포넌트는 단건
-      <code>await</code>로 직접 호출해 <code>try/catch</code>로 에러를 잡고, <code>ProcessScreen</code>
-      (클라이언트)은 여러 API를 <code>Promise.allSettled</code>로 병렬 호출해 <code>.then</code>/
-      <code>.catch</code>로 각각 처리합니다.</p>
+    <p><code>api/instance.ts</code>(구 <code>apis/index.ts</code>)가
+      <code>axios.create({ baseURL: NEXT_PUBLIC_META_SCAN_API })</code>로 공유 인스턴스를 만들고,
+      <code>api/scanApi.ts</code>(<code>scanRobotsTxtApi</code>/<code>scanSiteMapApi</code>/
+      <code>scanCrawlingApi</code>/<code>lsRunApi</code>)와 <code>api/statusApi.ts</code>
+      (<code>pingApi</code> — 구 <code>sitePingApi</code>)가 이 위에서 엔드포인트별 함수를
+      노출합니다. 호출 방식은 컨텍스트별로 다릅니다: 서버 컴포넌트는 단건 <code>await</code>로
+      직접 호출해 <code>try/catch</code>로 에러를 잡고, <code>ProcessScreen</code>(클라이언트)은
+      여러 API를 <code>Promise.allSettled</code>로 병렬 호출해 <code>.then</code>/<code>.catch</code>로
+      각각 처리합니다.</p>
     <div class="diagram-card">
       <pre class="mermaid">
 flowchart LR
-  INST["apis/index.ts<br/>axios.create({baseURL: NEXT_PUBLIC_META_SCAN_API})"] --> SCAN["apis/scan.ts<br/>sitePingApi / scanRobotsTxtApi /<br/>scanSiteMapApi / scanCrawlingApi / lsRunApi"]
-  INST --> STATUS["apis/status.ts<br/>pingApi"]
+  INST["api/instance.ts<br/>axios.create({baseURL: NEXT_PUBLIC_META_SCAN_API})"] --> SCAN["api/scanApi.ts<br/>scanRobotsTxtApi / scanSiteMapApi /<br/>scanCrawlingApi / lsRunApi"]
+  INST --> STATUS["api/statusApi.ts<br/>pingApi"]
   SCAN --> C1["서버 컴포넌트<br/>단건 await 호출"]
-  SCAN --> C2["ProcessScreen (클라이언트)<br/>Promise.allSettled 병렬 호출"]
+  SCAN --> C2["ProcessScreen (클라이언트)<br/>Promise.allSettled 병렬 호출, 응답은 저장하지 않고 버림"]
   C1 -->|에러 처리| T1["호출부 try/catch"]
-  C2 -->|에러 처리| T2["호출부 .then/.catch"]
+  C2 -.->|"아직 연결 안 됨"| SVC["services/combineScanResults.ts<br/>services/scanGating.ts (둘 다 export {} 스텁)"]
       </pre>
     </div>
-    <div class="callout">
-      <strong>baseURL 불일치</strong> — <code>sitePingApi</code>는 인스턴스의 <code>baseURL</code>만
-      쓰는데, <code>scanRobotsTxtApi</code>/<code>scanSiteMapApi</code>/<code>scanCrawlingApi</code>는
-      같은 인스턴스 위에 <code>NEXT_PUBLIC_META_SCAN_API</code>를 경로 앞에 다시 명시적으로 붙입니다.
-      API 함수 내부에 공통 에러 핸들러(인터셉터)는 없고, 에러 처리는 항상 호출부 책임입니다.
+    <div class="callout ok">
+      <strong>baseURL 불일치는 해결됨</strong> — 이전엔 <code>sitePingApi</code>만 인스턴스의
+      <code>baseURL</code>을 쓰고 나머지 <code>scan*Api</code> 함수들은 <code>NEXT_PUBLIC_META_SCAN_API</code>를
+      경로 앞에 다시 붙이던 불일치가 있었는데, <code>fix(front): drop redundant baseURL concat in
+      scanApi.ts</code> 커밋으로 지금은 전부 <code>baseURL</code>만 씁니다. API 함수 내부에 공통
+      에러 핸들러(인터셉터)는 여전히 없고, 에러 처리는 항상 호출부 책임입니다.
     </div>
+    <div class="callout">
+      <strong>가장 중요한 확인 사실 — 파이프가 아직 안 이어져 있음</strong>. ADR-010 마이그레이션이
+      새로 만든 <code>services/combineScanResults.ts</code>(4개 스캔 응답을 그룹별로 취합 — 계산
+      아님, <a href="../adr/index.html#adr-003">ADR-003</a> 참고)와 <code>services/scanGating.ts</code>
+      (<a href="../adr/index.html#adr-006">ADR-006</a> robots.txt 게이팅 로직)는 둘 다 파일에 함수
+      시그니처만 주석으로 적힌 <code>export {}</code> 스텁이고, <code>ProcessScreen</code>은 여전히
+      4개 API를 병렬 호출은 하지만 응답 바디를 저장하지 않고 <code>status === "ok"</code>만 확인한
+      뒤 버립니다. <code>/scan</code> 결과 페이지(<code>app/[lang]/scan/page.tsx</code>)도 여전히
+      서버 컴포넌트 안에서 <code>Math.random()</code>으로 만든 목업을 렌더링합니다. 즉 "이미 있는
+      UI/API 사이에 파이프를 연결"하는 작업이 아직 이 마이그레이션 이후로도 남아있습니다 — 루트
+      <code>CLAUDE.md</code> "현재 상태" 절과 동일한 사실입니다.
+    </div>
+    <p><code>hooks/</code>와 <code>ui/templates/</code>도 같은 이유로 아직 빈 자리입니다 —
+      <code>hooks/</code>는 React Query(<code>@tanstack/react-query</code>, 아직 미설치)를 감쌀
+      클라이언트 훅 자리이고, <code>ui/templates/</code>는 라우트별 organisms 조립 스켈레톤 자리인데,
+      지금은 <code>app/[lang]/**/page.tsx</code>가 여전히 <code>ui/organisms/</code>를 직접
+      조립합니다.</p>
 
     <h4>네이밍 컨벤션</h4>
     <table>
       <tr><th>대상</th><th>규칙</th><th>실제 예시</th></tr>
       <tr><td>컴포넌트 파일</td><td>PascalCase, 컴포넌트명과 1:1</td><td><code>HeroSection.tsx</code>, <code>ProcessStep.tsx</code></td></tr>
-      <tr><td>components/ui 파일</td><td>kebab-case / 소문자 (shadcn CLI 산출물 그대로)</td><td><code>button.tsx</code>, <code>alert-dialog.tsx</code></td></tr>
-      <tr><td>API 함수</td><td><code>&lt;도메인&gt;&lt;동사&gt;Api</code></td><td><code>sitePingApi</code>, <code>scanRobotsTxtApi</code> / 예외: <code>lsRunApi</code>(scan/site 접두어 대신 ls)</td></tr>
+      <tr><td>ui/atoms, ui/molecules 파일</td><td><strong>PascalCase로 변경됨</strong>(2026-08-21) — 이전 <code>components/ui/*</code>의 kebab-case(shadcn CLI 산출물 그대로)에서, 나머지 컴포넌트 파일들과 통일하는 쪽으로 리네임</td><td><code>Button.tsx</code>, <code>Badge.tsx</code> (이전엔 <code>button.tsx</code>, <code>badge.tsx</code>)</td></tr>
+      <tr><td>API 함수</td><td><code>&lt;도메인&gt;&lt;동사&gt;Api</code></td><td><code>pingApi</code>(구 <code>sitePingApi</code>), <code>scanRobotsTxtApi</code> / 예외: <code>lsRunApi</code>(scan/site 접두어 대신 ls)</td></tr>
       <tr><td>Props 타입</td><td><code>XxxProps</code> interface, 공통은 <code>DefaultProps</code>/<code>DefaultPageProps</code> extends</td><td><code>RootHeaderProps</code>, <code>ProcessScreenProps</code></td></tr>
       <tr><td>쿠키/스토리지 키 상수</td><td><code>xxxKey</code> 접미사</td><td><code>themeKey</code>, <code>langKey</code>, <code>crrUrlKey</code></td></tr>
       <tr><td><span class="badge warn">굳어진 오타</span></td><td>디렉토리명 <code>constans/</code>(constants 오타), 변수명 <code>promistList</code>(promise 오타)</td><td><code>src/constans/index.ts</code>, <code>ProcessScreen.tsx</code></td></tr>
@@ -231,33 +258,64 @@ flowchart LR
     </table>
 
     <h4>레이어 구조</h4>
+    <div class="callout info">
+      <strong>2026-08-21, <a href="../adr/index.html#adr-011">ADR-011</a>에 따라 Hexagonal(Ports &amp;
+      Adapters) 3계층으로 마이그레이션</strong> — <code>domain/</code>(포트 인터페이스) /
+      <code>application/</code>(유스케이스) / <code>adapters/</code>(inbound: HTTP 컨트롤러·라우터,
+      outbound: 브라우저 자동화 어댑터)로 재구성됐습니다. 이전 <code>src/modules/*</code> 레이어드
+      구조(scan/lighthouse/health 모듈별 폴더)는 대체됐습니다. entities 계층은 만들지 않았습니다 —
+      PRD 체크리스트 명세를 확인한 뒤 이 프로젝트엔 불필요하다고 판단한 것으로 기록돼 있습니다.
+      경로 별칭도 이전엔 <code>@core/*</code>/<code>@constant/*</code>/<code>@config/*</code>/
+      <code>@infra/*</code>/<code>@modules/*</code> 5개였는데, 같은 시점에 프론트와 동일하게
+      <code>@/*</code> 하나로 통합됐습니다.
+    </div>
     <div class="diagram-card">
       <pre class="mermaid">
 flowchart TD
-  subgraph scan["scan 모듈"]
-    R1["scan.router.ts<br/>수동 DI: new Puppeteer() → new ScanService() → new ScanController()"] --> C1["ScanController"] --> S1["ScanService"]
-  end
-  subgraph lighthouse["lighthouse 모듈"]
-    R2["lighthouse.router.ts"] --> C2["LighthouseController"] --> S2["LighthouseService"]
-  end
-  subgraph health["health 모듈"]
+  subgraph inbound["adapters/inbound/http/"]
+    R1["scan.router.ts<br/>수동 DI: new PuppeteerAdapter() → new ScanService() → new ScanController()"] --> C1["ScanController"]
+    R2["lighthouse.router.ts<br/>수동 DI: new ChromeLauncherAdapter() → new LighthouseService() → new LighthouseController()"] --> C2["LighthouseController"]
     R3["health.router.ts"] --> C3["HealthController"]
   end
-  C1 -. extends .-> BASE["BaseController<br/>ok() / html() / handle()"]
+  subgraph application["application/"]
+    S1["ScanService"]
+    S2["LighthouseService"]
+  end
+  subgraph domain["domain/ports/"]
+    P1["BrowserAutomationPort"]
+    P2["LighthouseRunnerPort"]
+  end
+  subgraph outbound["adapters/outbound/"]
+    O1["PuppeteerAdapter<br/>implements BrowserAutomationPort"]
+    O2["ChromeLauncherAdapter<br/>implements LighthouseRunnerPort"]
+  end
+  C1 --> S1
+  C2 --> S2
+  S1 -.타입 의존(포트 인터페이스만 앎).-> P1
+  S2 -.타입 의존(포트 인터페이스만 앎).-> P2
+  O1 -.구현.-> P1
+  O2 -.구현.-> P2
+  C1 -. extends .-> BASE["BaseController<br/>ok() / html() / handle()<br/>(core/http/, 계층 밖 공통 유틸)"]
   C2 -. extends .-> BASE
   C3 -. extends .-> BASE
       </pre>
     </div>
     <table>
       <tr><th>모듈</th><th>체인</th></tr>
-      <tr><td>scan</td><td><code>scan.router.ts</code>(수동 DI: <code>new Puppeteer() → new ScanService() → new ScanController()</code>) → <code>ScanController</code> → <code>ScanService</code></td></tr>
-      <tr><td>lighthouse</td><td><code>lighthouse.router.ts</code> → <code>LighthouseController</code> → <code>LighthouseService</code></td></tr>
-      <tr><td>health</td><td><code>health.router.ts</code> → <code>HealthController</code></td></tr>
+      <tr><td>scan</td><td><code>adapters/inbound/http/scan/scan.router.ts</code>(수동 DI: <code>new PuppeteerAdapter() → new ScanService(launcher) → new ScanController(service)</code>) → <code>ScanController</code> → <code>ScanService</code>(<code>application/</code>) → <code>BrowserAutomationPort</code> 포트 인터페이스 → <code>PuppeteerAdapter</code>(<code>adapters/outbound/</code>)</td></tr>
+      <tr><td>lighthouse</td><td><code>lighthouse.router.ts</code> → <code>LighthouseController</code> → <code>LighthouseService</code>(<code>application/</code>) → <code>LighthouseRunnerPort</code> → <code>ChromeLauncherAdapter</code></td></tr>
+      <tr><td>health</td><td><code>health.router.ts</code> → <code>HealthController</code>(포트/서비스 없이 바로 처리)</td></tr>
     </table>
-    <p class="sub">세 컨트롤러(<code>ScanController</code>/<code>LighthouseController</code>/
-      <code>HealthController</code>) 모두 <code>BaseController</code>(<code>ok()</code>/
-      <code>html()</code>/<code>handle()</code>)를 상속합니다. 리포지토리 계층은 없습니다 — DB가
-      없으므로(아래 참고) 자연히 존재하지 않습니다.</p>
+    <p class="sub">세 컨트롤러 모두 <code>BaseController</code>(<code>core/http/</code>)를 상속합니다.
+      리포지토리 계층은 없습니다 — DB가 없으므로(아래 참고) 자연히 존재하지 않습니다.</p>
+    <div class="callout">
+      <strong>알려진 미해결 impurity</strong> — <code>application/ScanService.ts</code>가
+      인바운드 어댑터의 DTO 타입(<code>adapters/inbound/http/scan/dto.ts</code>의
+      <code>UrlBody</code>)을 직접 import합니다. 이 마이그레이션 패스에서 해결하지 않고 코드
+      주석으로 명시적으로 남겨둔 known issue입니다(<code>docs/case-study/backend-hexagonal-architecture.md</code>
+      §5 참고). <code>ScanService</code> 등 God 클래스 분리·<code>runChecks</code> 도메인 추출도
+      후속 작업으로 남아있습니다.
+    </div>
 
     <h4>API 설계 패턴</h4>
     <table>
@@ -326,20 +384,22 @@ flowchart LR
     <h2>2. 공통 영역 <span class="tag">CROSS-CUTTING</span></h2>
     <table>
       <tr><th>영역</th><th>확인된 사실</th></tr>
-      <tr><td>테스트 프레임워크</td><td><span class="badge none">없음</span> — jest/vitest/playwright 등 의존성 없음, <code>*.test.*</code>/<code>*.spec.*</code> 파일 0건. 두 패키지 CLAUDE.md에도 "테스트 러너가 있다고 가정하지 말 것"이라 명시됨</td></tr>
-      <tr><td>Git 브랜치 전략</td><td>현재 <code>origin</code>에 <code>main</code> 단일 브랜치만 존재. subtree 병합 이전 원본 히스토리엔 <code>dev</code> 브랜치 → PR 병합 흔적이 남아있지만, 통합 저장소 기준 별도 전략 문서나 규칙은 없음</td></tr>
+      <tr><td>테스트 프레임워크</td><td><span class="badge warn">결정됨, 미도입</span> — <a href="../adr/index.html#adr-012">ADR-012</a>(2026-08-24)로 <code>meta-scan-front</code>는 Jest, <code>meta-scan-api</code>는 Vitest로 패키지별로 다르게 채택 확정. 실제 devDependency 추가·설정 파일 작성은 아직 안 됨 — <code>docs/harness/tdd-issue-loop.md</code>의 이슈 기반 TDD 파이프라인이 처음 도입하게 될 예정</td></tr>
+      <tr><td>Git 브랜치 전략</td><td><span class="badge ok">있음 — Full Git Flow</span>. <code>main</code>(프로덕션) – <code>dev</code>(통합/스테이징) – <code>feat/*</code> 3단에서, <code>release/*</code>·<code>hotfix/*</code>까지 더한 원조 Git Flow(Vincent Driessen)로 2026-08 확장(<code>docs/case-study/git-branching-strategy.md</code>). CI 자동화 없이 수동 운영이라 release 완료 시 main+dev 양방향 백머지를 사람이 챙겨야 하는 게 알려진 약점</td></tr>
       <tr><td>Git 훅</td><td><span class="badge ok">있음</span> — <code>husky</code>. <code>pre-commit</code>에서 <code>lint-staged</code>가 스테이지된 파일만 패키지별 ESLint <code>--fix</code>, <code>commit-msg</code>에서 <code>commitlint</code>가 커밋 메시지 형식을 검사. <code>pnpm install</code> 시 <code>prepare</code> 스크립트로 자동 활성화 (<a href="../adr/index.html#adr-002">ADR-002</a> 참고)</td></tr>
       <tr><td>커밋 메시지 컨벤션</td><td><span class="badge ok">있음</span> — Conventional Commits(<code>&lt;type&gt;(&lt;scope&gt;)?: &lt;subject&gt;</code>)를 <code>commitlint</code>로 강제. 단, 이 훅 도입(2026-08) 이전 히스토리(<code>"fix cors"</code>, <code>"update"</code> 등 자유 형식)는 그대로 남아있고 소급 적용되지 않음</td></tr>
-      <tr><td>CI/CD</td><td><span class="badge none">없음</span> — <code>.github/workflows</code> 등 전무, 원격(서버) 검사 파이프라인 없음. 위 Git 훅은 로컬에서만 강제되고 서버 쪽 강제 장치는 아님. Docker 빌드도 <code>pnpm docker:build:api</code> 수동 커맨드로만 존재</td></tr>
+      <tr><td>CI/CD</td><td><span class="badge none">없음</span> — <code>.github/workflows</code> 등 전무, 원격(서버) 검사 파이프라인 없음. 위 Git 훅은 로컬에서만 강제되고 서버 쪽 강제 장치는 아님. Docker 빌드도 <code>pnpm docker:build:api</code> 수동 커맨드로만 존재. GitHub Pages(<code>docs/</code>, <code>main</code> 브랜치 소스)만 예외적으로 자동 배포됨</td></tr>
+      <tr><td>Claude Code 개발 하네스</td><td><span class="badge ok">있음</span> — <code>.claude/agents/</code>·<code>.claude/skills/</code>에 파이프라인형 서브에이전트 구성. <code>design-intake → publish-front → qa-front-publish</code>(디자인 반영), <code>dev-interview → dev-backend/dev-front → qa-backend/qa-front</code>(GitHub Issues 기반 TDD 루프, <code>docs/harness/tdd-issue-loop.md</code>), <code>blog-writer</code>(케이스 스터디 → 블로그 초안) 등. 로드맵/미도입 항목은 <code>docs/harness/dev-lifecycle-harness.md</code> 참고</td></tr>
     </table>
   </section>
 
   <!-- 3. 참고 -->
   <section id="ref">
     <h2>3. 참고 <span class="tag">LINKS</span></h2>
-    <p class="sub" style="margin-top:0;">이 페이지는 2026-08-13 기준 저장소 스캔 결과이며, 코드가
+    <p class="sub" style="margin-top:0;">이 페이지는 2026-08-25 기준 저장소 스캔 결과이며, 코드가
       바뀌면 내용도 함께 갱신이 필요합니다. 설계 결정의 배경은 <a href="../adr/index.html">ADR 페이지</a>를,
-      비주얼 디자인 시스템은 <a href="../design/index.html">디자인 시스템 페이지</a>를 참고하세요.</p>
+      비주얼 디자인 시스템은 <a href="../design/index.html">디자인 시스템 페이지</a>를, 개발 하네스
+      로드맵은 <a href="../harness/dev-lifecycle-harness.md">docs/harness/</a>를 참고하세요.</p>
   </section>
 
 </main>

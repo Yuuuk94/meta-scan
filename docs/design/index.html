@@ -76,66 +76,49 @@
   <a href="#overview">1. 개요</a>
   <a href="#tokens">2. 토큰</a>
   <a class="sub" href="#color">2.1 컬러</a>
-  <a class="sub" href="#shadow">2.2 그림자</a>
+  <a class="sub" href="#typography">2.2 타이포그래피</a>
   <a href="#dark-mode">3. 다크모드 배선</a>
-  <a href="#principles">4. 사용 원칙</a>
+  <a href="#principles">4. 사용 원칙 · 금지 목록</a>
   <a href="#components">5. 컴포넌트 패턴</a>
-  <a href="#out-of-scope">6. 다루지 않은 것</a>
-  <a href="#ref">7. 참고</a>
+  <a href="#status-badges">6. 판정 배지 시맨틱</a>
+  <a href="#previous">7. 이전 버전 (폐기됨)</a>
+  <a href="#ref">8. 참고</a>
 </nav>
 
 <main>
   <header class="page-header">
     <h1>meta-scan 디자인 시스템</h1>
-    <p>2026-08-13, <code>packages/meta-scan-front</code>의 시각적 디자인을 재작업하며 정립한
-      토큰·컴포넌트 규칙입니다. <a href="../architecture/index.html">아키텍처</a> 페이지와는 다른
-      주제입니다 — 그쪽은 저장소 구조/스택/구현 패턴 같은 <strong>기술 설계</strong>를 다루고,
-      이 페이지는 색상·타이포·다크모드 같은 <strong>UI/UX 디자인 시스템</strong>을 다룹니다.</p>
+    <p>지금 <code>packages/meta-scan-front</code>에 실제로 반영돼 있는 토큰·컴포넌트 규칙입니다.
+      <a href="../architecture/index.html">아키텍처</a> 페이지와는 다른 주제입니다 — 그쪽은 저장소
+      구조/스택/구현 패턴 같은 <strong>기술 설계</strong>를 다루고, 이 페이지는 색상·타이포·다크모드
+      같은 <strong>UI/UX 디자인 시스템</strong>을 다룹니다.</p>
   </header>
 
-  <div class="callout bad" style="margin-bottom:2.5rem;">
-    <strong>2026-08-18 방향 전환</strong> — 아래 1~7절은 <strong>실제 코드에 지금 반영돼 있는</strong>
-    ADR-004(화이트/차콜 + 인디고) 톤을 그대로 기록한 것입니다. 이후 체크리스트 결과 화면을 다시
-    설계하는 과정에서 이 톤 자체를 폐기하고 <strong>"진 인덱스(Zine Index) + 오렌지"</strong> 톤으로
-    전면 교체하기로 결정했습니다(<a href="../adr/index.html#adr-008">ADR-008</a>). 새 토큰·컴포넌트
-    규칙은 <a href="design-system.md">docs/design/design-system.md</a>가 최신 소스입니다 — 단,
-    <strong>아직 와이어프레임 단계</strong>이고 <code>meta-scan-front</code>의 실제 토큰
-    (<code>globals.css</code>)은 이 페이지가 기록한 인디고 팔레트 그대로입니다(코드 구현은 별도
-    작업). 그래서 이 페이지는 일부러 고치지 않고 "코드에 실제로 반영된 것"이라는 원래 성격을
-    유지합니다 — 지금 참고해야 할 디자인 방향은 <code>docs/design/design-system.md</code> 쪽입니다.
+  <div class="callout ok" style="margin-bottom:2.5rem;">
+    <strong>현재 반영본 — "진 인덱스(Zine Index) + 오렌지"</strong>
+    (<a href="../adr/index.html#adr-008">ADR-008</a>). 인쇄된 진단 보고서를 스캔한 듯한 편집/진(zine)
+    톤으로, 2026-08-19 <code>meta-scan-front</code> 전 화면에 실제로 퍼블리싱됐습니다(디자인 원본은
+    <a href="intake/zine-index-full/spec.md">design/intake/zine-index-full/spec.md</a> 인테이크 스펙,
+    소스 오브 트루스는 <a href="design-system.md">docs/design/design-system.md</a>). 이전에 이 페이지가
+    기록하던 화이트/차콜+인디고 톤(ADR-004)은 2026-08-18 폐기됐습니다 — 아래
+    <a href="#previous">7. 이전 버전</a> 절 참고.
   </div>
 
   <!-- 1. 개요 -->
   <section id="overview">
-    <h2>1. 개요 <span class="tag">BEFORE / AFTER</span></h2>
-    <p>작업 전 전 화면(헤더/푸터/히어로/프로세스/FAQ/스캔 진행화면/<code>/scan</code> 결과 페이지)은
-      shadcn 기본 스캐폴드 토큰이 남아있는 채로, 실제 화면은 그 토큰을 쓰지 않고 요소마다
-      <code>theme === "dark" ? "..." : "..."</code> 삼항 연산자로 cyan→purple→pink 그라디언트,
-      <code>backdrop-blur</code>, glow 섀도우를 직접 나열하고 있었습니다.</p>
-
-    <div class="grid-2">
-      <div class="card">
-        <strong style="color:var(--bad);">이전</strong>
-        <ul>
-          <li>화면/카드마다 다른 그라디언트 색(cyan/purple/pink)</li>
-          <li>점수·상태 색이 등급과 무관하게 장식적으로만 사용됨</li>
-          <li><code>@custom-variant dark</code>가 주석 처리돼 <code>components/ui/*</code>가 OS
-            설정을 따르는 실제 버그</li>
-          <li>푸터에 조작된 <code>SCANS: 247,891</code> 통계, 에러 화면이 엉뚱한 문구 재사용</li>
-        </ul>
-      </div>
-      <div class="card">
-        <strong style="color:var(--ok);">이후</strong>
-        <ul>
-          <li>화이트/차콜 중립 + 인디고 단일 포인트 컬러</li>
-          <li>점수·상태는 success/warning/destructive로 고정 매핑</li>
-          <li><code>data-theme</code> 쿠키 하나로 전체 화면 + <code>components/ui/*</code> 통일</li>
-          <li>가짜 통계 제거, 에러 카피 수정</li>
-        </ul>
-      </div>
-    </div>
-    <p class="sub">관련 커밋: <code>style(front): replace AI-generated gradient theme with
-      token-based design system</code>, 배경/대안 검토는 <a href="../adr/index.html#adr-004">ADR-004</a>
+    <h2>1. 개요 <span class="tag">CURRENT</span></h2>
+    <p>SaaS 대시보드의 카드+그림자+둥근 모서리 문법을 의도적으로 피하고, 굵은 검정 룰(rule)과
+      채워진 색 블록으로 위계를 만드는 편집/진(zine) 톤입니다. 무료·고트래픽 애드센스 도구라는
+      제품 성격에 맞게 화려하지 않지만, 진단 결과(pass/warning/fail/info)가 실제 인쇄물의 도장·
+      색인 번호처럼 또렷하게 읽히는 걸 목표로 합니다.</p>
+    <table>
+      <tr><th>축</th><th>점수(10점 만점)</th><th>의미</th></tr>
+      <tr><td>밀도(Density)</td><td>6 — Daily App Balanced</td><td>체크리스트 항목이 많아 정보 밀도는 있지만, 굵은 룰 라인과 여백으로 숨 쉴 공간 확보</td></tr>
+      <tr><td>비대칭(Variance)</td><td>5</td><td>헤드라인·번호 라벨(01/02/03)에는 편집 레이아웃 특유의 비대칭, 체크리스트 카드 그리드는 스캔 결과 비교 목적상 균등 그리드 유지</td></tr>
+      <tr><td>모션(Motion)</td><td>2 — Static Restrained</td><td>진단 도구라 화려한 모션 배제, 아코디언 펼침/접힘 정도의 최소 인터랙션만</td></tr>
+    </table>
+    <p class="sub">배경/대안 검토는 <a href="../adr/index.html#adr-008">ADR-008</a>, 아트보드별
+      상세 스펙(레이아웃/카피/토큰 매핑)은 <a href="intake/zine-index-full/spec.md">design/intake/zine-index-full/spec.md</a>
       참고.</p>
   </section>
 
@@ -143,182 +126,225 @@
   <section id="tokens">
     <h2>2. 토큰 <span class="tag">TOKENS</span></h2>
     <p><code>src/css/globals.css</code>에 정의됩니다. 라이트는 <code>:root</code>, 다크는
-      <code>:root[data-theme="dark"]</code>에 같은 변수명으로 재정의하고, 화면 코드는
-      <code>bg-primary</code>/<code>text-success</code>처럼 토큰만 참조합니다 — 라이트/다크 값
-      자체를 알 필요가 없습니다. 전체 팔레트와 의미별 매핑표는
-      <a href="colors.md">colors.md</a>, 타이포그래피 스케일은
-      <a href="typography.md">typography.md</a>, 여백/그리드 스케일은
-      <a href="spacing.md">spacing.md</a>에 정리돼 있습니다.</p>
+      <code>:root[data-theme="dark"]</code>에 같은 변수명으로 재정의하고, 컴포넌트 코드는
+      <code>bg-background</code>/<code>text-foreground</code>처럼 토큰만 참조합니다.</p>
 
     <h3 class="subsection" id="color">2.1 컬러</h3>
     <table>
-      <tr><th>토큰</th><th>라이트</th><th>다크</th><th>용도</th></tr>
+      <tr><th>이름</th><th>값</th><th>globals.css 변수</th><th>역할</th></tr>
       <tr>
+        <td>Paper White</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#faf6ed"></span>#FAF6ED</div></td>
         <td><code>--background</code></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#ffffff"></span>#ffffff</div></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#0b0c10"></span>#0b0c10</div></td>
-        <td>페이지 배경</td>
+        <td>기본 배경(웜 페이퍼 화이트) — 인쇄 용지 느낌, 순백 아님</td>
       </tr>
       <tr>
-        <td><code>--card</code></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#ffffff"></span>#ffffff</div></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#131419"></span>#131419</div></td>
-        <td>카드 표면 (다크에서 배경보다 한 단 밝게 — 계단식 elevation)</td>
+        <td>Ink</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#141311"></span>#141311</div></td>
+        <td><code>--foreground</code> / <code>--input</code></td>
+        <td>본문 텍스트, 룰 라인, 헤더/푸터 경계선 — 순수 검정(<code>#000</code>) 아님</td>
       </tr>
       <tr>
-        <td><code>--muted</code></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#f4f5f7"></span>#f4f5f7</div></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#1a1c22"></span>#1a1c22</div></td>
-        <td>보조 배경, 저강조 영역</td>
+        <td>Ink Secondary</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#4a473f"></span>#4A473F</div></td>
+        <td><code>--foreground-secondary</code></td>
+        <td>서브 카피, 본문 설명</td>
       </tr>
       <tr>
-        <td><code>--primary</code></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#4f46e5"></span>#4f46e5</div></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#6366f1"></span>#6366f1</div></td>
-        <td><strong>단일 포인트 컬러(인디고)</strong> — 버튼, 액티브 상태, 강조 아이콘</td>
+        <td>Ink Tertiary</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#8a8577"></span>#8A8577</div></td>
+        <td>—</td>
+        <td>메타 정보(타임스탬프, 라벨), 비활성 텍스트</td>
       </tr>
       <tr>
-        <td><code>--secondary</code></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#eef0ff"></span>#eef0ff</div></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#1c1b3a"></span>#1c1b3a</div></td>
-        <td>포인트 컬러의 은은한 배경 톤(배지 등)</td>
+        <td>Hairline</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#e4decb"></span>#E4DECB</div></td>
+        <td>—</td>
+        <td>얇은 구분선(1.5px)</td>
       </tr>
       <tr>
-        <td><code>--success</code></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#16803c"></span>#16803c</div></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#34a260"></span>#34a260</div></td>
-        <td rowspan="3"><strong>점수/상태의 의미 색</strong> — 등급별 무지개색이 아니라 좋음/보통/
-          나쁨에 고정 매핑 (<code>score &gt;= 80 ? success : score &gt;= 60 ? warning :
-          destructive</code>)</td>
+        <td><strong>Brand Accent — Signal Orange</strong></td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#ff4b1f"></span>#FF4B1F</div></td>
+        <td>—</td>
+        <td><strong>유일한 브랜드 액센트.</strong> CTA 배경, 헤드라인 하이라이트, 링크, 강조
+          넘버링(01/02/03). 판정 색(아래)과 절대 겹치지 않음</td>
       </tr>
       <tr>
-        <td><code>--warning</code></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#b45309"></span>#b45309</div></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#d69433"></span>#d69433</div></td>
+        <td>Status · Pass</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#3e7d4f"></span>#3E7D4F</div></td>
+        <td rowspan="4">—</td>
+        <td rowspan="4"><strong>판정 시맨틱 색</strong> — 등급별 무지개색이 아니라 4가지 판정에
+          고정 매핑. 상세는 <a href="#status-badges">6절</a></td>
       </tr>
       <tr>
-        <td><code>--destructive</code></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#d1293d"></span>#d1293d</div></td>
-        <td><div class="swatch-row"><span class="swatch" style="background:#e35267"></span>#e35267</div></td>
+        <td>Status · Warn</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#e3a61e"></span>#E3A61E</div></td>
+      </tr>
+      <tr>
+        <td>Status · Fail</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#c81e3a"></span>#C81E3A</div></td>
+      </tr>
+      <tr>
+        <td>Status · Info</td>
+        <td><div class="swatch-row"><span class="swatch" style="background:#6b6659"></span>#6B6659</div></td>
       </tr>
     </table>
+    <p class="sub">전체 팔레트 표는 <a href="design-system.md">design-system.md</a> §2 원문 참고.
+      companion 문서 <a href="colors.md">colors.md</a>/<a href="typography.md">typography.md</a>/
+      <a href="components.md">components.md</a>는 <strong>아직 이전 인디고 버전 기준으로 남아있고
+      이 개편에서 갱신하지 않았습니다</strong> — 지금 참고할 소스는 이 페이지와
+      <code>design-system.md</code> 원문입니다.</p>
 
-    <h3 class="subsection" id="shadow">2.2 그림자</h3>
-    <p><code>--elevation-sm/md/lg</code>를 인디고 색조로 살짝 틴트해서(<code>rgba(45, 39, 130,
-      ...)</code>) 순수 검정 그림자보다 배경과 어우러지게 하고, <code>@theme inline</code>에서
-      Tailwind의 <code>shadow-sm/md/lg</code> 유틸리티에 매핑했습니다.</p>
-    <div class="card">
-      <code>--elevation-sm: 0 1px 2px rgba(30, 27, 75, 0.05);</code><br/>
-      <code>--elevation-md: 0 6px 16px -4px rgba(45, 39, 130, 0.1);</code><br/>
-      <code>--elevation-lg: 0 20px 40px -12px rgba(45, 39, 130, 0.18);</code>
+    <h3 class="subsection" id="typography">2.2 타이포그래피</h3>
+    <table>
+      <tr><th>용도</th><th>서체</th><th>웨이트</th></tr>
+      <tr><td>Display/Headline</td><td>Big Shoulders Display</td><td>700 / 800 / 900 — 굵고 압축된 컨덴스드. 숫자 라벨(01/02/03), 큰 헤드라인, 카드 제목</td></tr>
+      <tr><td>Body/UI</td><td>IBM Plex Sans</td><td>400 / 500 / 600 / 700 — 본문, 라벨, 버튼, 배지 텍스트 전부</td></tr>
+    </table>
+    <div class="callout">
+      <strong>금지</strong> — Inter(범용 SaaS 폰트, 이 톤과 안 맞음), 시스템 기본 서체를 헤드라인에
+      그대로 쓰는 것, 일반 세리프(Times/Georgia/Garamond, 세리프를 쓰면 오히려 전형적인 "에디토리얼
+      템플릿"처럼 보임). 체크리스트 숫자 데이터도 별도 모노스페이스 없이 Big Shoulders Display 굵은
+      웨이트로 — 진단 보고서이지 터미널이 아닙니다.
     </div>
   </section>
 
   <!-- 3. 다크모드 배선 -->
   <section id="dark-mode">
-    <h2>3. 다크모드 배선 <span class="tag">BUGFIX + SYSTEM</span></h2>
+    <h2>3. 다크모드 배선 <span class="tag">SYSTEM</span></h2>
     <div class="card"><code>@custom-variant dark (&amp;:where([data-theme=dark], [data-theme=dark] *));</code></div>
-    <p>이전엔 이 선언이 주석 처리돼 있었습니다. <code>components/ui/*</code>(button/badge/tabs)는
-      이미 Tailwind <code>dark:</code> 클래스로 작성돼 있었는데, 이 변형이 없으면 Tailwind v4
-      기본값인 OS <code>prefers-color-scheme</code>을 따릅니다 — 브라우저 설정이 다크인데 앱의 테마
-      토글은 라이트인 경우 컴포넌트마다 다르게 보이는 <strong>실제 버그</strong>였습니다.</p>
-
+    <p><code>src/css/globals.css</code>에 정의된 이 선언이 Tailwind v4의 <code>dark:</code> 변형을
+      OS <code>prefers-color-scheme</code>이 아니라 <code>data-theme</code> 속성에 매칭시킵니다.</p>
     <ol class="card" style="margin:1rem 0;">
       <li><code>ToggleSetting.tsx</code>에서 사용자가 테마를 토글하면 <code>document.cookie</code>의
-        <code>theme</code> 값을 갱신합니다.</li>
-      <li>서버의 <code>getSiteSetting()</code>이 이 쿠키를 읽어 <code>app/[lang]/layout.tsx</code>가
-        <code>&lt;html data-theme={theme}&gt;</code>를 렌더링합니다.</li>
-      <li><code>data-theme</code> 속성이 <code>@custom-variant dark</code>
-        (<code>[data-theme=dark]</code>)와 매칭됩니다.</li>
+        <code>theme</code> 값을 갱신합니다(<code>setDocumentCookies</code>, <code>utils/cookies.ts</code>).</li>
+      <li>서버의 <code>getSiteSetting()</code>(<code>utils/siteSetting.ts</code>)이 이 쿠키를 읽어
+        <code>app/[lang]/layout.tsx</code>가 <code>&lt;html data-theme={theme}&gt;</code>를
+        렌더링합니다.</li>
+      <li><code>data-theme</code> 속성이 <code>@custom-variant dark</code>(<code>[data-theme=dark]</code>)와 매칭됩니다.</li>
       <li>그 결과 <code>globals.css</code>의 <code>:root[data-theme=dark] { ... }</code> 토큰과
-        <code>components/ui/*</code>/<code>templates/*</code>의 <code>dark:</code> 클래스가 동시에
-        반응해 렌더링됩니다.</li>
+        <code>ui/**/*.tsx</code>의 <code>dark:</code> 클래스가 동시에 반응해 렌더링됩니다.</li>
     </ol>
-    <p class="sub">쿠키를 쓰고 읽는 책임 분리(쓰기=클라이언트, 읽기=서버)는 이번에 바꾸지 않았습니다 —
-      <a href="../architecture/index.html#frontend">아키텍처 페이지</a>의 기존 상태관리 패턴 그대로
-      입니다.</p>
+    <p class="sub">쿠키를 쓰고 읽는 책임 분리(쓰기=클라이언트, 읽기=서버)는 <a href="../architecture/index.html#frontend">아키텍처
+      페이지</a>의 상태관리 패턴과 동일합니다 — 진 인덱스 개편에서도 바뀌지 않았습니다.</p>
   </section>
 
   <!-- 4. 사용 원칙 -->
   <section id="principles">
-    <h2>4. 사용 원칙 <span class="tag">RULES</span></h2>
+    <h2>4. 사용 원칙 · 금지 목록 <span class="tag">RULES</span></h2>
     <ul>
-      <li><strong>포인트 컬러는 하나(인디고)</strong> — 화면마다/카드마다 다른 그라디언트 색을 쓰지
-        않습니다.</li>
-      <li><strong>점수·상태는 항상 success/warning/destructive로 매핑</strong> — 임의 색이 아니라
-        고정 규칙을 따릅니다.</li>
-      <li><strong>그라디언트/blur/glow 금지</strong> — <code>bg-gradient-to-r</code>,
-        <code>backdrop-blur-xl</code>, <code>shadow-*-500/20</code> 같은 장식 효과를 다시 넣지
-        않습니다. 강조가 필요하면 <code>--primary</code> 색상 자체나 그림자 토큰을 씁니다.</li>
-      <li><strong>다크 분기는 <code>dark:</code> 변형으로, 삼항 연산자로 반복하지 않음</strong> —
-        <code>theme === "dark" ? "bg-x" : "bg-y"</code>를 요소마다 나열하는 대신 토큰 클래스
-        (<code>bg-card</code>, <code>text-muted-foreground</code>)를 쓰면 라이트/다크가 CSS 변수
-        레벨에서 자동으로 갈립니다. <code>theme</code>/<code>lang</code> prop 자체는 테마 토글
-        로직·카피 분기에 여전히 필요하므로 계속 내려가지만, 순수 스타일링 목적의 삼항 분기는 새로
-        만들지 않습니다.</li>
+      <li><strong>브랜드 액센트는 하나(Signal Orange)뿐</strong> — 상태 4색(pass/warn/fail/info)은
+        브랜드 액센트가 아니라 별도의 "판정 시맨틱 색"으로 관리합니다.</li>
+      <li><strong>pass/warn/fail은 항상 동일한 무게의 채움 박스</strong>(2026-08-18 결정) — 배지
+        3종 중 하나만 채움 처리하고 나머지를 텍스트색으로만 표시하는 것 금지. <code>info</code>만
+        의도적으로 얇은 외곽선(낮은 무게).</li>
+      <li><strong>브랜드 액센트(오렌지)를 fail 배지 색으로 재사용 금지</strong> — 브랜드와 "실패"
+        판정이 같은 색으로 겹치면 사용자가 오인합니다.</li>
+      <li><strong>Sharp corners만</strong> — 카드/버튼/입력 필드 어디에도 <code>border-radius</code>
+        사용 금지.</li>
+      <li><strong>그림자·글로우·그라디언트·glassmorphism 전면 금지</strong> — <code>backdrop-blur</code>,
+        <code>shadow-*-500/20</code> 같은 장식 효과 없음. 경계는 항상 하드라인 룰로.</li>
+      <li><strong>순수 검정(#000)·순수 회색 무채색 배경 금지</strong> — 항상 웜톤 Ink/Paper 팔레트.</li>
+      <li><strong>이모지를 아이콘으로 사용 금지</strong> — 필요하면 인라인 SVG(스트로크 기반), 없으면
+        텍스트/숫자 라벨로 대체.</li>
+      <li><strong>가짜 통계·조작된 숫자 금지</strong> — ADR-004에서 이미 발견·제거한 패턴(예: 푸터의
+        "SCANS: 247,891"), 재발 금지.</li>
+      <li><strong>스크롤 유도 문구/화살표, "Elevate"·"Seamless"·"Next-Gen" 같은 AI 카피 클리셰 금지.</strong></li>
     </ul>
-    <div class="callout bad">
-      <strong>다시 넣지 말 것</strong> — <code>from-cyan-*</code>/<code>from-purple-*</code>/
-      <code>from-pink-*</code> 그라디언트, <code>Sparkles</code> 장식 아이콘, 조작된 통계 수치(예:
-      <code>SCANS: 247,891</code>). 전부 이번 작업에서 제거된 패턴입니다.
-    </div>
   </section>
 
   <!-- 5. 컴포넌트 패턴 -->
   <section id="components">
     <h2>5. 컴포넌트 패턴 <span class="tag">COMPONENTS</span></h2>
-    <p><code>components/ui/*</code>(shadcn 골격: <code>cva</code> variant → <code>cn()</code> 클래스
-      병합 → <code>data-slot</code>)는 이번에 구조를 바꾸지 않았습니다 — 이미 토큰을 참조하고
-      있었고, 문제는 토큰 값과 <code>dark:</code> 배선 쪽이었기 때문입니다. 새 프리미티브를 추가할 때도
-      이 골격을 그대로 따르세요.</p>
-    <p><code>templates/*</code>의 화면별 컴포넌트는 계속 <code>theme</code>/<code>lang</code>/
-      <code>t</code>를 props로 받는 구조를 유지하되(프롭 드릴링 자체는 이번 작업 범위 밖), 스타일링에
-      한해서만 토큰 + <code>dark:</code> 변형으로 옮겼습니다. 버튼/카드/인풋/모달 같은 프리미티브별
-      상세와 화면 레벨 합성 패턴(StatusBadge, ScoreCard, ProcessStep)은
-      <a href="components.md">components.md</a> 참고.</p>
+    <p>규칙은 <code>design-system.md</code> §4가 소스이고, 실제 구현은
+      <a href="../architecture/index.html#frontend">Atomic Design 5계층</a>(<code>ui/atoms</code>/
+      <code>ui/molecules</code>/<code>ui/organisms</code>)에 반영돼 있습니다. 각 프리미티브 파일
+      자체에 어떤 §를 따르는지 주석으로 명시돼 있어(예: <code>ui/atoms/Rule.tsx</code>가 §5,
+      <code>ui/molecules/StatusBadge.tsx</code>가 §2/§8), 이 페이지와 소스 코드가 서로를 참조합니다.</p>
     <table>
-      <tr><th>영역</th><th>바뀐 것</th><th>안 바뀐 것</th></tr>
-      <tr><td><code>components/ui/*</code></td><td>참조하는 토큰 값(팔레트)</td><td>cva/cn/data-slot 골격, props 인터페이스</td></tr>
-      <tr><td><code>templates/*</code></td><td>스타일링 클래스(토큰 + dark: 변형)</td><td>theme/lang/t props drilling, 화살표 함수 vs function 선언 컨벤션</td></tr>
+      <tr><th>규칙</th><th>구현</th></tr>
+      <tr><td>버튼: 채움 사각형, sharp corners, 그림자 없음, 호버는 배경 톤 다운만</td><td><code>ui/atoms/Button.tsx</code></td></tr>
+      <tr><td>배지(일반 태그/라벨): 채움 사각형, 자간 넓게(<code>tracking-[.04em]</code>)</td><td><code>ui/atoms/Badge.tsx</code></td></tr>
+      <tr><td>판정 배지(pass/warn/fail/info): Badge와 별도 프리미티브, 등가중 채움 + info만 아웃라인</td><td><code>ui/molecules/StatusBadge.tsx</code></td></tr>
+      <tr><td>카드: 그림자 없이 <code>1.5px solid</code> 하드라인 테두리</td><td><code>ui/molecules/Card.tsx</code></td></tr>
+      <tr><td>룰 라인(hairline/thick): 카드 그림자 대신 섹션/컬럼 구분에 사용</td><td><code>ui/atoms/Rule.tsx</code></td></tr>
+      <tr><td>번호 라벨(01/02/03): Big Shoulders Display + 브랜드 액센트</td><td><code>ui/atoms/NumberLabel.tsx</code></td></tr>
+      <tr><td>아코디언(FAQ): +/− 텍스트 토글, 애니메이션 없이 즉시 전환</td><td><code>ui/molecules/Accordion.tsx</code></td></tr>
     </table>
+    <p class="sub">프리미티브 뼈대(<code>cva</code> variant → <code>cn()</code> 클래스 병합 →
+      <code>data-slot</code> 속성 → named export)는 이전 인디고 버전(<code>components/ui/*</code>)에서
+      쓰던 것과 동일한 shadcn 골격이 그대로 유지됩니다 — <a href="../architecture/index.html#frontend">아키텍처
+      페이지</a>의 "UI 프리미티브 골격" 참고. 바뀐 건 참조하는 토큰 값과 룰/하드라인 위주의 시각
+      언어입니다.</p>
   </section>
 
-  <!-- 6. 다루지 않은 것 -->
-  <section id="out-of-scope">
-    <h2>6. 다루지 않은 것 <span class="tag">OUT OF SCOPE</span></h2>
-    <ul>
-      <li><strong>아이콘/모션/카피 톤</strong> — Lucide 아이콘 전량 사용, 정적 트랜지션 등도 "AI 생성
-        티"의 일부로 지적될 수 있지만, 이번 라운드는 색상·그라디언트·다크모드 배선에 집중했습니다.</li>
-      <li><strong><code>/scan</code> 결과 데이터</strong> — 여전히 <code>Math.random()</code>
-        목업입니다. 실데이터 연결(<code>crawling</code> 응답 확장 + 프론트 <code>computeChecklist</code>
-        판정 — <a href="../adr/index.html#adr-003">ADR-003</a>/<a href="../adr/index.html#adr-005">ADR-005</a>
-        결정에 따라 신규 <code>/analyze</code> 엔드포인트는 만들지 않음)은
-        <code>docs/prd/meta-scan-plus-prd.md</code> 스코프이며 이번 디자인 작업과 분리해서 진행하기로
-        확정했습니다.</li>
-      <li><strong>완전 커스텀 루트 404</strong> — <code>/ko/asdf</code>처럼 라우트 자체가 없는 경로는
-        여전히 Next.js 기본 404가 뜹니다. 이 저장소에 진짜 루트 <code>app/layout.tsx</code>가 없어서
-        (<code>app/[lang]/layout.tsx</code>가 사실상 루트 역할) 루트 <code>app/not-found.tsx</code>를
-        추가하려면 레이아웃 구조 자체를 바꿔야 합니다 — 별도 작업으로 분리했습니다.</li>
-    </ul>
+  <!-- 6. 판정 배지 시맨틱 -->
+  <section id="status-badges">
+    <h2>6. 판정 배지 시맨틱 <span class="tag">PRODUCT-SPECIFIC</span></h2>
+    <p>일반적인 디자인 시스템에는 없는, meta-scan 체크리스트 제품의 핵심 규칙입니다(<code>checks[]</code>의
+      <code>pass</code>/<code>warning</code>/<code>fail</code>/<code>info</code> — 점수 합산이
+      아니라는 <a href="../adr/index.html#adr-005">ADR-005</a> 결정과 직접 연결됩니다).</p>
+    <table>
+      <tr><th>상태</th><th>시각</th><th>의미</th><th>톤</th></tr>
+      <tr><td><span class="badge ok">pass</span></td><td>채움 박스, <code>#3E7D4F</code></td><td>통과</td><td>안심</td></tr>
+      <tr><td><span class="badge warn">warning</span></td><td>채움 박스, <code>#E3A61E</code></td><td>경고 — 권장 사항 미충족</td><td>주의, 겁주지 않음</td></tr>
+      <tr><td><span class="badge bad">fail</span></td><td>채움 박스, <code>#C81E3A</code></td><td>실패 — 색인/크롤링에 실질적 영향</td><td>명확한 문제</td></tr>
+      <tr><td><span class="badge none">info</span></td><td>얇은 외곽선만</td><td>있으면 좋은 신호(AEO/GEO 계열 다수) — 없어도 감점 아님</td><td>중립, 정보 제공</td></tr>
+    </table>
+    <p class="sub"><code>info</code>가 시각적으로 가장 가벼운 이유: "없다고 감점"이 아니라 "있으면
+      좋은 신호"를 무료 진단 도구 톤에 맞게 사용자를 겁주지 않고 전달하기 위함입니다
+      (<a href="../prd/index.html">PRD</a> 참고).</p>
   </section>
 
-  <!-- 7. 참고 -->
+  <!-- 7. 이전 버전 -->
+  <section id="previous">
+    <h2>7. 이전 버전 (폐기됨) <span class="tag">HISTORY</span></h2>
+    <p>2026-08-13~08-18 사이 <code>meta-scan-front</code>에 실제 반영돼 있던 버전입니다
+      (<a href="../adr/index.html#adr-004">ADR-004</a>). 화이트/차콜 중립 배경 + 인디고
+      (<code>#4f46e5</code>) 단일 포인트 컬러, 점수/상태는 success/warning/destructive 3색 고정
+      매핑이었습니다 — 그 전(AI가 생성한 cyan→purple→pink 그라디언트, glow, 조작된 통계) 대비 크게
+      개선된 버전이었지만, 이후 체크리스트 결과 화면을 다시 설계하는 과정에서 이 톤 자체가
+      "AI 생성 SaaS 템플릿" 인상을 완전히 벗지 못했다고 판단해 <a href="../adr/index.html#adr-008">ADR-008</a>로
+      진 인덱스 톤에 전면 교체됐습니다.</p>
+    <div class="grid-2">
+      <div class="card">
+        <strong style="color:var(--bad);">ADR-004 (인디고, 폐기)</strong>
+        <ul>
+          <li>화이트/차콜 중립 + 인디고 단일 포인트</li>
+          <li>카드: 둥근 모서리 + 그림자(elevation) 기반 위계</li>
+          <li>점수/상태: success/warning/destructive 3색</li>
+        </ul>
+      </div>
+      <div class="card">
+        <strong style="color:var(--ok);">ADR-008 (진 인덱스, 현재)</strong>
+        <ul>
+          <li>웜 페이퍼 화이트 + Ink + Signal Orange 단일 액센트</li>
+          <li>카드: sharp corners + 하드라인 룰 기반 위계(그림자 없음)</li>
+          <li>판정: pass/warn/fail/info 4색, 동일 무게 채움(info만 아웃라인)</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub">인디고 버전 원문은 <a href="design.md">design.md</a> (companion:
+      <a href="colors.md">colors.md</a>/<a href="typography.md">typography.md</a>/
+      <a href="components.md">components.md</a>) — 자체는 폐기됐지만 "그 이전(AI 그라디언트 테마)에서
+      무엇을 왜 고쳤는가"의 기록으로서는 여전히 유효합니다.</p>
+  </section>
+
+  <!-- 8. 참고 -->
   <section id="ref">
-    <h2>7. 참고 <span class="tag">LINKS</span></h2>
-    <p>이 절의 배경/대안 검토(인디고 톤)는 <a href="../adr/index.html#adr-004">ADR-004</a>
-      (<code>Superseded by ADR-008</code>), 저장소 구조/스택은
+    <h2>8. 참고 <span class="tag">LINKS</span></h2>
+    <p>배경/대안 검토는 <a href="../adr/index.html#adr-004">ADR-004</a>(<code>Superseded by
+      ADR-008</code>) · <a href="../adr/index.html#adr-008">ADR-008</a>(현재), 저장소 구조/스택은
       <a href="../architecture/index.html">아키텍처</a> 페이지를 참고하세요.</p>
-    <p class="sub"><strong>최신 디자인 방향</strong>(진 인덱스+오렌지, 아직 코드 미반영)은
-      <a href="../adr/index.html#adr-008">ADR-008</a> · <a href="design-system.md">docs/design/design-system.md</a>
-      참고.</p>
-    <a class="footer-link" href="design.md">→ docs/design/design.md (인디고 톤 개요 원문, 코드와 일치)</a><br/>
-    <a class="footer-link" href="colors.md">→ colors.md</a><br/>
-    <a class="footer-link" href="typography.md">→ typography.md</a><br/>
-    <a class="footer-link" href="spacing.md">→ spacing.md</a><br/>
-    <a class="footer-link" href="components.md">→ components.md</a><br/>
-    <a class="footer-link" href="design-system.md">→ docs/design/design-system.md (신규 — 진 인덱스+오렌지, ADR-008)</a>
-    <p class="sub" style="margin-top:2rem;">1~7절은 2026-08-13 기준 작업 결과(코드에 실제 반영된 상태)이며,
-      그 이후의 방향 전환은 위 콜아웃과 ADR-008을 참고하세요.</p>
+    <a class="footer-link" href="design-system.md">→ docs/design/design-system.md (현재 — 진 인덱스+오렌지, ADR-008, 코드에 실제 반영됨)</a><br/>
+    <a class="footer-link" href="intake/zine-index-full/spec.md">→ design/intake/zine-index-full/spec.md (아트보드별 인테이크 스펙)</a><br/>
+    <a class="footer-link" href="design.md">→ design.md (이전 버전 — 인디고, ADR-004, 폐기됨)</a><br/>
+    <a class="footer-link" href="colors.md">→ colors.md (이전 버전 기준, 미갱신)</a><br/>
+    <a class="footer-link" href="typography.md">→ typography.md (이전 버전 기준, 미갱신)</a><br/>
+    <a class="footer-link" href="spacing.md">→ spacing.md (이전 버전 기준, 미갱신)</a><br/>
+    <a class="footer-link" href="components.md">→ components.md (이전 버전 기준, 미갱신)</a>
+    <p class="sub" style="margin-top:2rem;">이 페이지는 2026-08-25 기준 저장소 스캔 결과이며, 코드가
+      바뀌면 내용도 함께 갱신이 필요합니다.</p>
   </section>
 
 </main>
