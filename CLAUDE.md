@@ -221,7 +221,12 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
   Adapters) 3계층 채택 — 전체 후보 조사는 `docs/case-study/backend-architecture-survey.md`, 원문은
   `docs/case-study/backend-hexagonal-architecture.md`; entities 계층은 PRD 체크리스트 명세 확인 후
   불필요하다고 판단해 안 만듦; 2026-08-21 `meta-scan-api` 코드에 실제 반영 완료 — `ScanService`
-  등 God 클래스 분리·`runChecks` 도메인 추출은 후속 작업으로 남음). 새 결정이 생기면
+  등 God 클래스 분리·`runChecks` 도메인 추출은 후속 작업으로 남음), ADR-012(테스트 러너로
+  `meta-scan-front`는 Jest, `meta-scan-api`는 Vitest를 패키지별로 다르게 채택 — 기술적으로는
+  두 패키지 다 Vitest가 더 효율적이라고 조사됐지만(`docs/case-study/test-runner-survey.md`), 이
+  프로젝트가 학습을 겸하고 있어 프론트/백엔드에서 서로 다른 러너를 각각 경험하는 쪽을 사용자가
+  의도적으로 선택; 2026-08-24 결정, 아직 실제 도입(devDependency 추가·설정 파일 작성)은 안 함 —
+  `docs/harness/tdd-issue-loop.md`의 TDD 이슈 루프가 이 러너들을 쓸 예정). 새 결정이 생기면
   여기 계속 추가. **작성 규칙(페이지 상단 "ADR 작성 규칙" 카드)**: `Accepted`가 된 ADR의 본문(배경/
   결정/대안/결과)과 최초 작성일은 append-only — 다시 쓰지 않습니다. 방향이 바뀌면 새 번호의 ADR을
   추가하고, 기존 ADR은 상태 배지 변경 + 카드 맨 아래 "변경 이력"에 날짜와 사유만 한 줄 추가하세요.
