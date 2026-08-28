@@ -10,7 +10,7 @@ export const scanSiteMapApi = async (data: UrlData) =>
   await instance.post<SiteMapData>("/api/v1/scan/siteMap", data);
 
 export const scanCrawlingApi = async (data: UrlData) =>
-  await instance.post<unknown>("/api/v1/scan/crawling", data);
+  await instance.post<CrawlingScanData>("/api/v1/scan/crawling", data);
 
 export const lsRunApi = async (data: UrlData) =>
   await instance.post<unknown>("/api/v1/lighthouse/run", {
