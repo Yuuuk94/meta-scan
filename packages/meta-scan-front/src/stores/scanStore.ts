@@ -7,8 +7,10 @@ import { persist } from "zustand/middleware";
 // 스토어 구조 변경"), so re-scanning the same URL never overwrites a
 // previously shared /scan/:id link.
 
-/** 10 minutes — spec-fixed.md req #3. Filtered at read time (getScanResult),
- * not cleaned up eagerly on write. */
+/** 10 minutes — spec-fixed.md req #3. Filtered at read time (getScanResult)
+ * and pruned at write time (saveScanResult) so expired entries don't sit
+ * in localStorage indefinitely (each entry can carry a full Lighthouse
+ * report body, so unbounded growth risks hitting the per-origin quota). */
 export const SCAN_RESULT_TTL_MS = 10 * 60 * 1000;
 
 interface ScanStoreState {
@@ -27,9 +29,16 @@ export const useScanStore = create<ScanStoreState>()(
       saveScanResult: (entry) => {
         const id = crypto.randomUUID();
         const scannedAt = Date.now();
-        set((state) => ({
-          results: { ...state.results, [id]: { ...entry, scannedAt } },
-        }));
+        set((state) => {
+          const fresh = Object.fromEntries(
+            Object.entries(state.results).filter(
+              ([, v]) => scannedAt - v.scannedAt <= SCAN_RESULT_TTL_MS
+            )
+          );
+          return {
+            results: { ...fresh, [id]: { ...entry, scannedAt } },
+          };
+        });
         return id;
       },
       getScanResult: (id) => {

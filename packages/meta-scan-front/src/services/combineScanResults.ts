@@ -52,6 +52,7 @@ function buildTopIssues(
 }
 
 export function combineScanResults(
+  url: string,
   raw: RawScanResponses,
   topIssuesLimit: number = DEFAULT_TOP_ISSUES_LIMIT
 ): CombinedScanResult {
@@ -62,7 +63,10 @@ export function combineScanResults(
   const extract = raw.crawling?.extract;
 
   return {
-    url: raw.crawling?.url ?? raw.robotsTxt?.url ?? raw.siteMap?.url,
+    // The scanned page's URL, passed in explicitly by the caller — not
+    // derived from raw.robotsTxt.url/raw.siteMap.url, which are the
+    // fetched *resource* URLs (…/robots.txt, …/sitemap.xml), not the page.
+    url,
     title: extract?.title,
     description: extract?.description,
     canonical: extract?.canonical,

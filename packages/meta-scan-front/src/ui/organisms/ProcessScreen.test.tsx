@@ -142,4 +142,19 @@ describe("ProcessScreen robots.txt 게이팅 (ADR-006, 이슈 #1)", () => {
     expect(mockedCrawling).not.toHaveBeenCalled();
     expect(mockedLsRun).not.toHaveBeenCalled();
   });
+
+  it("renders ErrorScreen instead of throwing when robotsTxt resolves 2xx with an empty body", async () => {
+    mockedRobotsTxt.mockResolvedValue({ data: null });
+
+    renderScreen();
+
+    await waitFor(() =>
+      expect(screen.getByText(t.errorTitle)).toBeInTheDocument(),
+    );
+
+    expect(screen.queryByText(t.blockedTitle)).not.toBeInTheDocument();
+    expect(mockedSiteMap).not.toHaveBeenCalled();
+    expect(mockedCrawling).not.toHaveBeenCalled();
+    expect(mockedLsRun).not.toHaveBeenCalled();
+  });
 });

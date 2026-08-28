@@ -79,4 +79,19 @@ describe("useScanStore", () => {
   it("getScanResult returns undefined for an unknown id", () => {
     expect(useScanStore.getState().getScanResult("does-not-exist")).toBeUndefined();
   });
+
+  it("saveScanResult prunes expired entries from the store, not just from getScanResult reads", () => {
+    jest.useFakeTimers().setSystemTime(0);
+    const staleId = useScanStore.getState().saveScanResult(entryFixture);
+
+    jest.setSystemTime(SCAN_RESULT_TTL_MS + 1);
+    const freshId = useScanStore.getState().saveScanResult(entryFixture);
+
+    // Not just unreadable via getScanResult — actually gone from the
+    // underlying map, so it can't sit in localStorage indefinitely.
+    expect(useScanStore.getState().results[staleId]).toBeUndefined();
+    expect(useScanStore.getState().results[freshId]).toBeDefined();
+
+    jest.useRealTimers();
+  });
 });

@@ -104,8 +104,14 @@ export function ProcessScreen({
       try {
         const res = await scanRobotsTxtApi(data);
         robotsTxtResult = res.data;
+        if (!robotsTxtResult) {
+          // A 2xx with an empty/null body (malformed proxy, unexpected
+          // content-type) — treat the same as a network failure rather
+          // than let shouldBlockScan dereference an undefined value.
+          throw new Error("robotsTxt API returned an empty response");
+        }
         raw.robotsTxt = robotsTxtResult;
-        processCallback(robotsTxtResult?.status === okStatus, 0);
+        processCallback(robotsTxtResult.status === okStatus, 0);
       } catch (e) {
         console.error(e);
         setScreenState("error");
@@ -149,7 +155,7 @@ export function ProcessScreen({
         }
 
         const rawResponses = raw as unknown as RawScanResponses;
-        const combined = combineScanResults(rawResponses);
+        const combined = combineScanResults(siteStatus.url, rawResponses);
         const id = saveScanResult({
           url: siteStatus.url,
           raw: rawResponses,

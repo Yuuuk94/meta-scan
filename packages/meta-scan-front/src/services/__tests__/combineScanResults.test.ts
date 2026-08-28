@@ -32,13 +32,14 @@ const siteMap: SiteMapData = { status: "ok", has: true, url: "https://example.co
 
 describe("combineScanResults", () => {
   it("merges already-judged fields from the 4 raw responses without recomputing them", () => {
-    const combined = combineScanResults({
+    const combined = combineScanResults("https://example.com", {
       robotsTxt,
       siteMap,
       crawling,
       lighthouse: { fake: "lhr" },
     });
 
+    expect(combined.url).toBe("https://example.com");
     expect(combined.title).toBe("Example Domain");
     expect(combined.description).toBe("An example page");
     expect(combined.canonical).toBe("https://example.com");
@@ -50,7 +51,7 @@ describe("combineScanResults", () => {
   });
 
   it("marks null raw responses as failed APIs", () => {
-    const combined = combineScanResults({
+    const combined = combineScanResults("https://example.com", {
       robotsTxt,
       siteMap: null,
       crawling: null,
@@ -61,6 +62,9 @@ describe("combineScanResults", () => {
       expect.arrayContaining(["siteMap", "crawling", "lighthouse"])
     );
     expect(combined.failedApis).not.toContain("robotsTxt");
+    // Must stay the scanned page's URL even when crawling failed — not
+    // silently fall back to robotsTxt/siteMap's own fetch URLs.
+    expect(combined.url).toBe("https://example.com");
   });
 
   it("builds topIssues fail-first, backfilled with warning, capped at 3 by default", () => {
@@ -75,7 +79,7 @@ describe("combineScanResults", () => {
       ],
     };
 
-    const combined = combineScanResults({
+    const combined = combineScanResults("https://example.com", {
       robotsTxt,
       siteMap,
       crawling: manyIssues,
@@ -94,7 +98,7 @@ describe("combineScanResults", () => {
       checks: [{ id: "info1", level: "info", message: "i1" }],
     };
 
-    const combined = combineScanResults({
+    const combined = combineScanResults("https://example.com", {
       robotsTxt,
       siteMap,
       crawling: clean,
