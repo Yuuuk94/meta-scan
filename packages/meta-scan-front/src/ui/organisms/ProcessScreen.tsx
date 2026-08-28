@@ -9,14 +9,15 @@ import {
   scanRobotsTxtApi,
   scanSiteMapApi,
 } from "@/api/scanApi";
+import { shouldBlockScan } from "@/services/scanGating";
+import { BlockedScreen } from "@/ui/organisms/BlockedScreen";
+import { ErrorScreen } from "@/ui/organisms/ErrorScreen";
 import { ProcessStep } from "@/ui/molecules/ProcessStep";
 
-const promistList = [
-  scanRobotsTxtApi,
-  scanSiteMapApi,
-  scanCrawlingApi,
-  lsRunApi,
-];
+// robots.txt (index 0) is always awaited alone first (ADR-006 pre-check
+// gating) — the remaining 3 only fire once its verdict is known to be
+// non-blocking. Index stays aligned with `stepIds`/`t.steps` below.
+const remainingApiList = [scanSiteMapApi, scanCrawlingApi, lsRunApi];
 
 // The design's step grid has exactly 4 tiles, one per real scan API
 // (robots.txt/sitemap.xml/crawling+AI/lighthouse) — the "site is reachable"
@@ -39,6 +40,12 @@ export function ProcessScreen({
   const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>(
     Array(stepIds.length).fill(null)
   );
+  // "processing" = existing step-tile grid, "blocked" = ADR-006 hard block
+  // (BlockedScreen), "error" = robotsTxt call itself failed (ErrorScreen,
+  // distinct from an explicit disallow verdict — issue #1 requirement #5).
+  const [screenState, setScreenState] = useState<
+    "processing" | "blocked" | "error"
+  >("processing");
   const didRunRef = useRef(false);
 
   useEffect(() => {
@@ -57,9 +64,26 @@ export function ProcessScreen({
         state.map((v, i) => (i === idx ? value : v))
       );
     };
-    const process = async () =>
+
+    const process = async () => {
+      let robotsTxtResult: RobotsTxtData;
+      try {
+        const res = await scanRobotsTxtApi(data);
+        robotsTxtResult = res.data;
+        processCallback(robotsTxtResult?.status === okStatus, 0);
+      } catch (e) {
+        console.error(e);
+        setScreenState("error");
+        return;
+      }
+
+      if (shouldBlockScan(robotsTxtResult)) {
+        setScreenState("blocked");
+        return;
+      }
+
       await Promise.allSettled(
-        promistList.map((promise, idx) =>
+        remainingApiList.map((promise, idx) =>
           promise(data)
             .then((res) => {
               processCallback(
@@ -67,7 +91,7 @@ export function ProcessScreen({
                   (res.data as OkStatus).status === okStatus
                   ? true
                   : false,
-                idx
+                idx + 1
               );
               return res;
             })
@@ -83,9 +107,18 @@ export function ProcessScreen({
         );
         router.replace("/scan");
       });
+    };
 
     process();
   }, []);
+
+  if (screenState === "error") {
+    return <ErrorScreen theme={theme} lang={lang} t={t} />;
+  }
+
+  if (screenState === "blocked") {
+    return <BlockedScreen t={t} url={siteStatus.url} />;
+  }
 
   return (
     <div className="content-frame flex flex-col items-center gap-7 py-16 text-center">
