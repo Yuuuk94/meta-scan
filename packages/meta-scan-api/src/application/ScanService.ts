@@ -7,7 +7,7 @@ import type {
   PuppeteerProcess,
 } from "@/domain/ports/BrowserAutomationPort.js";
 import crypto from "node:crypto";
-import { DESC_MAX, DESC_MIN, TITLE_MAX, TITLE_MIN } from "@/constant/meta.js";
+import { buildBasicSeoChecks } from "@/domain/checks/basicSeoChecks.js";
 
 export class ScanService {
   constructor(private readonly chrome: BrowserAutomationPort) {}
@@ -280,137 +280,6 @@ export class ScanService {
     };
   }
 
-  private runChecks(
-    url: string,
-    ext: Awaited<ReturnType<typeof this.getOnloadHtml>>["extracted"]
-  ): MetaScanResult["checks"] {
-    const checks: MetaScanResult["checks"] = [];
-
-    const title = norm(ext.title);
-    const desc = norm(ext.description);
-
-    if (!title) {
-      checks.push({
-        id: "title.missing",
-        level: "error",
-        message: "title 태그가 없습니다.",
-        target: "title",
-      });
-    } else if (title.length < TITLE_MIN || title.length > TITLE_MAX) {
-      checks.push({
-        id: "title.length",
-        level: "warn",
-        message: `title 길이 비권장(${title.length}자). 권장: ${TITLE_MIN}–${TITLE_MAX}자.`,
-        target: "title",
-      });
-    }
-
-    if (!desc) {
-      checks.push({
-        id: "desc.missing",
-        level: "warn",
-        message: "meta[name=description]이 없습니다.",
-        target: "description",
-      });
-    } else if (desc.length < DESC_MIN || desc.length > DESC_MAX) {
-      checks.push({
-        id: "desc.length",
-        level: "warn",
-        message: `description 길이 비권장(${desc.length}자). 권장: ${DESC_MIN}–${DESC_MAX}자.`,
-        target: "description",
-      });
-    }
-
-    if (ext.keywords) {
-      checks.push({
-        id: "keywords.deprecated",
-        level: "info",
-        message: "meta[name=keywords]는 현대 SEO에서 비권장입니다.",
-        target: "keywords",
-      });
-    }
-
-    if (
-      !ext.openGraph["og:title"] ||
-      !ext.openGraph["og:description"] ||
-      !ext.openGraph["og:image"]
-    ) {
-      checks.push({
-        id: "og.missing_core",
-        level: "warn",
-        message:
-          "Open Graph 핵심 태그(og:title/og:description/og:image) 일부가 없습니다.",
-        target: "openGraph",
-      });
-    }
-
-    if (!ext.twitter["twitter:card"]) {
-      checks.push({
-        id: "twitter.missing_card",
-        level: "info",
-        message: "Twitter Card(twitter:card)가 없습니다.",
-        target: "twitter",
-      });
-    }
-
-    if (!ext.canonical) {
-      checks.push({
-        id: "canonical.missing",
-        level: "info",
-        message: "Canonical 링크가 없습니다.",
-        target: "canonical",
-      });
-    } else if (/^\/(?!\/)/.test(ext.canonical)) {
-      checks.push({
-        id: "canonical.relative",
-        level: "info",
-        message: "Canonical이 상대경로입니다. 절대경로를 권장합니다.",
-        target: "canonical",
-      });
-    }
-
-    if (ext.h1.length === 0) {
-      checks.push({
-        id: "h1.none",
-        level: "warn",
-        message: "H1 태그가 없습니다.",
-        target: "h1",
-      });
-    } else if (ext.h1.length > 1) {
-      checks.push({
-        id: "h1.multiple",
-        level: "info",
-        message: `H1 태그가 ${ext.h1.length}개입니다. 1개 권장(정보구조 따라 예외 가능).`,
-        target: "h1",
-      });
-    }
-
-    if (ext.images.altMissing > 0) {
-      checks.push({
-        id: "img.alt_missing",
-        level: "warn",
-        message: `ALT 누락 이미지 ${ext.images.altMissing}개.`,
-        target: "img",
-      });
-    }
-
-    if (
-      ext.duplicates.metaName.length > 0 ||
-      ext.duplicates.metaProperty.length > 0
-    ) {
-      const names = ext.duplicates.metaName.join(", ");
-      const props = ext.duplicates.metaProperty.join(", ");
-      checks.push({
-        id: "meta.duplicate",
-        level: "info",
-        message: `중복 메타 태그 감지 name[${names}] property[${props}]`,
-        target: "meta",
-      });
-    }
-
-    return checks;
-  }
-
   async crawling({ url }: UrlBody) {
     let proc: PuppeteerProcess | undefined;
     try {
@@ -444,10 +313,10 @@ export class ScanService {
           twitter: onload.extracted.twitter,
           duplicates: onload.extracted.duplicates,
         },
-        checks: [],
+        checks: { basicSeo: [] },
       };
 
-      result.checks = this.runChecks(url, onload.extracted);
+      result.checks.basicSeo = buildBasicSeoChecks(onload.extracted);
       return result;
     } catch (e) {
       throw ApiError.internal();
@@ -481,10 +350,6 @@ function patternToRegex(pattern: string) {
 
 function sha1(s: string) {
   return crypto.createHash("sha1").update(s).digest("hex");
-}
-
-function norm(s?: string | null) {
-  return (s ?? "").trim().replace(/\s+/g, " ");
 }
 
 function ratio(a: number, b: number) {
