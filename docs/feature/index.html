@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>meta-scan 기능 인덱스</title>
+<style>
+  :root {
+    --bg: #1a1a1a; --bg-card: #232323; --bg-card-2: #1f1f1f; --border: #3a3a3a;
+    --text: #eee; --text-dim: #a3a3a3; --accent: #5b9bd9; --accent-2: #5b9bd9;
+    --ok: #4fae66; --warn: #d6a53a; --bad: #d9706f; --none: #7d8590;
+    --topbar-h: 3.2rem;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", sans-serif; margin: 0; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:visited { color: var(--accent); }
+  a:hover { opacity: 0.85; }
+  .topbar { position: sticky; top: 0; z-index: 20; height: var(--topbar-h); display: flex; align-items: center; gap: 0.3rem; padding: 0 1.2rem; background: var(--bg-card-2); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .topbar .brand { font-weight: 700; color: var(--text); margin-right: 1rem; font-size: 0.9rem; white-space: nowrap; }
+  .topbar a { color: var(--text-dim); text-decoration: none; font-size: 0.83rem; padding: 0.4rem 0.8rem; border-radius: 6px; white-space: nowrap; }
+  .topbar a:hover { background: #2c2c2c; color: var(--text); }
+  .topbar a.active { background: rgba(91,155,217,0.15); color: var(--accent); font-weight: 600; }
+  main { max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem 6rem; }
+  header.page-header { margin-bottom: 2rem; }
+  header.page-header h1 { font-size: 1.8rem; margin: 0 0 0.4rem; }
+  header.page-header p { color: var(--text-dim); margin: 0; font-size: 0.95rem; line-height: 1.7; }
+  h3 { font-size: 1.05rem; color: var(--accent-2); margin: 0 0 0.3rem; }
+  h4 { font-size: 0.92rem; color: var(--accent-2); margin: 1.3rem 0 0.5rem; }
+  p { line-height: 1.7; color: #d4d4d4; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.4rem 1.6rem; margin: 1.4rem 0; scroll-margin-top: calc(var(--topbar-h) + 1rem); }
+  .cat-meta { color: var(--text-dim); font-size: 0.82rem; margin: 0 0 1rem; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; font-size: 0.85rem; }
+  th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--text-dim); font-weight: 600; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  td.slug code, .slug-only { white-space: nowrap; }
+  code { background: #2a2a2a; padding: 0.12rem 0.4rem; border-radius: 4px; font-size: 0.85em; color: #f3f3f3; }
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; white-space: nowrap; }
+  .badge.ok { background: rgba(79,174,102,0.15); color: var(--ok); }
+  .badge.warn { background: rgba(214,165,58,0.15); color: var(--warn); }
+  .badge.bad { background: rgba(217,112,111,0.15); color: var(--bad); }
+  .badge.none { background: rgba(125,133,144,0.2); color: #9ca3af; }
+  .scope-tag { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.6rem; border-radius: 6px; margin-left: 0.5rem; vertical-align: middle; }
+  .scope-tag.in { background: rgba(91,155,217,0.15); color: var(--accent); }
+  .scope-tag.out { background: rgba(125,133,144,0.2); color: #9ca3af; }
+  ul, ol { line-height: 1.8; color: #d4d4d4; }
+  .sub { color: var(--text-dim); font-size: 0.85rem; }
+  .note { border-left: 3px solid var(--accent); padding: 0.2rem 0 0.2rem 0.9rem; margin: 0.9rem 0; color: #c9c9c9; font-size: 0.86rem; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">meta-scan docs</span>
+  <a href="../index.html">허브</a>
+  <a href="../prd/index.html">PRD · 기획</a>
+  <a href="../feature/index.html" class="active">기능 인덱스</a>
+  <a href="../design/index.html">디자인 시스템</a>
+  <a href="../architecture/index.html">아키텍처</a>
+  <a href="../adr/index.html">ADR</a>
+</div>
+
+<main>
+  <header class="page-header">
+    <h1>기능 인덱스 (Feature Index)</h1>
+    <p>meta-scan이 가져야 할 기능 전체를 개발 진행 상태와 무관하게 <strong>수직 슬라이스</strong> 단위로
+      분류한 목록입니다. GitHub Issue로 등록하기 전 스펙의 원재료이며(<code>docs/harness/tdd-issue-loop.md</code>
+      참고), 마이그레이션·추가 개발 시 "지금 뭐가 있고 뭐가 없는지"를 확인하는 참고 자료이기도 합니다.</p>
+  </header>
+
+  <div class="note">
+    현재 상태: 23개 슬라이스 전부 <code>spec.md</code> 작성 + 검토(질문/답변 방식) 완료 — 확정본은
+    <code>spec-fixed.md</code>(아래 슬러그 링크가 가리키는 파일)이며, 검토 과정의 결정 로그도 함께
+    담겨 있습니다. GitHub Issue로 등록해 <code>/tdd-issue-loop</code>로 처리할 수 있는 상태입니다.
+  </div>
+
+  <h4 style="margin-top:2rem;">카테고리 5개</h4>
+  <table>
+    <tr><th>#</th><th>카테고리</th><th>범위</th><th>슬라이스 수</th></tr>
+    <tr><td>1</td><td><a href="#cat-1">SEO/AEO/GEO 체커</a></td><td><span class="scope-tag in">이번 스코프</span></td><td>11</td></tr>
+    <tr><td>2</td><td><a href="#cat-2">FAQ 스키마 생성기</a></td><td><span class="scope-tag out">스코프 제외</span></td><td>1</td></tr>
+    <tr><td>3</td><td><a href="#cat-3">공통 기능/UI</a></td><td>인프라</td><td>5</td></tr>
+    <tr><td>4</td><td><a href="#cat-4">메인/랜딩 페이지</a></td><td>인프라 + 이번 스코프(자체 SEO)</td><td>4</td></tr>
+    <tr><td>5</td><td><a href="#cat-5">수익화</a></td><td>확인 필요</td><td>2</td></tr>
+  </table>
+
+  <!-- ===================== 1. SEO/AEO/GEO 체커 ===================== -->
+  <div class="card" id="cat-1">
+    <h3>1. SEO/AEO/GEO 체커 <span class="scope-tag in">이번 스코프</span></h3>
+    <p class="cat-meta">meta-scan의 핵심 제품 — URL을 스캔해 SEO/AEO 체크리스트(pass/warning/fail/info)를
+      보여주는 흐름 전체. PRD §2~§7 기준.</p>
+    <table>
+      <tr><th>슬러그</th><th>설명</th><th>상태</th></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/scan-input/spec-fixed.md">scan-input</a></code></td><td>URL 입력→검증→쿠키저장→<code>/request-scan</code> 이동</td><td><span class="badge ok">완료</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/site-reachability-check/spec-fixed.md">site-reachability-check</a></code></td><td>ping 확인→진행/에러화면</td><td><span class="badge ok">완료</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/robots-gating/spec-fixed.md">robots-gating</a></code></td><td>robots.txt 비허용 시 하드 차단 (ADR-006)</td><td><span class="badge bad">미구현</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/pipe-connection/spec-fixed.md">pipe-connection</a></code></td><td>4개 API 응답 저장 + 취합 + 스토어 + Hero 교체 (걷기 골격)</td><td><span class="badge bad">미구현</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/basic-seo-checklist/spec-fixed.md">basic-seo-checklist</a></code></td><td>title/desc/keywords/img alt/중복meta</td><td><span class="badge warn">판정 완료, 카드 미연결</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/indexing-checklist/spec-fixed.md">indexing-checklist</a></code></td><td>sitemap/robots선언/canonical/noindex</td><td><span class="badge warn">절반 구현</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/previews-checklist/spec-fixed.md">previews-checklist</a></code></td><td>OG/Twitter+og:image크기+favicon+카드 미리보기</td><td><span class="badge warn">OG/Twitter만 구현</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/ai-signals-checklist/spec-fixed.md">ai-signals-checklist</a></code></td><td>prompts.txt/구조화데이터/FAQ섹션/JS렌더링의존도 — 핵심 차별화</td><td><span class="badge bad">전부 미구현</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/content-stats-checklist/spec-fixed.md">content-stats-checklist</a></code></td><td>단어수/헤딩계층/TL;DR</td><td><span class="badge bad">h1만 구현</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/i18n-ux-checklist/spec-fixed.md">i18n-ux-checklist</a></code></td><td>hreflang/viewport</td><td><span class="badge bad">전부 미구현</span></td></tr>
+      <tr><td class="slug"><code><a href="01-seo-aeo-geo-checker/lighthouse-suggestions/spec-fixed.md">lighthouse-suggestions</a></code></td><td>4개 점수(카테고리 버그 있음) + <code>lhr.audits</code> 개선 제안 카드 (ADR-007)</td><td><span class="badge warn">부분 구현</span></td></tr>
+    </table>
+    <p class="sub">권장 순서: <code>robots-gating</code> → <code>pipe-connection</code> → 나머지 6개
+      체크리스트(서로 독립, <code>content-stats-checklist</code>만 <code>basic-seo-checklist</code>의
+      h1 판정을 흡수하므로 그 이후 권장) → <code>lighthouse-suggestions</code>.
+      <code>scan-result-shell</code>은 별도 슬라이스로 두지 않고 <code>pipe-connection</code>에
+      흡수했습니다.</p>
+  </div>
+
+  <!-- ===================== 2. FAQ 스키마 생성기 ===================== -->
+  <div class="card" id="cat-2">
+    <h3>2. FAQ 스키마 생성기 <span class="scope-tag out">스코프 제외</span></h3>
+    <p class="cat-meta">체커가 "FAQ/PromptObject 신호 없음"을 진단하면, <em>스캔 대상 사이트</em>의 실제
+      콘텐츠 기반으로 <code>FAQPage</code> JSON-LD를 생성해 처방까지 이어주는 후속 제품. PRD §10.</p>
+    <table>
+      <tr><th>슬러그</th><th>설명</th><th>상태</th></tr>
+      <tr><td class="slug"><code><a href="02-faq-schema-generator/faq-schema-generator/spec-fixed.md">faq-schema-generator</a></code></td><td>스캔 대상 사이트를 위한 FAQ 스키마 생성 도구</td><td><span class="badge none">계획만 있음</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ===================== 3. 공통 기능/UI ===================== -->
+  <div class="card" id="cat-3">
+    <h3>3. 공통 기능/UI</h3>
+    <p class="cat-meta">모든 페이지에 공통으로 적용되는 셸/인프라 기능.</p>
+    <table>
+      <tr><th>슬러그</th><th>설명</th><th>상태</th></tr>
+      <tr><td class="slug"><code><a href="03-common-ui/theme-toggle/spec-fixed.md">theme-toggle</a></code></td><td>다크/라이트 테마 전환</td><td><span class="badge ok">완료</span></td></tr>
+      <tr><td class="slug"><code><a href="03-common-ui/language-switcher/spec-fixed.md">language-switcher</a></code></td><td>한/영 언어 전환</td><td><span class="badge ok">완료</span></td></tr>
+      <tr><td class="slug"><code><a href="03-common-ui/service-status/spec-fixed.md">service-status</a></code></td><td>API 서버 생존 상태 뱃지(ONLINE/WARNING)</td><td><span class="badge ok">완료</span></td></tr>
+      <tr><td class="slug"><code><a href="03-common-ui/header-footer-shell/spec-fixed.md">header-footer-shell</a></code></td><td>헤더/푸터 조립(워드마크, 정책 링크 등)</td><td><span class="badge ok">완료</span></td></tr>
+      <tr><td class="slug"><code><a href="03-common-ui/static-legal-pages/spec-fixed.md">static-legal-pages</a></code></td><td>개인정보처리방침/이용약관 정적 페이지</td><td><span class="badge ok">완료</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ===================== 4. 메인/랜딩 페이지 ===================== -->
+  <div class="card" id="cat-4">
+    <h3>4. 메인/랜딩 페이지</h3>
+    <p class="cat-meta">기획·디자인·퍼블이 이미 끝난 섹션(재문서화 불필요)과, meta-scan 자기 자신의
+      SEO 기반(아직 비어있는 것으로 확인됨)으로 나뉩니다.</p>
+    <table>
+      <tr><th>슬러그</th><th>설명</th><th>상태</th></tr>
+      <tr><td class="slug"><code><a href="04-landing-page/process-explainer/spec-fixed.md">process-explainer</a></code></td><td>메인페이지 "작동 방식" 4단계 설명</td><td><span class="badge ok">완료</span></td></tr>
+      <tr><td class="slug"><code><a href="04-landing-page/faq-section/spec-fixed.md">faq-section</a></code></td><td>메인페이지 FAQ 아코디언</td><td><span class="badge ok">완료</span></td></tr>
+      <tr><td class="slug"><code><a href="04-landing-page/site-seo-basics/spec-fixed.md">site-seo-basics</a></code></td><td>meta-scan 자체 <code>sitemap.xml</code> + <code>robots.txt</code> (Next.js 라우트 핸들러)</td><td><span class="badge bad">미구현</span></td></tr>
+      <tr><td class="slug"><code><a href="04-landing-page/site-faq-schema/spec-fixed.md">site-faq-schema</a></code></td><td>meta-scan 자체 FAQ 섹션에 <code>FAQPage</code> JSON-LD 추가</td><td><span class="badge bad">미구현</span></td></tr>
+    </table>
+    <p class="sub"><code>site-faq-schema</code>는 <a href="#cat-2">카테고리 2</a>의
+      <code>faq-schema-generator</code>(스캔 대상 사이트를 위한 도구)와 다른 기능입니다 —
+      이쪽은 meta-scan 자기 자신의 FAQ 섹션에 스키마를 다는 것.</p>
+  </div>
+
+  <!-- ===================== 5. 수익화 ===================== -->
+  <div class="card" id="cat-5">
+    <h3>5. 수익화</h3>
+    <p class="cat-meta">PRD §8은 "이번 스코프의 구현 대상은 아니지만 레이아웃 설계 시 자리만 고려"라고
+      명시하는데, 최근 초안 메모엔 "이번 스코프"로 적혀 있어 상충됩니다 — <strong>스코프 여부 확인
+      필요</strong>.</p>
+    <table>
+      <tr><th>슬러그</th><th>설명</th><th>상태</th></tr>
+      <tr><td class="slug"><code><a href="05-monetization/adsense-integration/spec-fixed.md">adsense-integration</a></code></td><td>Google 애드센스 슬롯 삽입</td><td><span class="badge bad">미구현</span></td></tr>
+      <tr><td class="slug"><code><a href="05-monetization/analytics-integration/spec-fixed.md">analytics-integration</a></code></td><td>애널리틱스 연동 (PRD에 언급 없음)</td><td><span class="badge bad">미구현</span></td></tr>
+    </table>
+  </div>
+
+  <p class="sub" style="margin-top:2.5rem;">작성 시점: 2026-08-28. append-only가 아니라 현재 상태를
+    반영하는 살아있는 문서입니다 — 슬라이스가 추가/변경되면 이 페이지도 함께 갱신하세요. 원본 폴더:
+    <code>docs/feature/</code>.</p>
+</main>
+</body>
+</html>
