@@ -13,17 +13,35 @@ import { shouldBlockScan } from "@/services/scanGating";
 import { BlockedScreen } from "@/ui/organisms/BlockedScreen";
 import { ErrorScreen } from "@/ui/organisms/ErrorScreen";
 import { ProcessStep } from "@/ui/molecules/ProcessStep";
+import { combineScanResults } from "@/services/combineScanResults";
+import { useScanStore } from "@/stores/scanStore";
 
 // robots.txt (index 0) is always awaited alone first (ADR-006 pre-check
 // gating) — the remaining 3 only fire once its verdict is known to be
 // non-blocking. Index stays aligned with `stepIds`/`t.steps` below.
 const remainingApiList = [scanSiteMapApi, scanCrawlingApi, lsRunApi];
 
+// Order-matched to promistList — which raw-response key each call's body
+// gets stored under.
+const rawKeys: (keyof RawScanResponses)[] = [
+  "robotsTxt",
+  "siteMap",
+  "crawling",
+  "lighthouse",
+];
+
 // The design's step grid has exactly 4 tiles, one per real scan API
 // (robots.txt/sitemap.xml/crawling+AI/lighthouse) — the "site is reachable"
 // ping result is shown only via the URL-chip badge above the grid, not
 // duplicated as a 5th tile (zine-index intake §3.2 decision).
 const stepIds = ["ai", "meta", "analysis", "gen"];
+
+// rawKeys indices that must ALL fail to hard-error (pipe-connection
+// spec-fixed.md req #4). robots.txt (index 0) failing alone isn't fatal
+// here — that's the separate BlockedScreen/ErrorScreen path from
+// robots-gating (issue #1), handled before this Promise.allSettled ever
+// fires.
+const fatalIndices = [1, 2, 3];
 
 interface ProcessScreenProps extends DefaultPageProps {
   siteStatus: SiteStatusData;
@@ -35,14 +53,17 @@ export function ProcessScreen({
   siteStatus,
 }: ProcessScreenProps) {
   const router = useRouter();
+  const saveScanResult = useScanStore((state) => state.saveScanResult);
 
   const [progress, setProgress] = useState(10);
   const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>(
     Array(stepIds.length).fill(null)
   );
   // "processing" = existing step-tile grid, "blocked" = ADR-006 hard block
-  // (BlockedScreen), "error" = robotsTxt call itself failed (ErrorScreen,
-  // distinct from an explicit disallow verdict — issue #1 requirement #5).
+  // (BlockedScreen), "error" = robotsTxt call itself failed, or all 3
+  // remaining calls failed (both render ErrorScreen — distinct from an
+  // explicit disallow verdict, issue #1 requirement #5 / pipe-connection
+  // requirement #4).
   const [screenState, setScreenState] = useState<
     "processing" | "blocked" | "error"
   >("processing");
@@ -55,6 +76,19 @@ export function ProcessScreen({
     if (siteStatus.status !== okStatus) return;
 
     const data = { url: siteStatus.url };
+    // Response bodies for each of the 4 calls, keyed by rawKeys — filled in
+    // as each settles, then handed to combineScanResults once all 4 are
+    // done (spec-fixed.md req #1/#6). Plain object (not state): only read
+    // after Promise.allSettled resolves, doesn't drive any render. Typed
+    // loosely (promistList's calls each return a different response shape)
+    // and narrowed back to RawScanResponses once fully populated below.
+    const raw: Record<keyof RawScanResponses, unknown> = {
+      robotsTxt: null,
+      siteMap: null,
+      crawling: null,
+      lighthouse: null,
+    };
+
     const processFinished = () => {
       setProgress((state) => (state < 100 ? state + 20 : state));
     };
@@ -70,6 +104,7 @@ export function ProcessScreen({
       try {
         const res = await scanRobotsTxtApi(data);
         robotsTxtResult = res.data;
+        raw.robotsTxt = robotsTxtResult;
         processCallback(robotsTxtResult?.status === okStatus, 0);
       } catch (e) {
         console.error(e);
@@ -86,17 +121,16 @@ export function ProcessScreen({
         remainingApiList.map((promise, idx) =>
           promise(data)
             .then((res) => {
-              processCallback(
-                (res.data as OkStatus)?.status &&
-                  (res.data as OkStatus).status === okStatus
-                  ? true
-                  : false,
-                idx + 1
-              );
+              const isOk =
+                !!(res.data as OkStatus)?.status &&
+                (res.data as OkStatus).status === okStatus;
+              raw[rawKeys[idx + 1]] = isOk ? res.data : null;
+              processCallback(isOk, idx + 1);
               return res;
             })
             .catch((e) => {
               console.error(e);
+              raw[rawKeys[idx + 1]] = null;
               processFinished();
             })
         )
@@ -105,7 +139,23 @@ export function ProcessScreen({
         setCurrentProcess((state) =>
           state.map((v) => (v === null ? false : v))
         );
-        router.replace("/scan");
+
+        const isFatal = fatalIndices.every(
+          (idx) => raw[rawKeys[idx]] == null
+        );
+        if (isFatal) {
+          setScreenState("error");
+          return;
+        }
+
+        const rawResponses = raw as unknown as RawScanResponses;
+        const combined = combineScanResults(rawResponses);
+        const id = saveScanResult({
+          url: siteStatus.url,
+          raw: rawResponses,
+          combined,
+        });
+        router.replace(`/scan/${id}`);
       });
     };
 
