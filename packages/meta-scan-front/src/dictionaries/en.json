@@ -82,7 +82,12 @@
     "errorTitle": "Site can't be reached",
     "errorSubtitle": "Double-check the URL, or try again in a moment.",
     "goBack": "Home",
-    "retryButton": "Retry"
+    "retryButton": "Retry",
+    "blockedTitle": "This site can't be scanned",
+    "blockedDescription": "robots.txt disallows scanning this site. Out of respect for the site owner's choice, the remaining checks (crawling, Lighthouse) were not run.",
+    "blockedDescriptionMobile": "robots.txt disallows scanning this site. The remaining checks (crawling, Lighthouse) were not run.",
+    "blockedTargetLabel": "Target URL",
+    "blockedAction": "Try another URL"
   },
   "scan": {
     "title": "Meta-Scan",
