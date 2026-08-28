@@ -87,9 +87,7 @@
     "blockedDescription": "robots.txt disallows scanning this site. Out of respect for the site owner's choice, the remaining checks (crawling, Lighthouse) were not run.",
     "blockedDescriptionMobile": "robots.txt disallows scanning this site. The remaining checks (crawling, Lighthouse) were not run.",
     "blockedTargetLabel": "Target URL",
-    "blockedAction": "Try another URL",
-    "blockedCaption": "A site blocked by robots.txt stops here — no further checks are run",
-    "blockedCaptionMobile": "A site blocked by robots.txt stops here"
+    "blockedAction": "Try another URL"
   },
   "scan": {
     "title": "Meta-Scan",

@@ -32,8 +32,6 @@ export function BlockedScreen({ t, url, disallowRule }: BlockedScreenProps) {
     descriptionMobile: t.blockedDescriptionMobile,
     targetLabel: t.blockedTargetLabel,
     action: t.blockedAction,
-    caption: t.blockedCaption,
-    captionMobile: t.blockedCaptionMobile,
   };
 
   return (
@@ -70,11 +68,6 @@ export function BlockedScreen({ t, url, disallowRule }: BlockedScreenProps) {
       >
         {copy.action}
       </Button>
-
-      <span className="text-[11px] text-muted-foreground">
-        <span className="sm:hidden">{copy.captionMobile}</span>
-        <span className="hidden sm:inline">{copy.caption}</span>
-      </span>
     </div>
   );
 }

@@ -14,8 +14,6 @@ const t = {
   blockedDescriptionMobile: "robots.txt가 이 사이트의 스캔을 차단하고 있다.",
   blockedTargetLabel: "대상 URL",
   blockedAction: "다른 URL 시도",
-  blockedCaption: "robots.txt가 차단한 사이트는 추가 검사 없이 여기서 멈춘다",
-  blockedCaptionMobile: "robots.txt가 차단한 사이트는 추가 검사 없이 멈춘다",
 };
 
 describe("BlockedScreen", () => {
