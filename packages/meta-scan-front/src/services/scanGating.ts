@@ -1,12 +1,7 @@
-// TODO(ADR-010, docs/frontend-atomic-architecture.md): not implemented yet — this migration pass
-// only moved existing code into the new folder structure, it didn't build the missing logic.
-//
-// Per ADR-006 (docs/adr/index.html#adr-006): robots.txt must be checked alone first; if its
-// verdict is disallow, the other three scans (siteMap/crawling/lighthouse) must not be called at
-// all (cost control), and `@/ui/organisms/BlockedScreen` should render instead. That sequencing
-// logic doesn't exist yet — `@/ui/organisms/ProcessScreen` still fires all four calls in parallel via
-// `Promise.allSettled` (see its `promistList`) and never renders `BlockedScreen`.
-//
-// export function shouldBlockScan(robotsTxtResult: RobotsTxtData): boolean { ... }
-
-export {};
+// Per ADR-006 (docs/adr/index.html#adr-006): robots.txt is checked alone first; if it explicitly
+// disallows every UA ("*"), the other three scans (siteMap/crawling/lighthouse) must not be
+// called at all. If robots.txt doesn't exist (`has === false`), that's treated the same as an
+// explicit allow (decision log #1 in the confirmed spec, issue #1) — most sites don't ship one.
+export function shouldBlockScan(robotsTxtResult: RobotsTxtData): boolean {
+  return robotsTxtResult.has === true && robotsTxtResult.allow?.["*"] === false;
+}
