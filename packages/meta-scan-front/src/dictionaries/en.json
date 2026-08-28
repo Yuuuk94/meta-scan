@@ -115,6 +115,16 @@
     "promptObject": "PromptObject",
     "faqPage": "FAQ section",
     "structuredData": "Structured data",
-    "jsRenderDependency": "JS render dependency"
+    "jsRenderDependency": "JS render dependency",
+    "topIssuesTitle": "Fix these now",
+    "topIssuesEmpty": "No serious issues found in what's been checked so far",
+    "rawResultsTitle": "Scan results",
+    "rawSiteMapLabel": "sitemap.xml",
+    "rawCrawlingLabel": "Page crawl",
+    "rawLighthouseLabel": "Lighthouse",
+    "unavailable": "Unavailable",
+    "notFoundTitle": "No result to show",
+    "notFoundDescription": "The scan result you requested wasn't found or has expired — results are only kept for 10 minutes.",
+    "notFoundAction": "Back to home"
   }
 }
