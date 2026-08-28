@@ -123,7 +123,8 @@ describe("ProcessScreen robots.txt 게이팅 (ADR-006, 이슈 #1)", () => {
 
     renderScreen();
 
-    await waitFor(() => expect(replace).toHaveBeenCalledWith("/scan"));
+    await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+    expect(replace.mock.calls[0][0]).toMatch(/^\/scan\/[0-9a-f-]{36}$/);
     expect(screen.queryByText(t.blockedTitle)).not.toBeInTheDocument();
   });
 
