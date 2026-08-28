@@ -1,7 +1,7 @@
 import { shouldBlockScan } from "@/services/scanGating";
 
 describe("shouldBlockScan", () => {
-  it("blocks when robots.txt exists and explicitly disallows all UAs", () => {
+  it("robots.txt가 존재하고 모든 UA를 명시적으로 비허용하면 차단한다", () => {
     const result: RobotsTxtData = {
       status: "ok",
       has: true,
@@ -11,7 +11,7 @@ describe("shouldBlockScan", () => {
     expect(shouldBlockScan(result)).toBe(true);
   });
 
-  it("does not block when robots.txt exists and allows all UAs", () => {
+  it("robots.txt가 존재하고 모든 UA를 허용하면 차단하지 않는다", () => {
     const result: RobotsTxtData = {
       status: "ok",
       has: true,
@@ -23,7 +23,7 @@ describe("shouldBlockScan", () => {
 
   // ADR-006 decision log #1: no robots.txt at all is treated the same as an
   // explicit allow — most sites don't ship one.
-  it("does not block when robots.txt does not exist, regardless of allow", () => {
+  it("robots.txt가 존재하지 않으면 allow 값과 무관하게 차단하지 않는다", () => {
     const result: RobotsTxtData = {
       status: "ok",
       has: false,
@@ -33,7 +33,7 @@ describe("shouldBlockScan", () => {
     expect(shouldBlockScan(result)).toBe(false);
   });
 
-  it("does not block when has is true but allow is missing", () => {
+  it("has는 true인데 allow가 없으면 차단하지 않는다", () => {
     const result: RobotsTxtData = {
       status: "ok",
       has: true,

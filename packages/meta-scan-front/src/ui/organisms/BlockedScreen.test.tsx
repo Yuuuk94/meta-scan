@@ -17,14 +17,14 @@ const t = {
 };
 
 describe("BlockedScreen", () => {
-  it("renders copy from the t dictionary, not a hardcoded lang ternary", () => {
+  it("하드코딩된 lang 삼항 연산자가 아니라 t 딕셔너리에서 카피를 렌더한다", () => {
     render(<BlockedScreen t={t} url="https://example.com" />);
 
     expect(screen.getByText(t.blockedTitle)).toBeInTheDocument();
     expect(screen.getByText(t.blockedAction)).toBeInTheDocument();
   });
 
-  it("renders without a disallow rule when disallowRule is omitted (per spec: generic copy only)", () => {
+  it("disallowRule이 없으면 규칙 텍스트 없이 렌더한다(스펙: 일반 문구만 표시)", () => {
     render(<BlockedScreen t={t} url="https://example.com" />);
 
     expect(screen.queryByText(/— robots\.txt/)).not.toBeInTheDocument();

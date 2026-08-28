@@ -54,20 +54,20 @@ const siteStatus: SiteStatusData = {
 
 const renderScreen = () =>
   render(
-    <ProcessScreen theme="dark" lang="ko" t={t} siteStatus={siteStatus} />
+    <ProcessScreen theme="dark" lang="ko" t={t} siteStatus={siteStatus} />,
   );
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("ProcessScreen robots.txt gating (ADR-006, issue #1)", () => {
-  it("calls robotsTxt alone first and does not call the other 3 until it resolves", async () => {
+describe("ProcessScreen robots.txt 게이팅 (ADR-006, 이슈 #1)", () => {
+  it("robotsTxt를 단독으로 먼저 호출하고, 응답이 오기 전까지 나머지 3개는 호출하지 않는다", async () => {
     let resolveRobots: (value: unknown) => void = () => {};
     mockedRobotsTxt.mockReturnValue(
       new Promise((resolve) => {
         resolveRobots = resolve;
-      })
+      }),
     );
     mockedSiteMap.mockResolvedValue({ data: { status: "ok" } });
     mockedCrawling.mockResolvedValue({ data: { status: "ok" } });
@@ -84,7 +84,9 @@ describe("ProcessScreen robots.txt gating (ADR-006, issue #1)", () => {
     expect(screen.getByText(t.analyzingText)).toBeInTheDocument();
 
     await act(async () => {
-      resolveRobots({ data: { status: "ok", has: true, allow: { "*": true } } });
+      resolveRobots({
+        data: { status: "ok", has: true, allow: { "*": true } },
+      });
     });
 
     await waitFor(() => expect(mockedSiteMap).toHaveBeenCalledTimes(1));
@@ -92,7 +94,7 @@ describe("ProcessScreen robots.txt gating (ADR-006, issue #1)", () => {
     expect(mockedLsRun).toHaveBeenCalledTimes(1);
   });
 
-  it("renders BlockedScreen and skips the other 3 calls when robots.txt disallows", async () => {
+  it("robots.txt가 비허용이면 BlockedScreen을 렌더하고 나머지 3개 호출을 건너뛴다", async () => {
     mockedRobotsTxt.mockResolvedValue({
       data: { status: "ok", has: true, allow: { "*": false } },
     });
@@ -100,7 +102,7 @@ describe("ProcessScreen robots.txt gating (ADR-006, issue #1)", () => {
     renderScreen();
 
     await waitFor(() =>
-      expect(screen.getByText(t.blockedTitle)).toBeInTheDocument()
+      expect(screen.getByText(t.blockedTitle)).toBeInTheDocument(),
     );
 
     // Step grid is unmounted, replaced entirely by BlockedScreen.
@@ -111,7 +113,7 @@ describe("ProcessScreen robots.txt gating (ADR-006, issue #1)", () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it("treats a missing robots.txt (has: false) as allowed and proceeds", async () => {
+  it("robots.txt가 없으면(has: false) 허용으로 간주하고 진행한다", async () => {
     mockedRobotsTxt.mockResolvedValue({
       data: { status: "ok", has: false },
     });
@@ -125,13 +127,13 @@ describe("ProcessScreen robots.txt gating (ADR-006, issue #1)", () => {
     expect(screen.queryByText(t.blockedTitle)).not.toBeInTheDocument();
   });
 
-  it("renders ErrorScreen (not BlockedScreen) when the robotsTxt call itself fails", async () => {
+  it("robotsTxt 호출 자체가 실패하면 BlockedScreen이 아니라 ErrorScreen을 렌더한다", async () => {
     mockedRobotsTxt.mockRejectedValue(new Error("network error"));
 
     renderScreen();
 
     await waitFor(() =>
-      expect(screen.getByText(t.errorTitle)).toBeInTheDocument()
+      expect(screen.getByText(t.errorTitle)).toBeInTheDocument(),
     );
 
     expect(screen.queryByText(t.blockedTitle)).not.toBeInTheDocument();
