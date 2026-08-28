@@ -16,6 +16,6 @@ export const lsRunApi = async (data: UrlData) =>
   await instance.post<unknown>("/api/v1/lighthouse/run", {
     url: data.url,
     formFactor: "mobile",
-    onlyCategories: ["seo", "performance"],
+    onlyCategories: ["performance", "seo", "best-practices", "accessibility"],
     format: "json",
   });
