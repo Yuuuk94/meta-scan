@@ -123,6 +123,14 @@ and test the change themselves — the automated qa stage only runs Jest/Vitest 
 it doesn't verify actual behavior in the running app. Remind them that the next issue's dev/qa
 won't start until this PR is merged.
 
+**After the user merges a PR (they tell you it's merged, or you merge it yourself once they
+explicitly say to), close its issue yourself** (`gh issue close <n> -c "PR #<pr> merged into
+dev"`) — don't assume the PR's `Closes #<n>` text handled it. GitHub only auto-closes on merge
+into the repo's *default* branch (`main` here), and this workflow always merges into `dev`
+(`main` only moves via `release/*`), so the keyword never fires and the issue is left open
+even though `status:done` is already on it (2026-08-31 — found issues #2/#3/#4 sitting open
+after merge because of exactly this).
+
 ## Re-running a stuck issue
 
 If the user points you at a `status:blocked` issue after fixing something manually or clarifying
