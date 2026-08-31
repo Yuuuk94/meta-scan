@@ -14,6 +14,7 @@ import {
   buildSitemapExistsCheck,
 } from "@/domain/checks/indexingChecks.js";
 import { buildPreviewsChecksFromCrawling } from "@/domain/checks/previewsChecks.js";
+import { buildAiSignalsChecksFromCrawling } from "@/domain/checks/aiSignalsChecks.js";
 
 export class ScanService {
   constructor(private readonly chrome: BrowserAutomationPort) {}
@@ -225,6 +226,29 @@ export class ScanService {
     };
   }
 
+  // Plain existence/byte-count fetch against `/.well-known/prompts.txt`, run in parallel with
+  // `fetchFirstHtml` from `crawling` (issue #6 ai-signals-checklist req #1) — same fetch-only
+  // pattern `robotsTxt`/`headCheck` already use, deliberately not a 5th API route (ADR-003: a new
+  // route would break ProcessScreen's 4-step composition). A failed/non-200 fetch is treated as
+  // "doesn't exist", same swallow-errors philosophy as `headCheck`.
+  private async fetchPromptsTxt(
+    url: string
+  ): Promise<{ exists: boolean; byteCount?: number }> {
+    try {
+      const parsedUrl = new URL(url);
+      const promptsTxtUrl = this.getUrl(parsedUrl, "/.well-known/prompts.txt");
+      const result = await fetch(promptsTxtUrl, {
+        method: "GET",
+        signal: AbortSignal.timeout(this.timeOut),
+      });
+      if (result.status !== 200) return { exists: false };
+      const text = await result.text();
+      return { exists: true, byteCount: Buffer.byteLength(text, "utf-8") };
+    } catch (e) {
+      return { exists: false };
+    }
+  }
+
   private async getOnloadHtml(url: string, browser: PuppeteerProcess) {
     const t0 = Date.now();
     const page = await browser.newPage();
@@ -286,6 +310,36 @@ export class ScanService {
       const altMissing = imgs.filter(
         (i) => !(i.getAttribute("alt") ?? "").trim()
       ).length;
+      // issue #6 ai-signals-checklist: deduped `@type` values across every JSON-LD script,
+      // including nested `@graph` arrays — feeds promptObject/structuredData/faqSection
+      // judgement. A malformed script just contributes no types (a dedicated parse-error
+      // judgement is PRD §3.4 scope this issue doesn't cover).
+      const structuredDataTypesSet = new Set<string>();
+      const collectTypes = (node: unknown): void => {
+        if (Array.isArray(node)) {
+          node.forEach(collectTypes);
+          return;
+        }
+        if (!node || typeof node !== "object") return;
+        const obj = node as Record<string, unknown>;
+        const t = obj["@type"];
+        if (typeof t === "string") structuredDataTypesSet.add(t);
+        else if (Array.isArray(t)) {
+          t.forEach((tt) => typeof tt === "string" && structuredDataTypesSet.add(tt));
+        }
+        if (Array.isArray(obj["@graph"])) collectTypes(obj["@graph"]);
+      };
+      const jsonLdScripts = Array.from(
+        document.querySelectorAll('script[type="application/ld+json"]')
+      );
+      for (const script of jsonLdScripts) {
+        try {
+          collectTypes(JSON.parse(script.textContent || ""));
+        } catch {
+          // malformed JSON-LD — skip, see comment above
+        }
+      }
+      const structuredDataTypes = Array.from(structuredDataTypesSet);
       return {
         title: document.title || undefined,
         description: metaByName["description"],
@@ -306,6 +360,8 @@ export class ScanService {
           metaName: Array.from(new Set(dupName)),
           metaProperty: Array.from(new Set(dupProp)),
         },
+        // issue #6 ai-signals-checklist
+        structuredDataTypes,
       };
     };
     const extracted = await page.evaluate(fs);
@@ -325,8 +381,12 @@ export class ScanService {
     let proc: PuppeteerProcess | undefined;
     try {
       proc = await this.chrome.launch();
-      // 1) 첫 HTML
-      const first = await this.fetchFirstHtml(url);
+      // 1) 첫 HTML + prompts.txt(issue #6 ai-signals-checklist req #1) 병렬 fetch — 같은
+      // "원본 HTML을 fetch하는 지점"에서 실행, 별도 API 라우트 신설 없음(ADR-003).
+      const [first, promptsTxt] = await Promise.all([
+        this.fetchFirstHtml(url),
+        this.fetchPromptsTxt(url),
+      ]);
 
       // 2) onload 이후 HTML + 메타 추출
       const onload = await this.getOnloadHtml(first.finalUrl, proc);
@@ -355,8 +415,10 @@ export class ScanService {
           openGraph: onload.extracted.openGraph,
           twitter: onload.extracted.twitter,
           duplicates: onload.extracted.duplicates,
+          structuredDataTypes: onload.extracted.structuredDataTypes,
+          promptsTxt,
         },
-        checks: { basicSeo: [], indexing: [], previews: [] },
+        checks: { basicSeo: [], indexing: [], previews: [], aiSignals: [] },
       };
 
       result.checks.basicSeo = buildBasicSeoChecks(onload.extracted);
@@ -381,6 +443,12 @@ export class ScanService {
         faviconFallbackOk,
         openGraph: onload.extracted.openGraph,
         twitter: onload.extracted.twitter,
+      });
+
+      result.checks.aiSignals = buildAiSignalsChecksFromCrawling({
+        promptsTxt,
+        structuredDataTypes: onload.extracted.structuredDataTypes,
+        deltaRatio: result.html.deltaRatio,
       });
 
       return result;
