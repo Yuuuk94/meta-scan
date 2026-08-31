@@ -163,6 +163,7 @@ describe("combineScanResults", () => {
           { id: "desc.missing", status: "fail" },
           { id: "keywords.deprecated", status: "info" },
         ],
+        indexing: [],
       },
     };
 
@@ -189,6 +190,7 @@ describe("combineScanResults", () => {
           { id: "title.length", status: "pass", detail: 14 },
           { id: "keywords.deprecated", status: "info" },
         ],
+        indexing: [],
       },
     };
 

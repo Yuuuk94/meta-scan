@@ -100,6 +100,56 @@ describe("ProcessScreen", () => {
     expect(stored?.combined.failedApis).toEqual([]);
   });
 
+  it("forwards robotsTxt's declared sitemap URLs as siteMap's candidateSitemaps (issue #4 req #1)", async () => {
+    (scanRobotsTxtApi as jest.Mock).mockReturnValue(
+      okRes<RobotsTxtData>({
+        status: "ok",
+        has: true,
+        sitemap: ["https://example.com/sitemap-alt.xml"],
+      })
+    );
+    (scanSiteMapApi as jest.Mock).mockReturnValue(
+      okRes<SiteMapData>({ status: "ok", has: true })
+    );
+    (scanCrawlingApi as jest.Mock).mockReturnValue(
+      okRes<CrawlingScanData>(crawlingFixture)
+    );
+    (lsRunApi as jest.Mock).mockReturnValue(okRes({ status: "ok" }));
+
+    render(
+      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+    );
+
+    await waitFor(() => expect(scanSiteMapApi).toHaveBeenCalledTimes(1));
+    expect(scanSiteMapApi).toHaveBeenCalledWith({
+      url: "https://example.com",
+      candidateSitemaps: ["https://example.com/sitemap-alt.xml"],
+    });
+  });
+
+  it("forwards undefined candidateSitemaps when robotsTxt declares no sitemap", async () => {
+    (scanRobotsTxtApi as jest.Mock).mockReturnValue(
+      okRes<RobotsTxtData>({ status: "ok", has: true })
+    );
+    (scanSiteMapApi as jest.Mock).mockReturnValue(
+      okRes<SiteMapData>({ status: "ok", has: true })
+    );
+    (scanCrawlingApi as jest.Mock).mockReturnValue(
+      okRes<CrawlingScanData>(crawlingFixture)
+    );
+    (lsRunApi as jest.Mock).mockReturnValue(okRes({ status: "ok" }));
+
+    render(
+      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+    );
+
+    await waitFor(() => expect(scanSiteMapApi).toHaveBeenCalledTimes(1));
+    expect(scanSiteMapApi).toHaveBeenCalledWith({
+      url: "https://example.com",
+      candidateSitemaps: undefined,
+    });
+  });
+
   it("renders ErrorScreen instead of routing when sitemap/crawling/lighthouse all fail", async () => {
     (scanRobotsTxtApi as jest.Mock).mockReturnValue(
       okRes<RobotsTxtData>({ status: "ok", has: true })

@@ -16,11 +16,6 @@ import { ProcessStep } from "@/ui/molecules/ProcessStep";
 import { combineScanResults } from "@/services/combineScanResults";
 import { useScanStore } from "@/stores/scanStore";
 
-// robots.txt (index 0) is always awaited alone first (ADR-006 pre-check
-// gating) — the remaining 3 only fire once its verdict is known to be
-// non-blocking. Index stays aligned with `stepIds`/`t.steps` below.
-const remainingApiList = [scanSiteMapApi, scanCrawlingApi, lsRunApi];
-
 // Order-matched to promistList — which raw-response key each call's body
 // gets stored under.
 const rawKeys: (keyof RawScanResponses)[] = [
@@ -123,9 +118,25 @@ export function ProcessScreen({
         return;
       }
 
+      // siteMap gets its own call (not just `data`) so it can carry
+      // robots.txt's already-fetched declared sitemap URLs as
+      // `candidateSitemaps` (issue #4 indexing-checklist req #1) — robots.txt
+      // is always awaited alone first (ADR-006 pre-check gating), so
+      // `robotsTxtResult.sitemap` is available by the time these 3 fire.
+      // Index stays aligned with `stepIds`/`t.steps`/`rawKeys.slice(1)`.
+      const remainingCalls = [
+        () =>
+          scanSiteMapApi({
+            url: data.url,
+            candidateSitemaps: robotsTxtResult.sitemap,
+          }),
+        () => scanCrawlingApi(data),
+        () => lsRunApi(data),
+      ];
+
       await Promise.allSettled(
-        remainingApiList.map((promise, idx) =>
-          promise(data)
+        remainingCalls.map((call, idx) =>
+          call()
             .then((res) => {
               const isOk =
                 !!(res.data as OkStatus)?.status &&
