@@ -9,9 +9,7 @@ import type {
 import crypto from "node:crypto";
 import { buildBasicSeoChecks } from "@/domain/checks/basicSeoChecks.js";
 import {
-  buildCanonicalCheck,
-  buildCanonicalMultipleCheck,
-  buildMetaRobotsNoindexCheck,
+  buildIndexingChecksFromCrawling,
   buildSitemapDeclaredInRobotsCheck,
   buildSitemapExistsCheck,
 } from "@/domain/checks/indexingChecks.js";
@@ -267,9 +265,14 @@ export class ScanService {
         if (k.startsWith("twitter:")) tw[k] = v;
         // name=twitter:* 케이스
       }
-      const canonical =
-        document.querySelector('link[rel="canonical"]')?.getAttribute("href") ??
-        undefined;
+      // All canonical link tags, not just the first — canonicalMultiple (issue #4
+      // indexing-checklist) needs the full count regardless of href value equality.
+      const canonicalLinks = Array.from(
+        document.querySelectorAll('link[rel="canonical"]')
+      )
+        .map((el) => el.getAttribute("href") ?? "")
+        .filter(Boolean);
+      const canonical = canonicalLinks[0];
       const h1 = Array.from(document.querySelectorAll("h1"))
         .map((el) => (el.textContent || "").trim())
         .filter(Boolean);
@@ -283,6 +286,12 @@ export class ScanService {
         description: metaByName["description"],
         keywords: metaByName["keywords"],
         canonical,
+        // Full list, alongside `canonical` (its first element, kept for backward
+        // compatibility with existing consumers of extract.canonical).
+        canonicalLinks,
+        // `<meta name="robots" content="...">` — metaByName already lower-cases the name, so
+        // this is just surfacing it under an explicit key (issue #4 indexing-checklist).
+        metaRobots: metaByName["robots"],
         h1,
         images: { total: totalImgs, altMissing },
         openGraph: og,
@@ -333,16 +342,22 @@ export class ScanService {
           description: onload.extracted.description,
           keywords: onload.extracted.keywords,
           canonical: onload.extracted.canonical,
+          canonicalLinks: onload.extracted.canonicalLinks,
+          metaRobots: onload.extracted.metaRobots,
           h1: onload.extracted.h1,
           images: onload.extracted.images,
           openGraph: onload.extracted.openGraph,
           twitter: onload.extracted.twitter,
           duplicates: onload.extracted.duplicates,
         },
-        checks: { basicSeo: [] },
+        checks: { basicSeo: [], indexing: [] },
       };
 
       result.checks.basicSeo = buildBasicSeoChecks(onload.extracted);
+      result.checks.indexing = buildIndexingChecksFromCrawling({
+        canonicalLinks: onload.extracted.canonicalLinks,
+        metaRobotsContent: onload.extracted.metaRobots,
+      });
       return result;
     } catch (e) {
       throw ApiError.internal();
