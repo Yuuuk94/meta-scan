@@ -33,6 +33,14 @@ type IndexingCheckItem = {
   detail?: number;
 };
 
+// Result row for one "미리보기(Previews)" checklist item (issue #5 previews-checklist). Reuses
+// BasicSeoStatus's pass/warning/fail/info vocabulary, same as indexing (IndexingCheckItem).
+type PreviewsCheckItem = {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number;
+};
+
 type MetaScanResult = {
   url: string;
   finalUrl: string;
@@ -66,8 +74,14 @@ type MetaScanResult = {
   // content-stats/previews land via their own issues, see
   // docs/feature/01-seo-aeo-geo-checker/*-checklist/spec-fixed.md). Replaces the previous flat
   // `checks: Array<{ id, level, message, target? }>` shape.
+  // issue #5 previews-checklist adds `previews` — `ogImageDimensions`/`favicon` (both judged from
+  // this response's own DOM extraction, no cross-API merge needed, same as basicSeo). The raw
+  // og/twitter values used for the frontend's actual card preview render (not judgement) already
+  // live under `extract.openGraph`/`extract.twitter` above (spec req #3 — passthrough, no new
+  // field needed here).
   checks: {
     basicSeo: BasicSeoCheckItem[];
     indexing: IndexingCheckItem[];
+    previews: PreviewsCheckItem[];
   };
 };

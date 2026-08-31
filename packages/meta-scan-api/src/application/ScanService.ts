@@ -13,6 +13,7 @@ import {
   buildSitemapDeclaredInRobotsCheck,
   buildSitemapExistsCheck,
 } from "@/domain/checks/indexingChecks.js";
+import { buildPreviewsChecksFromCrawling } from "@/domain/checks/previewsChecks.js";
 
 export class ScanService {
   constructor(private readonly chrome: BrowserAutomationPort) {}
@@ -273,6 +274,10 @@ export class ScanService {
         .map((el) => el.getAttribute("href") ?? "")
         .filter(Boolean);
       const canonical = canonicalLinks[0];
+      // issue #5 previews-checklist: only checks for the <link> tag itself, no fetch — the
+      // conventional /favicon.ico fallback (spec decision log #1) is checked afterwards by
+      // ScanService, outside page.evaluate (this callback only has DOM access, not `fetch`).
+      const hasIconLink = !!document.querySelector('link[rel~="icon"]');
       const h1 = Array.from(document.querySelectorAll("h1"))
         .map((el) => (el.textContent || "").trim())
         .filter(Boolean);
@@ -292,6 +297,7 @@ export class ScanService {
         // `<meta name="robots" content="...">` — metaByName already lower-cases the name, so
         // this is just surfacing it under an explicit key (issue #4 indexing-checklist).
         metaRobots: metaByName["robots"],
+        hasIconLink,
         h1,
         images: { total: totalImgs, altMissing },
         openGraph: og,
@@ -350,7 +356,7 @@ export class ScanService {
           twitter: onload.extracted.twitter,
           duplicates: onload.extracted.duplicates,
         },
-        checks: { basicSeo: [], indexing: [] },
+        checks: { basicSeo: [], indexing: [], previews: [] },
       };
 
       result.checks.basicSeo = buildBasicSeoChecks(onload.extracted);
@@ -358,6 +364,25 @@ export class ScanService {
         canonicalLinks: onload.extracted.canonicalLinks,
         metaRobotsContent: onload.extracted.metaRobots,
       });
+
+      // No <link rel~="icon"> tag found — fall back to a HEAD check against the conventional
+      // /favicon.ico path before judging (spec decision log #1), same network-check style as
+      // siteMap's headCheck. Skipped entirely (no extra request) when the <link> tag was already
+      // found.
+      const faviconFallbackOk = onload.extracted.hasIconLink
+        ? false
+        : (await this.headCheck(
+            this.getUrl(new URL(onload.finalUrl), "/favicon.ico")
+          )) !== null;
+
+      result.checks.previews = buildPreviewsChecksFromCrawling({
+        ogImage: onload.extracted.openGraph["og:image"],
+        hasIconLink: onload.extracted.hasIconLink,
+        faviconFallbackOk,
+        openGraph: onload.extracted.openGraph,
+        twitter: onload.extracted.twitter,
+      });
+
       return result;
     } catch (e) {
       throw ApiError.internal();

@@ -59,6 +59,19 @@ interface IndexingCheckItem {
   detail?: number;
 }
 
+/** One row of the "미리보기(Previews)" checklist card (issue #5
+ * previews-checklist). Like `checks.basicSeo`, all 4 rows come from the
+ * `crawling` response alone (no cross-API merge) — mirrors meta-scan-api's
+ * `PreviewsCheckItem` (`domain/checks/previewsChecks.ts`). None of the
+ * current 4 ids (ogImageDimensions/favicon/ogRequiredTags/twitterCard) ever
+ * carry `detail`, but the field is kept optional for parity with
+ * BasicSeoCheckItem/IndexingCheckItem. */
+interface PreviewsCheckItem {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number;
+}
+
 interface CrawlingScanData extends OkStatus {
   url: string;
   finalUrl: string;
@@ -82,12 +95,18 @@ interface CrawlingScanData extends OkStatus {
   // Grouped by checklist card (issue #3 basic-seo-checklist introduces the
   // first group, `basicSeo`; issue #4 indexing-checklist adds `indexing`
   // — though its `sitemapExists`/`sitemapDeclaredInRobots` rows come from
-  // the siteMap/robotsTxt responses, not this one; other groups —
-  // content-stats/previews — land via their own issues). Replaces the
-  // previous flat `checks: Array<{ id, level, message, target? }>` shape
-  // that `ScanService.crawling`'s old push-only-on-problem `runChecks` used
-  // to return.
-  checks: { basicSeo: BasicSeoCheckItem[]; indexing: IndexingCheckItem[] };
+  // the siteMap/robotsTxt responses, not this one; issue #5
+  // previews-checklist adds `previews`, a straight passthrough like
+  // `basicSeo` since all 4 rows come from this same response; content-stats
+  // lands via its own issue). Replaces the previous flat
+  // `checks: Array<{ id, level, message, target? }>` shape that
+  // `ScanService.crawling`'s old push-only-on-problem `runChecks` used to
+  // return.
+  checks: {
+    basicSeo: BasicSeoCheckItem[];
+    indexing: IndexingCheckItem[];
+    previews: PreviewsCheckItem[];
+  };
 }
 
 /** Raw response bodies for the 4 scan APIs, as ProcessScreen collects them.
@@ -117,13 +136,16 @@ interface TopIssue {
 
 /** Already-judged fields merged from the 4 raw responses — `combineScanResults`
  * only merges/sorts, it doesn't compute any verdicts itself (ADR-003 update,
- * PRD §4). `checks.basicSeo` is a straight passthrough of
- * `raw.crawling.checks.basicSeo` (issue #3 basic-seo-checklist) — no
- * cross-API merge needed since that group only ever comes from one response.
- * `checks.indexing` (issue #4 indexing-checklist) *is* a cross-API merge —
- * `siteMap`/`robotsTxt`/`crawling` each contribute their own subset, and
- * this is where they get concatenated into one array. Other groups
- * (content-stats/previews) aren't built yet. */
+ * PRD §4). `checks.basicSeo`/`checks.previews` are straight passthroughs of
+ * `raw.crawling.checks.basicSeo`/`.previews` (issue #3 basic-seo-checklist,
+ * issue #5 previews-checklist) — no cross-API merge needed since those
+ * groups only ever come from one response. `checks.indexing` (issue #4
+ * indexing-checklist) *is* a cross-API merge — `siteMap`/`robotsTxt`/
+ * `crawling` each contribute their own subset, and this is where they get
+ * concatenated into one array. `openGraph`/`twitter` (already present above)
+ * double as the previews card's raw values for its Google/Twitter-style
+ * mockup render (issue #5 req #3/#4) — not re-derived here. content-stats
+ * isn't built yet. */
 interface CombinedScanResult {
   url?: string;
   title?: string;
@@ -136,7 +158,11 @@ interface CombinedScanResult {
   /** fail-first, backfilled with warning, capped at `topIssuesLimit` (default 3). */
   topIssues: TopIssue[];
   failedApis: FailedScanApi[];
-  checks: { basicSeo: BasicSeoCheckItem[]; indexing: IndexingCheckItem[] };
+  checks: {
+    basicSeo: BasicSeoCheckItem[];
+    indexing: IndexingCheckItem[];
+    previews: PreviewsCheckItem[];
+  };
 }
 
 interface ScanResultEntry {
