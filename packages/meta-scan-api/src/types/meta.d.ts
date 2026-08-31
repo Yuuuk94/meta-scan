@@ -22,6 +22,17 @@ type BasicSeoExtractInput = {
   duplicates: { metaName: string[]; metaProperty: string[] };
 };
 
+// Result row for one "indexing" checklist item (issue #4 indexing-checklist). Reuses
+// BasicSeoStatus's pass/warning/fail/info vocabulary — it's a shared <StatusBadge> vocabulary,
+// not something specific to the basicSeo group despite the type's name (see that type's doc
+// comment). None of the current indexing checks carry a numeric `detail` (unlike basicSeo's
+// title.length etc.), but the field is kept optional for parity/future use.
+type IndexingCheckItem = {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number;
+};
+
 type MetaScanResult = {
   url: string;
   finalUrl: string;
