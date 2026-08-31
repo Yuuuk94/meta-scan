@@ -29,11 +29,21 @@ interface SiteMapData extends OkStatus, HasData {
  * (see meta-scan-api CLAUDE.md "응답 스프레드 규약"). Replaces the previous
  * `unknown` placeholder now that the backend shape is stable enough to type
  * (front CLAUDE.md "API 호출 패턴" flagged this as the thing to fill in). */
-interface CrawlingCheckItem {
+
+/** Judgement vocabulary shared with `<StatusBadge>` (pass/warning/fail/info —
+ * docs/design-system.md §8), mirrors meta-scan-api's `BasicSeoStatus`. */
+type BasicSeoStatus = "pass" | "warning" | "fail" | "info";
+
+/** One row of the "기본 SEO" checklist card (issue #3 basic-seo-checklist).
+ * `detail` is a raw number (char count / missing count / duplicate count) —
+ * the backend never returns a rendered sentence; the frontend assembles one
+ * from `dictionaries/{ko,en}.json` templates (see
+ * `services/buildBasicSeoMessage.ts`) so copy stays translatable. Mirrors
+ * meta-scan-api's `BasicSeoCheckItem`. */
+interface BasicSeoCheckItem {
   id: string;
-  level: "error" | "warn" | "info";
-  message: string;
-  target?: string;
+  status: BasicSeoStatus;
+  detail?: number;
 }
 
 interface CrawlingScanData extends OkStatus {
@@ -56,7 +66,13 @@ interface CrawlingScanData extends OkStatus {
     twitter: Record<string, string>;
     duplicates: { metaName: string[]; metaProperty: string[] };
   };
-  checks: CrawlingCheckItem[];
+  // Grouped by checklist card (issue #3 basic-seo-checklist introduces the
+  // first group, `basicSeo`; other groups — indexing/content-stats/previews
+  // — land via their own issues). Replaces the previous flat
+  // `checks: Array<{ id, level, message, target? }>` shape that
+  // `ScanService.crawling`'s old push-only-on-problem `runChecks` used to
+  // return.
+  checks: { basicSeo: BasicSeoCheckItem[] };
 }
 
 /** Raw response bodies for the 4 scan APIs, as ProcessScreen collects them.
@@ -73,16 +89,23 @@ interface RawScanResponses {
 
 type FailedScanApi = "robotsTxt" | "siteMap" | "crawling" | "lighthouse";
 
+/** `detail` (not a rendered `message`) so the sentence gets assembled at
+ * render time from `dictionaries/{ko,en}.json` (issue #3 basic-seo-checklist
+ * req #3) instead of being baked into `localStorage`-persisted state in
+ * whatever locale was active at scan time. See
+ * `services/buildBasicSeoMessage.ts` + `<ScanHero>`. */
 interface TopIssue {
   id: string;
   status: "fail" | "warning";
-  message: string;
+  detail?: number;
 }
 
 /** Already-judged fields merged from the 4 raw responses — `combineScanResults`
  * only merges/sorts, it doesn't compute any verdicts itself (ADR-003 update,
- * PRD §4). Grouped `checks.basicSeo` etc. isn't built yet — out of scope for
- * this pass; only the fields that already exist today are merged. */
+ * PRD §4). `checks.basicSeo` is a straight passthrough of
+ * `raw.crawling.checks.basicSeo` (issue #3 basic-seo-checklist) — no
+ * cross-API merge needed since that group only ever comes from one response.
+ * Other groups (indexing/content-stats/previews) aren't built yet. */
 interface CombinedScanResult {
   url?: string;
   title?: string;
@@ -95,6 +118,7 @@ interface CombinedScanResult {
   /** fail-first, backfilled with warning, capped at `topIssuesLimit` (default 3). */
   topIssues: TopIssue[];
   failedApis: FailedScanApi[];
+  checks: { basicSeo: BasicSeoCheckItem[] };
 }
 
 interface ScanResultEntry {
