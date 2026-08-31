@@ -15,8 +15,14 @@ pnpm --filter meta-scan-api build         # tsc -p tsconfig.json && tsc-alias -p
 pnpm --filter meta-scan-api start         # node dist/app.js (빌드 결과물 실행)
 pnpm --filter meta-scan-api lint          # eslint .
 pnpm --filter meta-scan-api typecheck     # tsc --noEmit
+pnpm --filter meta-scan-api test          # vitest run (또는 루트에서 pnpm test:api)
 pnpm --filter meta-scan-api build:docker  # Docker 이미지 빌드 (아래 "Docker 빌드" 참고)
 ```
+
+2026-08-31, ADR-012에 따라 Vitest를 부트스트랩했습니다(`vitest.config.ts` — `tsconfig.json`의
+`@/*` → `src/*` alias를 그대로 미러링). 아직 실제 스펙 파일이 없어 `test.passWithNoTests: true`로
+빈 스위트를 통과시키는 상태입니다 — 첫 `*.test.ts`가 생기면 그 옵션은 지워도 됩니다. 스펙은
+`src/**/*.test.ts` 위치에 둡니다.
 
 테스트 스크립트는 없습니다 — 테스트 러너가 있다고 가정하지 마세요.
 

@@ -60,9 +60,15 @@ pnpm --filter meta-scan-front build       # next build
 pnpm -r lint                              # 모든 패키지 lint
 pnpm --filter meta-scan-front lint        # eslint (next/core-web-vitals, next/typescript)
 pnpm --filter meta-scan-api typecheck     # tsc --noEmit
+
+pnpm test                                 # 모든 패키지 테스트 (api: Vitest, front: Jest)
+pnpm test:api                             # meta-scan-api만 (vitest run)
+pnpm test:front                           # meta-scan-front만 (jest)
 ```
 
-두 패키지 모두 테스트 스크립트가 없습니다 — 테스트 러너가 있다고 가정하지 마세요.
+2026-08-31, ADR-012 러너 선택(front=Jest, api=Vitest)이 실제로 두 패키지 다 부트스트랩됐습니다
+(`meta-scan-api`는 아직 실제 스펙 파일이 없어 `vitest run`이 "No test files found"로 통과만
+하는 상태 — `vitest.config.ts`의 `passWithNoTests: true` 참고, 첫 스펙이 생기면 제거해도 됨).
 
 ```bash
 pnpm --filter meta-scan-api build:docker  # Docker 이미지 빌드 (컨텍스트 = 레포 루트,

@@ -78,6 +78,10 @@ pnpm dev:front                # meta-scan-front 개발 서버 (:3000)
 pnpm -r build                 # 전체 빌드
 pnpm -r lint                  # 전체 lint
 pnpm --filter meta-scan-api typecheck
+
+pnpm test                     # 전체 테스트 (api: Vitest, front: Jest)
+pnpm test:api                 # meta-scan-api만 (Vitest)
+pnpm test:front                # meta-scan-front만 (Jest)
 ```
 
 더 자세한 명령어와 환경 변수는 [`CLAUDE.md`](CLAUDE.md)를 참고하세요.
