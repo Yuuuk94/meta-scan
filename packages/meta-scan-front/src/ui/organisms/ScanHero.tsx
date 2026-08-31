@@ -25,6 +25,13 @@ export const ScanHero = ({ t, topIssues }: ScanHeroProps) => {
           {t.topIssuesEmpty}
         </p>
       ) : (
+        // This section's box+dark-rule pattern (gap-px + bg-foreground +
+        // border-foreground, badge-first/left, items-center) is
+        // deliberately different from <BasicSeoCard>/<IndexingCard>'s
+        // hairline `.row` pattern — confirmed against ScanZine.dc.html
+        // (the "지금 고쳐야 할 것" artboard uses this exact box treatment,
+        // badge on the left), not a bug. Don't "fix" this to match the
+        // checklist cards.
         <div className="mt-4 flex flex-col gap-px border-[1.5px] border-foreground bg-foreground">
           {topIssues.map((issue) => (
             <div

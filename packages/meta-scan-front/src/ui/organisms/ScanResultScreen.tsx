@@ -7,6 +7,7 @@ import { useScanStore } from "@/stores/scanStore";
 import { Button } from "@/ui/atoms/Button";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
+import { IndexingCard } from "@/ui/organisms/IndexingCard";
 import { ScanHero } from "@/ui/organisms/ScanHero";
 
 // Screen transition unit for /scan/:id and bare /scan (spec-fixed.md req #9)
@@ -90,16 +91,34 @@ export function ScanResultScreen({
         />
       </div>
 
-      {/* "기본 SEO" checklist card (issue #3 basic-seo-checklist) — renders
-       * nothing itself when checks.basicSeo is empty (crawling failed).
-       * Other grouped checklist cards (indexing/content-stats/previews)
-       * aren't built yet — out of scope for this pass. */}
-      <div className="mt-8">
+      {/* Checklist card group — design-system.md §5: "체크리스트 카드 그룹은
+       * 4열 균등 그리드(기본 SEO/Indexing/Content Stats/국제화·UX)", §4:
+       * cells share 1px rule-lines instead of a real gap (same
+       * gap-px + bg-foreground container trick as the raw-results grid
+       * below and ProcessScreen's step grid) — so the cards themselves
+       * render border-less (see <BasicSeoCard>/<IndexingCard>).
+       *
+       * Column count is deliberately `sm:grid-cols-2` (not `lg:grid-cols-4`
+       * yet) — only 2 of the 4 planned cards exist (content-stats/i18n-ux
+       * are separate, not-yet-built issues #7/#8). Sizing the grid for 4
+       * before 4 exist left the other half of the row as a huge solid
+       * `bg-foreground` block (user feedback — looked like a stray dark
+       * panel, not empty grid space). Bump to `lg:grid-cols-4` once both
+       * land. This doesn't handle a card going empty at *runtime* (its
+       * source API failed) leaving a gap either — same accepted limitation
+       * as the raw-results tiles below, just smaller in scope now. */}
+      <div className="mt-8 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
         <BasicSeoCard
           lang={lang}
           theme={theme}
           t={t}
           checks={combined.checks.basicSeo}
+        />
+        <IndexingCard
+          lang={lang}
+          theme={theme}
+          t={t}
+          checks={combined.checks.indexing}
         />
       </div>
 

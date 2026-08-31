@@ -73,6 +73,16 @@ export const swaggerSpec = {
                     url: "https://dev-portfolio.withmay.com/",
                   },
                 },
+                withCandidateSitemaps: {
+                  summary:
+                    "/sitemap.xml 404 시 robots.txt가 선언한 후보 URL들을 순차 확인 (issue #4)",
+                  value: {
+                    url: "https://dev-portfolio.withmay.com/",
+                    candidateSitemaps: [
+                      "https://dev-portfolio.withmay.com/sitemap_index.xml",
+                    ],
+                  },
+                },
               },
             },
           },

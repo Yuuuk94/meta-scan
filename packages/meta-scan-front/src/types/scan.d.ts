@@ -17,11 +17,13 @@ interface RobotsTxtData extends OkStatus, HasData {
   allow?: Record<string, boolean>;
   contents?: string;
   sitemap?: string[];
+  checks?: { indexing: IndexingCheckItem[] };
 }
 
 interface SiteMapData extends OkStatus, HasData {
   url?: string;
   redirected?: boolean;
+  checks?: { indexing: IndexingCheckItem[] };
 }
 
 /** Mirrors meta-scan-api's `MetaScanResult` (packages/meta-scan-api/src/types/meta.d.ts)
@@ -41,6 +43,17 @@ type BasicSeoStatus = "pass" | "warning" | "fail" | "info";
  * `services/buildBasicSeoMessage.ts`) so copy stays translatable. Mirrors
  * meta-scan-api's `BasicSeoCheckItem`. */
 interface BasicSeoCheckItem {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number;
+}
+
+/** One row of the "색인/크롤링(Indexing)" checklist card (issue #4
+ * indexing-checklist). Unlike `checks.basicSeo`, these rows come from three
+ * different responses (`siteMap`/`robotsTxt`/`crawling`) and get
+ * concatenated by `combineScanResults` — see that file's comment. Mirrors
+ * meta-scan-api's `IndexingCheckItem`. */
+interface IndexingCheckItem {
   id: string;
   status: BasicSeoStatus;
   detail?: number;
@@ -67,12 +80,14 @@ interface CrawlingScanData extends OkStatus {
     duplicates: { metaName: string[]; metaProperty: string[] };
   };
   // Grouped by checklist card (issue #3 basic-seo-checklist introduces the
-  // first group, `basicSeo`; other groups — indexing/content-stats/previews
-  // — land via their own issues). Replaces the previous flat
-  // `checks: Array<{ id, level, message, target? }>` shape that
-  // `ScanService.crawling`'s old push-only-on-problem `runChecks` used to
-  // return.
-  checks: { basicSeo: BasicSeoCheckItem[] };
+  // first group, `basicSeo`; issue #4 indexing-checklist adds `indexing`
+  // — though its `sitemapExists`/`sitemapDeclaredInRobots` rows come from
+  // the siteMap/robotsTxt responses, not this one; other groups —
+  // content-stats/previews — land via their own issues). Replaces the
+  // previous flat `checks: Array<{ id, level, message, target? }>` shape
+  // that `ScanService.crawling`'s old push-only-on-problem `runChecks` used
+  // to return.
+  checks: { basicSeo: BasicSeoCheckItem[]; indexing: IndexingCheckItem[] };
 }
 
 /** Raw response bodies for the 4 scan APIs, as ProcessScreen collects them.
@@ -105,7 +120,10 @@ interface TopIssue {
  * PRD §4). `checks.basicSeo` is a straight passthrough of
  * `raw.crawling.checks.basicSeo` (issue #3 basic-seo-checklist) — no
  * cross-API merge needed since that group only ever comes from one response.
- * Other groups (indexing/content-stats/previews) aren't built yet. */
+ * `checks.indexing` (issue #4 indexing-checklist) *is* a cross-API merge —
+ * `siteMap`/`robotsTxt`/`crawling` each contribute their own subset, and
+ * this is where they get concatenated into one array. Other groups
+ * (content-stats/previews) aren't built yet. */
 interface CombinedScanResult {
   url?: string;
   title?: string;
@@ -118,7 +136,7 @@ interface CombinedScanResult {
   /** fail-first, backfilled with warning, capped at `topIssuesLimit` (default 3). */
   topIssues: TopIssue[];
   failedApis: FailedScanApi[];
-  checks: { basicSeo: BasicSeoCheckItem[] };
+  checks: { basicSeo: BasicSeoCheckItem[]; indexing: IndexingCheckItem[] };
 }
 
 interface ScanResultEntry {

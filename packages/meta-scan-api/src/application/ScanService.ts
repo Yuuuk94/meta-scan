@@ -1,13 +1,18 @@
 import { ApiError } from "@/core/http/ApiError.js";
 // NOTE(ADR-011): application importing an inbound-adapter DTO type is a known impurity this
 // migration pass didn't resolve — see docs/case-study/backend-hexagonal-architecture.md §5.
-import type { UrlBody } from "@/adapters/inbound/http/scan/dto.js";
+import type { SiteMapBody, UrlBody } from "@/adapters/inbound/http/scan/dto.js";
 import type {
   BrowserAutomationPort,
   PuppeteerProcess,
 } from "@/domain/ports/BrowserAutomationPort.js";
 import crypto from "node:crypto";
 import { buildBasicSeoChecks } from "@/domain/checks/basicSeoChecks.js";
+import {
+  buildIndexingChecksFromCrawling,
+  buildSitemapDeclaredInRobotsCheck,
+  buildSitemapExistsCheck,
+} from "@/domain/checks/indexingChecks.js";
 
 export class ScanService {
   constructor(private readonly chrome: BrowserAutomationPort) {}
@@ -149,33 +154,52 @@ export class ScanService {
           allow,
           contents,
           sitemap,
+          checks: { indexing: [buildSitemapDeclaredInRobotsCheck(sitemap)] },
         };
       }
-      return { has };
+      return { has, checks: { indexing: [buildSitemapDeclaredInRobotsCheck([])] } };
     } catch (e) {
       throw ApiError.internal();
     }
   }
 
-  async siteMap({ url }: UrlBody) {
+  private async headCheck(url: string) {
     try {
-      const parsedUrl = new URL(url);
-      const siteMapUrl = this.getUrl(parsedUrl, "/sitemap.xml");
-      const result = await fetch(siteMapUrl, {
+      const result = await fetch(url, {
         method: "HEAD",
         signal: AbortSignal.timeout(this.timeOut),
       });
-      let has = false;
+      return result.status === 200 ? result : null;
+    } catch (e) {
+      // A single candidate failing to fetch (network error, DNS, timeout) shouldn't abort the
+      // rest of the fallback sequence — treat it the same as a non-200 response.
+      return null;
+    }
+  }
 
-      if (result.status === 200) {
-        has = true;
-        return {
-          has,
-          redirected: result.redirected,
-          url: result.url,
-        };
+  async siteMap({ url, candidateSitemaps }: SiteMapBody) {
+    try {
+      const parsedUrl = new URL(url);
+      const siteMapUrl = this.getUrl(parsedUrl, "/sitemap.xml");
+
+      let matched = await this.headCheck(siteMapUrl);
+
+      // /sitemap.xml itself 404s — fall back to robots.txt's declared sitemap locations
+      // (already fetched by the frontend, passed through as candidateSitemaps) one at a time,
+      // stopping at the first 200 (spec decision log #2/#3).
+      if (!matched && candidateSitemaps?.length) {
+        for (const candidate of candidateSitemaps) {
+          matched = await this.headCheck(candidate);
+          if (matched) break;
+        }
       }
-      return { has };
+
+      const has = matched !== null;
+      return {
+        has,
+        ...(matched ? { url: matched.url, redirected: matched.redirected } : {}),
+        checks: { indexing: [buildSitemapExistsCheck(has)] },
+      };
     } catch (e) {
       throw ApiError.internal();
     }
@@ -241,9 +265,14 @@ export class ScanService {
         if (k.startsWith("twitter:")) tw[k] = v;
         // name=twitter:* 케이스
       }
-      const canonical =
-        document.querySelector('link[rel="canonical"]')?.getAttribute("href") ??
-        undefined;
+      // All canonical link tags, not just the first — canonicalMultiple (issue #4
+      // indexing-checklist) needs the full count regardless of href value equality.
+      const canonicalLinks = Array.from(
+        document.querySelectorAll('link[rel="canonical"]')
+      )
+        .map((el) => el.getAttribute("href") ?? "")
+        .filter(Boolean);
+      const canonical = canonicalLinks[0];
       const h1 = Array.from(document.querySelectorAll("h1"))
         .map((el) => (el.textContent || "").trim())
         .filter(Boolean);
@@ -257,6 +286,12 @@ export class ScanService {
         description: metaByName["description"],
         keywords: metaByName["keywords"],
         canonical,
+        // Full list, alongside `canonical` (its first element, kept for backward
+        // compatibility with existing consumers of extract.canonical).
+        canonicalLinks,
+        // `<meta name="robots" content="...">` — metaByName already lower-cases the name, so
+        // this is just surfacing it under an explicit key (issue #4 indexing-checklist).
+        metaRobots: metaByName["robots"],
         h1,
         images: { total: totalImgs, altMissing },
         openGraph: og,
@@ -307,16 +342,22 @@ export class ScanService {
           description: onload.extracted.description,
           keywords: onload.extracted.keywords,
           canonical: onload.extracted.canonical,
+          canonicalLinks: onload.extracted.canonicalLinks,
+          metaRobots: onload.extracted.metaRobots,
           h1: onload.extracted.h1,
           images: onload.extracted.images,
           openGraph: onload.extracted.openGraph,
           twitter: onload.extracted.twitter,
           duplicates: onload.extracted.duplicates,
         },
-        checks: { basicSeo: [] },
+        checks: { basicSeo: [], indexing: [] },
       };
 
       result.checks.basicSeo = buildBasicSeoChecks(onload.extracted);
+      result.checks.indexing = buildIndexingChecksFromCrawling({
+        canonicalLinks: onload.extracted.canonicalLinks,
+        metaRobotsContent: onload.extracted.metaRobots,
+      });
       return result;
     } catch (e) {
       throw ApiError.internal();

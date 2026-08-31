@@ -28,11 +28,26 @@ const crawling: CrawlingScanData = {
       { id: "img.altMissing", status: "warning", detail: 2 },
       { id: "meta.duplicate", status: "pass", detail: 0 },
     ],
+    indexing: [
+      { id: "canonical", status: "pass" },
+      { id: "canonicalMultiple", status: "pass" },
+      { id: "metaRobotsNoindex", status: "pass" },
+    ],
   },
 };
 
-const robotsTxt: RobotsTxtData = { status: "ok", has: true, url: "https://example.com" };
-const siteMap: SiteMapData = { status: "ok", has: true, url: "https://example.com" };
+const robotsTxt: RobotsTxtData = {
+  status: "ok",
+  has: true,
+  url: "https://example.com",
+  checks: { indexing: [{ id: "sitemapDeclaredInRobots", status: "pass" }] },
+};
+const siteMap: SiteMapData = {
+  status: "ok",
+  has: true,
+  url: "https://example.com",
+  checks: { indexing: [{ id: "sitemapExists", status: "pass" }] },
+};
 
 describe("combineScanResults", () => {
   it("merges already-judged fields from the 4 raw responses without recomputing them", () => {
@@ -93,6 +108,50 @@ describe("combineScanResults", () => {
     expect(combined.checks.basicSeo).toEqual([]);
   });
 
+  it("merges checks.indexing from siteMap/crawling/robotsTxt into one array (issue #4)", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.indexing).toEqual([
+      { id: "sitemapExists", status: "pass" },
+      { id: "canonical", status: "pass" },
+      { id: "canonicalMultiple", status: "pass" },
+      { id: "metaRobotsNoindex", status: "pass" },
+      { id: "sitemapDeclaredInRobots", status: "pass" },
+    ]);
+  });
+
+  it("defaults checks.indexing to an empty array when siteMap/robotsTxt/crawling all failed", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt: null,
+      siteMap: null,
+      crawling: null,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.indexing).toEqual([]);
+  });
+
+  it("still merges the indexing rows that did come back when only some of the 3 sources failed", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap: null,
+      crawling,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.indexing).toEqual([
+      { id: "canonical", status: "pass" },
+      { id: "canonicalMultiple", status: "pass" },
+      { id: "metaRobotsNoindex", status: "pass" },
+      { id: "sitemapDeclaredInRobots", status: "pass" },
+    ]);
+  });
+
   it("builds topIssues fail-first, backfilled with warning, capped at 3 by default", () => {
     const manyIssues: CrawlingScanData = {
       ...crawling,
@@ -104,6 +163,7 @@ describe("combineScanResults", () => {
           { id: "desc.missing", status: "fail" },
           { id: "keywords.deprecated", status: "info" },
         ],
+        indexing: [],
       },
     };
 
@@ -130,6 +190,7 @@ describe("combineScanResults", () => {
           { id: "title.length", status: "pass", detail: 14 },
           { id: "keywords.deprecated", status: "info" },
         ],
+        indexing: [],
       },
     };
 
