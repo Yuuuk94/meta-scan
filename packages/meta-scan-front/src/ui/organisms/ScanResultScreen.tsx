@@ -8,6 +8,7 @@ import { Button } from "@/ui/atoms/Button";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { IndexingCard } from "@/ui/organisms/IndexingCard";
+import { LighthouseCard } from "@/ui/organisms/LighthouseCard";
 import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
 import { ScanHero } from "@/ui/organisms/ScanHero";
 import { mockScanResultEntry } from "@/mocks/mockScanResult";
@@ -163,6 +164,32 @@ export function ScanResultScreen({
           description={combined.description}
           openGraph={combined.openGraph}
           twitter={combined.twitter}
+        />
+      </div>
+
+      {/* "Lighthouse 개선 제안" (issue #9 lighthouse-suggestions, ADR-007) —
+       * standalone card after Previews, same "own full <Card> border" as
+       * PreviewsCard, before the technical/debug raw-results tiles below.
+       * `combined.lighthouse` is optional on the type (older/hand-built
+       * fixtures may not have it) — falls back to an empty shape rather
+       * than crashing; <LighthouseCard> itself renders nothing for that
+       * case. */}
+      <div className="mt-8">
+        <LighthouseCard
+          lang={lang}
+          theme={theme}
+          t={t}
+          lighthouse={
+            combined.lighthouse ?? {
+              scores: {
+                performance: null,
+                seo: null,
+                accessibility: null,
+                bestPractices: null,
+              },
+              suggestions: [],
+            }
+          }
         />
       </div>
 

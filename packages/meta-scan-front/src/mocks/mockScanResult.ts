@@ -1,10 +1,14 @@
 // Dev-only fixture so `/scan/:id` has something to render without running a
 // full scan first — real captured response (robotsTxt/siteMap/crawling/
-// lighthouse, lighthouse trimmed to just category scores) from
-// https://dev-portfolio.withmay.com via the local API, then combined with
-// the actual `combineScanResults` so it matches production shape exactly.
+// lighthouse, lighthouse trimmed to category scores + a couple of
+// representative low-scoring audits) from https://dev-portfolio.withmay.com
+// via the local API, then combined with the actual `combineScanResults` so
+// it matches production shape exactly.
 // Refreshed 2026-08-31 (issue #5 previews-checklist) — `checks.previews` is
 // now a real capture too, not the earlier synthetic placeholder.
+// Refreshed 2026-08-31 (issue #9 lighthouse-suggestions) — added
+// raw.lighthouse.audits (trimmed, real ids/titles) and combined.lighthouse
+// so the new card has something to render in dev.
 // Only ever used from `ScanResultScreen` when `location.hostname` is
 // localhost/127.0.0.1 (see there) — never reachable in a deployed build.
 export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
@@ -69,6 +73,22 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
         "best-practices": { title: "Best Practices", score: 1 },
         seo: { title: "SEO", score: 1 },
       },
+      audits: {
+        "uses-responsive-images": {
+          id: "uses-responsive-images",
+          title: "Properly size images",
+          description:
+            "Serve images that are appropriately-sized to save cellular data and improve load time.",
+          score: 0.75,
+        },
+        "unused-javascript": {
+          id: "unused-javascript",
+          title: "Reduce unused JavaScript",
+          description:
+            "Reduce unused JavaScript and defer loading scripts until they are required.",
+          score: 0.5,
+        },
+      },
     },
   },
   combined: {
@@ -101,6 +121,30 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
         { id: "favicon", status: "pass" },
         { id: "ogRequiredTags", status: "warning" },
         { id: "twitterCard", status: "warning" },
+      ],
+    },
+    lighthouse: {
+      scores: {
+        performance: 0.98,
+        seo: 1,
+        accessibility: 0.95,
+        bestPractices: 1,
+      },
+      suggestions: [
+        {
+          id: "unused-javascript",
+          title: "Reduce unused JavaScript",
+          description:
+            "Reduce unused JavaScript and defer loading scripts until they are required.",
+          score: 0.5,
+        },
+        {
+          id: "uses-responsive-images",
+          title: "Properly size images",
+          description:
+            "Serve images that are appropriately-sized to save cellular data and improve load time.",
+          score: 0.75,
+        },
       ],
     },
   },
