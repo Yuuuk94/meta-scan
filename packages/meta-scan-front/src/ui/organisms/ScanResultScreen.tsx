@@ -7,6 +7,7 @@ import { useScanStore } from "@/stores/scanStore";
 import { Button } from "@/ui/atoms/Button";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
+import { IndexingCard } from "@/ui/organisms/IndexingCard";
 import { ScanHero } from "@/ui/organisms/ScanHero";
 
 // Screen transition unit for /scan/:id and bare /scan (spec-fixed.md req #9)
@@ -91,15 +92,27 @@ export function ScanResultScreen({
       </div>
 
       {/* "기본 SEO" checklist card (issue #3 basic-seo-checklist) — renders
-       * nothing itself when checks.basicSeo is empty (crawling failed).
-       * Other grouped checklist cards (indexing/content-stats/previews)
-       * aren't built yet — out of scope for this pass. */}
+       * nothing itself when checks.basicSeo is empty (crawling failed). */}
       <div className="mt-8">
         <BasicSeoCard
           lang={lang}
           theme={theme}
           t={t}
           checks={combined.checks.basicSeo}
+        />
+      </div>
+
+      {/* "색인/크롤링(Indexing)" checklist card (issue #4 indexing-checklist)
+       * — checks.indexing is already a cross-API merge (siteMap/robotsTxt/
+       * crawling) done in combineScanResults, so this just renders it like
+       * BasicSeoCard. Other grouped checklist cards (content-stats/previews)
+       * aren't built yet — out of scope for this pass. */}
+      <div className="mt-8">
+        <IndexingCard
+          lang={lang}
+          theme={theme}
+          t={t}
+          checks={combined.checks.indexing}
         />
       </div>
 

@@ -23,6 +23,8 @@ const t = {
   notFoundAction: "홈으로",
   basicSeo: "기본 SEO",
   basicSeoTitleLengthPass: "제목 길이가 적절하다 ({count}자)",
+  indexing: "Indexing",
+  indexingSitemapExistsPass: "sitemap.xml이 확인된다",
 };
 
 const combined: CombinedScanResult = {
@@ -30,7 +32,7 @@ const combined: CombinedScanResult = {
   description: "An example page used in docs",
   topIssues: [],
   failedApis: ["lighthouse"],
-  checks: { basicSeo: [] },
+  checks: { basicSeo: [], indexing: [] },
 };
 
 beforeEach(() => {
@@ -87,6 +89,7 @@ describe("ScanResultScreen", () => {
         ...combined,
         checks: {
           basicSeo: [{ id: "title.length", status: "pass", detail: 42 }],
+          indexing: [],
         },
       },
     });
@@ -95,5 +98,24 @@ describe("ScanResultScreen", () => {
 
     expect(screen.getByText("기본 SEO")).toBeInTheDocument();
     expect(screen.getByText("제목 길이가 적절하다 (42자)")).toBeInTheDocument();
+  });
+
+  it("renders the Indexing card from combined.checks.indexing when present", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined: {
+        ...combined,
+        checks: {
+          ...combined.checks,
+          indexing: [{ id: "sitemapExists", status: "pass" }],
+        },
+      },
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.getByText("Indexing")).toBeInTheDocument();
+    expect(screen.getByText("sitemap.xml이 확인된다")).toBeInTheDocument();
   });
 });

@@ -7,7 +7,12 @@
 // `/scan/:id` renders — it doesn't compute any verdicts itself (ADR-003 update, PRD §4). Group
 // structure (checks.basicSeo etc.) is built here as a straight passthrough (issue #3
 // basic-seo-checklist) — no cross-API merge needed since that group only ever comes from the
-// crawling response. Other groups (indexing/content-stats/previews) aren't built yet.
+// crawling response. `checks.indexing` (issue #4 indexing-checklist) is different: it's a real
+// cross-API merge — siteMap contributes sitemapExists, robotsTxt contributes
+// sitemapDeclaredInRobots, and crawling contributes canonical/canonicalMultiple/
+// metaRobotsNoindex, each already judged by the backend (domain/checks/indexingChecks.ts) — this
+// just concatenates whichever of the 3 came back. Other groups (content-stats/previews) aren't
+// built yet.
 
 const DEFAULT_TOP_ISSUES_LIMIT = 3;
 
@@ -59,6 +64,19 @@ function buildTopIssues(
     }));
 }
 
+// Order: siteMap (sitemapExists) -> crawling (canonical, canonicalMultiple,
+// metaRobotsNoindex) -> robotsTxt (sitemapDeclaredInRobots) — mirrors the
+// spec's requirement numbering (spec-fixed.md req #1-#4). A source that
+// failed (null) or came back without a `checks.indexing` field just
+// contributes nothing, rather than dropping the whole merge.
+function buildIndexingChecks(raw: RawScanResponses): IndexingCheckItem[] {
+  return [
+    ...(raw.siteMap?.checks?.indexing ?? []),
+    ...(raw.crawling?.checks?.indexing ?? []),
+    ...(raw.robotsTxt?.checks?.indexing ?? []),
+  ];
+}
+
 export function combineScanResults(
   url: string,
   raw: RawScanResponses,
@@ -84,6 +102,9 @@ export function combineScanResults(
     hasSitemap: raw.siteMap?.has,
     topIssues: buildTopIssues(raw.crawling, topIssuesLimit),
     failedApis,
-    checks: { basicSeo: raw.crawling?.checks?.basicSeo ?? [] },
+    checks: {
+      basicSeo: raw.crawling?.checks?.basicSeo ?? [],
+      indexing: buildIndexingChecks(raw),
+    },
   };
 }
