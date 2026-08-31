@@ -9,6 +9,24 @@ import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { IndexingCard } from "@/ui/organisms/IndexingCard";
 import { ScanHero } from "@/ui/organisms/ScanHero";
+import { mockScanResultEntry } from "@/mocks/mockScanResult";
+
+// Dev convenience only — never true in a deployed build (a real domain is
+// never "localhost", and these 2 ids are reserved fixtures, not something a
+// real scan would ever produce). Only these exact /scan/:id values render
+// `mockScanResultEntry` instead of the not-found screen when there's no
+// real store entry — narrowed from "any id" so a typo'd/expired real id
+// still correctly shows not-found instead of silently masking it.
+const MOCK_SCAN_IDS = ["6f31d40e-9f8e-4553-b1cf-4800841fa784", "test"];
+function isMockableLocalDev(id?: string) {
+  return (
+    !!id &&
+    MOCK_SCAN_IDS.includes(id) &&
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1")
+  );
+}
 
 // Screen transition unit for /scan/:id and bare /scan (spec-fixed.md req #9)
 // — same function-declaration convention as ProcessScreen/ErrorScreen (front
@@ -42,7 +60,12 @@ export function ScanResultScreen({
   );
 
   useEffect(() => {
-    setEntry(id ? (getScanResult(id) ?? null) : null);
+    const found = id ? (getScanResult(id) ?? null) : null;
+    if (!found && isMockableLocalDev(id)) {
+      setEntry({ ...mockScanResultEntry, scannedAt: Date.now() });
+      return;
+    }
+    setEntry(found);
   }, [id, getScanResult]);
 
   if (entry === undefined) return null;
