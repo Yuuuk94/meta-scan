@@ -1,7 +1,7 @@
 import React from "react";
 
 import { buildIndexingMessage } from "@/services/buildIndexingMessage";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
+import { CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 
 // "색인/크롤링(Indexing)" checklist card (issue #4 indexing-checklist req
@@ -11,6 +11,10 @@ import { StatusBadge } from "@/ui/molecules/StatusBadge";
 // canonicalMultiple/metaRobotsNoindex from crawling — see that service's
 // comment). Row layout/behavior mirrors <BasicSeoCard> exactly for visual
 // consistency across the results screen's checklist cards.
+//
+// Same as <BasicSeoCard>: no <Card> wrapper here — it's a cell in
+// <ScanResultScreen>'s shared 4-column checklist grid, which supplies the
+// rule-line borders between cells itself (design-system.md §4/§5).
 interface IndexingCardProps extends DefaultPageProps {
   checks: IndexingCheckItem[];
 }
@@ -22,27 +26,32 @@ export const IndexingCard = ({ t, checks }: IndexingCardProps) => {
   if (checks.length === 0) return null;
 
   return (
-    <Card>
+    <div data-slot="card" className="flex flex-col bg-card">
       <CardHeader>
         <CardTitle>{t.indexing}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-px border-[1.5px] border-foreground bg-foreground">
+        {/* See <BasicSeoCard> for why: hairline (--border) row dividers
+         * instead of the dark card-to-card rule, text-then-badge with
+         * justify-between (badge on the right, matches ScanZine.dc.html's
+         * `.row`), items-start instead of the mockup's items-center since
+         * these sentences can wrap. */}
+        <div className="flex flex-col divide-y divide-border">
           {checks.map((check) => (
             <div
               key={check.id}
-              className="flex items-center gap-4 bg-card px-5 py-3.5"
+              className="flex items-start justify-between gap-4 py-3.5"
             >
-              <StatusBadge status={check.status}>
-                {check.status.toUpperCase()}
-              </StatusBadge>
               <span className="text-sm font-medium text-foreground">
                 {buildIndexingMessage(t, check)}
               </span>
+              <StatusBadge status={check.status}>
+                {check.status.toUpperCase()}
+              </StatusBadge>
             </div>
           ))}
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 };

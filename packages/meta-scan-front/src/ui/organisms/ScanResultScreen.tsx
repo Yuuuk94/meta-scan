@@ -91,23 +91,29 @@ export function ScanResultScreen({
         />
       </div>
 
-      {/* "기본 SEO" checklist card (issue #3 basic-seo-checklist) — renders
-       * nothing itself when checks.basicSeo is empty (crawling failed). */}
-      <div className="mt-8">
+      {/* Checklist card group — design-system.md §5: "체크리스트 카드 그룹은
+       * 4열 균등 그리드(기본 SEO/Indexing/Content Stats/국제화·UX)", §4:
+       * cells share 1px rule-lines instead of a real gap (same
+       * gap-px + bg-foreground container trick as the raw-results grid
+       * below and ProcessScreen's step grid) — so the cards themselves
+       * render border-less (see <BasicSeoCard>/<IndexingCard>).
+       *
+       * Column count is deliberately `sm:grid-cols-2` (not `lg:grid-cols-4`
+       * yet) — only 2 of the 4 planned cards exist (content-stats/i18n-ux
+       * are separate, not-yet-built issues #7/#8). Sizing the grid for 4
+       * before 4 exist left the other half of the row as a huge solid
+       * `bg-foreground` block (user feedback — looked like a stray dark
+       * panel, not empty grid space). Bump to `lg:grid-cols-4` once both
+       * land. This doesn't handle a card going empty at *runtime* (its
+       * source API failed) leaving a gap either — same accepted limitation
+       * as the raw-results tiles below, just smaller in scope now. */}
+      <div className="mt-8 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
         <BasicSeoCard
           lang={lang}
           theme={theme}
           t={t}
           checks={combined.checks.basicSeo}
         />
-      </div>
-
-      {/* "색인/크롤링(Indexing)" checklist card (issue #4 indexing-checklist)
-       * — checks.indexing is already a cross-API merge (siteMap/robotsTxt/
-       * crawling) done in combineScanResults, so this just renders it like
-       * BasicSeoCard. Other grouped checklist cards (content-stats/previews)
-       * aren't built yet — out of scope for this pass. */}
-      <div className="mt-8">
         <IndexingCard
           lang={lang}
           theme={theme}
