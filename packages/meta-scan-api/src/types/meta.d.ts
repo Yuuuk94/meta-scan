@@ -41,6 +41,17 @@ type PreviewsCheckItem = {
   detail?: number;
 };
 
+// Result row for one "AI 신호(AI Signals/AEO)" checklist item (issue #6 ai-signals-checklist).
+// Reuses BasicSeoStatus's pass/warning/fail/info vocabulary, same as indexing/previews.
+// `detail` carries the natural number for the id where one exists (promptsTxt's byte count,
+// jsRenderDelta's raw deltaRatio) — promptObject/structuredData/faqSection are existence-only, no
+// detail.
+type AiSignalsCheckItem = {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number;
+};
+
 type MetaScanResult = {
   url: string;
   finalUrl: string;
@@ -67,6 +78,15 @@ type MetaScanResult = {
     openGraph: Record<string, string>;
     twitter: Record<string, string>;
     duplicates: { metaName: string[]; metaProperty: string[] };
+    // Deduped `@type` values collected from every `script[type="application/ld+json"]` on the
+    // page (including nested `@graph` arrays) — issue #6 ai-signals-checklist. Parse errors are
+    // swallowed per-script (a malformed JSON-LD block just contributes no types); a dedicated
+    // parse-error judgement is PRD §3.4 scope this issue doesn't cover (spec-fixed.md only asks
+    // for promptsTxt/promptObject/structuredData/faqSection existence).
+    structuredDataTypes: string[];
+    // Raw result of the `/.well-known/prompts.txt` fetch run in parallel with the original-HTML
+    // fetch in `ScanService.crawling` (issue #6 — ADR-003: no 5th API route for this).
+    promptsTxt: { exists: boolean; byteCount?: number };
   };
   // Grouped by checklist card (issue #3 basic-seo-checklist introduces the first group,
   // `basicSeo`; issue #4 indexing-checklist adds `indexing` — though its `sitemapExists`/
@@ -79,9 +99,14 @@ type MetaScanResult = {
   // og/twitter values used for the frontend's actual card preview render (not judgement) already
   // live under `extract.openGraph`/`extract.twitter` above (spec req #3 — passthrough, no new
   // field needed here).
+  // issue #6 ai-signals-checklist adds `aiSignals` — `promptsTxt`/`promptObject`/
+  // `structuredData`/`faqSection`/`jsRenderDelta`, all judged from this response's own
+  // extraction (prompts.txt fetch + JSON-LD @type parsing + the already-computed
+  // `html.deltaRatio`), same single-endpoint-composer pattern as basicSeo/previews.
   checks: {
     basicSeo: BasicSeoCheckItem[];
     indexing: IndexingCheckItem[];
     previews: PreviewsCheckItem[];
+    aiSignals: AiSignalsCheckItem[];
   };
 };
