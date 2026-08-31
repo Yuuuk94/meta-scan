@@ -100,6 +100,42 @@ describe("ProcessScreen", () => {
     expect(stored?.combined.failedApis).toEqual([]);
   });
 
+  it("stores a real lighthouse response even though it has no {status:'ok'} wrapper (issue #9)", async () => {
+    // meta-scan-api CLAUDE.md "응답 스프레드 규약과 예외": lighthouse run
+    // returns `result?.lhr` directly, unlike the other 3 endpoints — a
+    // truthy 2xx body here must count as success, not just one with a
+    // `status === "ok"` field.
+    (scanRobotsTxtApi as jest.Mock).mockReturnValue(
+      okRes<RobotsTxtData>({ status: "ok", has: true })
+    );
+    (scanSiteMapApi as jest.Mock).mockReturnValue(
+      okRes<SiteMapData>({ status: "ok", has: true })
+    );
+    (scanCrawlingApi as jest.Mock).mockReturnValue(
+      okRes<CrawlingScanData>(crawlingFixture)
+    );
+    (lsRunApi as jest.Mock).mockReturnValue(
+      okRes<LighthouseData>({
+        lighthouseVersion: "12.8.2",
+        categories: {
+          performance: { title: "Performance", score: 0.5 },
+        },
+      })
+    );
+
+    render(
+      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+    );
+
+    await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+
+    const id = replace.mock.calls[0][0].split("/scan/")[1];
+    const stored = useScanStore.getState().getScanResult(id);
+    expect(stored?.raw.lighthouse?.categories?.performance?.score).toBe(0.5);
+    expect(stored?.combined.failedApis).not.toContain("lighthouse");
+    expect(stored?.combined.lighthouse?.scores.performance).toBe(0.5);
+  });
+
   it("forwards robotsTxt's declared sitemap URLs as siteMap's candidateSitemaps (issue #4 req #1)", async () => {
     (scanRobotsTxtApi as jest.Mock).mockReturnValue(
       okRes<RobotsTxtData>({
