@@ -72,6 +72,20 @@ interface PreviewsCheckItem {
   detail?: number;
 }
 
+/** One row of the "AI 신호(AI Signals/AEO)" checklist card (issue #6
+ * ai-signals-checklist). Like `checks.basicSeo`/`checks.previews`, all 5
+ * rows (promptsTxt/promptObject/structuredData/faqSection/jsRenderDelta)
+ * come from the `crawling` response alone (no cross-API merge) — mirrors
+ * meta-scan-api's `AiSignalsCheckItem` (`domain/checks/aiSignalsChecks.ts`).
+ * `detail` carries promptsTxt's byte count (pass only) or jsRenderDelta's
+ * raw signed deltaRatio (all 3 statuses); promptObject/structuredData/
+ * faqSection are existence-only, no detail. */
+interface AiSignalsCheckItem {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number;
+}
+
 interface CrawlingScanData extends OkStatus {
   url: string;
   finalUrl: string;
@@ -98,7 +112,9 @@ interface CrawlingScanData extends OkStatus {
   // the siteMap/robotsTxt responses, not this one; issue #5
   // previews-checklist adds `previews`, a straight passthrough like
   // `basicSeo` since all 4 rows come from this same response; content-stats
-  // lands via its own issue). Replaces the previous flat
+  // lands via its own issue; issue #6 ai-signals-checklist adds
+  // `aiSignals`, also a straight passthrough — all 5 rows come from this
+  // same response's own extraction). Replaces the previous flat
   // `checks: Array<{ id, level, message, target? }>` shape that
   // `ScanService.crawling`'s old push-only-on-problem `runChecks` used to
   // return.
@@ -106,6 +122,7 @@ interface CrawlingScanData extends OkStatus {
     basicSeo: BasicSeoCheckItem[];
     indexing: IndexingCheckItem[];
     previews: PreviewsCheckItem[];
+    aiSignals: AiSignalsCheckItem[];
   };
 }
 
@@ -144,8 +161,10 @@ interface TopIssue {
  * `crawling` each contribute their own subset, and this is where they get
  * concatenated into one array. `openGraph`/`twitter` (already present above)
  * double as the previews card's raw values for its Google/Twitter-style
- * mockup render (issue #5 req #3/#4) — not re-derived here. content-stats
- * isn't built yet. */
+ * mockup render (issue #5 req #3/#4) — not re-derived here. `checks.aiSignals`
+ * (issue #6 ai-signals-checklist) is a straight passthrough too, same as
+ * `basicSeo`/`previews` — all 5 rows only ever come from `crawling`.
+ * content-stats isn't built yet. */
 interface CombinedScanResult {
   url?: string;
   title?: string;
@@ -162,6 +181,7 @@ interface CombinedScanResult {
     basicSeo: BasicSeoCheckItem[];
     indexing: IndexingCheckItem[];
     previews: PreviewsCheckItem[];
+    aiSignals: AiSignalsCheckItem[];
   };
 }
 

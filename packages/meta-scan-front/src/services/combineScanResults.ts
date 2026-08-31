@@ -109,6 +109,11 @@ export function combineScanResults(
       // from crawling alone, no cross-API merge needed (issue #5
       // previews-checklist).
       previews: raw.crawling?.checks?.previews ?? [],
+      // Straight passthrough too — all 5 aiSignals checks
+      // (promptsTxt/promptObject/structuredData/faqSection/jsRenderDelta)
+      // come from crawling alone, no cross-API merge needed (issue #6
+      // ai-signals-checklist).
+      aiSignals: raw.crawling?.checks?.aiSignals ?? [],
     },
   };
 }

@@ -5,6 +5,10 @@
 // the actual `combineScanResults` so it matches production shape exactly.
 // Refreshed 2026-08-31 (issue #5 previews-checklist) — `checks.previews` is
 // now a real capture too, not the earlier synthetic placeholder.
+// Refreshed again same day (issue #6 ai-signals-checklist) — `checks.aiSignals`
+// added; this site has no prompts.txt/PromptObject/structured data (all
+// `info`, not a deduction) and a small JS-render delta (matches
+// `html.deltaRatio` below, `pass`).
 // Only ever used from `ScanResultScreen` when `location.hostname` is
 // localhost/127.0.0.1 (see there) — never reachable in a deployed build.
 export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
@@ -58,6 +62,13 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
           { id: "ogRequiredTags", status: "warning" },
           { id: "twitterCard", status: "warning" },
         ],
+        aiSignals: [
+          { id: "promptsTxt", status: "info" },
+          { id: "promptObject", status: "info" },
+          { id: "structuredData", status: "info" },
+          { id: "faqSection", status: "info" },
+          { id: "jsRenderDelta", status: "pass", detail: 0.009520662197463255 },
+        ],
       },
     },
     lighthouse: {
@@ -101,6 +112,13 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
         { id: "favicon", status: "pass" },
         { id: "ogRequiredTags", status: "warning" },
         { id: "twitterCard", status: "warning" },
+      ],
+      aiSignals: [
+        { id: "promptsTxt", status: "info" },
+        { id: "promptObject", status: "info" },
+        { id: "structuredData", status: "info" },
+        { id: "faqSection", status: "info" },
+        { id: "jsRenderDelta", status: "pass", detail: 0.009520662197463255 },
       ],
     },
   },
