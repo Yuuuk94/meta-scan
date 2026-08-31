@@ -19,7 +19,7 @@ export const scanCrawlingApi = async (data: UrlData) =>
   await instance.post<CrawlingScanData>("/api/v1/scan/crawling", data);
 
 export const lsRunApi = async (data: UrlData) =>
-  await instance.post<unknown>("/api/v1/lighthouse/run", {
+  await instance.post<LighthouseData>("/api/v1/lighthouse/run", {
     url: data.url,
     formFactor: "mobile",
     onlyCategories: ["performance", "seo", "best-practices", "accessibility"],
