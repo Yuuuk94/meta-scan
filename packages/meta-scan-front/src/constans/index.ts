@@ -14,3 +14,14 @@ export const crrUrlKey = "crrUrl";
 export const urlPattern = /^https?:\/\/.+\..+/;
 
 export const okStatus = "ok";
+
+// meta-scan's own site URL (own sitemap.xml/robots.txt, issue #10) —
+// distinct from a scanned target's URL. Same placeholder domain
+// RootLayout's openGraph metadata already hardcodes; kept here as a single
+// source of truth for the sitemap/robots routes.
+export const siteUrl = "https://example.com";
+
+// Real routes that get indexed per-locale in sitemap.xml. `/scan/:id` is a
+// personalized result page (pipe-connection, issue #2) and intentionally
+// excluded.
+export const siteRoutes = ["", "/request-scan", "/scan", "/privacy", "/terms"];
