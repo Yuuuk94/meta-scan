@@ -1,13 +1,20 @@
 import { ApiError } from "@/core/http/ApiError.js";
 // NOTE(ADR-011): application importing an inbound-adapter DTO type is a known impurity this
 // migration pass didn't resolve — see docs/case-study/backend-hexagonal-architecture.md §5.
-import type { UrlBody } from "@/adapters/inbound/http/scan/dto.js";
+import type { SiteMapBody, UrlBody } from "@/adapters/inbound/http/scan/dto.js";
 import type {
   BrowserAutomationPort,
   PuppeteerProcess,
 } from "@/domain/ports/BrowserAutomationPort.js";
 import crypto from "node:crypto";
 import { buildBasicSeoChecks } from "@/domain/checks/basicSeoChecks.js";
+import {
+  buildCanonicalCheck,
+  buildCanonicalMultipleCheck,
+  buildMetaRobotsNoindexCheck,
+  buildSitemapDeclaredInRobotsCheck,
+  buildSitemapExistsCheck,
+} from "@/domain/checks/indexingChecks.js";
 
 export class ScanService {
   constructor(private readonly chrome: BrowserAutomationPort) {}
@@ -157,25 +164,43 @@ export class ScanService {
     }
   }
 
-  async siteMap({ url }: UrlBody) {
+  private async headCheck(url: string) {
     try {
-      const parsedUrl = new URL(url);
-      const siteMapUrl = this.getUrl(parsedUrl, "/sitemap.xml");
-      const result = await fetch(siteMapUrl, {
+      const result = await fetch(url, {
         method: "HEAD",
         signal: AbortSignal.timeout(this.timeOut),
       });
-      let has = false;
+      return result.status === 200 ? result : null;
+    } catch (e) {
+      // A single candidate failing to fetch (network error, DNS, timeout) shouldn't abort the
+      // rest of the fallback sequence — treat it the same as a non-200 response.
+      return null;
+    }
+  }
 
-      if (result.status === 200) {
-        has = true;
-        return {
-          has,
-          redirected: result.redirected,
-          url: result.url,
-        };
+  async siteMap({ url, candidateSitemaps }: SiteMapBody) {
+    try {
+      const parsedUrl = new URL(url);
+      const siteMapUrl = this.getUrl(parsedUrl, "/sitemap.xml");
+
+      let matched = await this.headCheck(siteMapUrl);
+
+      // /sitemap.xml itself 404s — fall back to robots.txt's declared sitemap locations
+      // (already fetched by the frontend, passed through as candidateSitemaps) one at a time,
+      // stopping at the first 200 (spec decision log #2/#3).
+      if (!matched && candidateSitemaps?.length) {
+        for (const candidate of candidateSitemaps) {
+          matched = await this.headCheck(candidate);
+          if (matched) break;
+        }
       }
-      return { has };
+
+      const has = matched !== null;
+      return {
+        has,
+        ...(matched ? { url: matched.url, redirected: matched.redirected } : {}),
+        checks: { indexing: [buildSitemapExistsCheck(has)] },
+      };
     } catch (e) {
       throw ApiError.internal();
     }
