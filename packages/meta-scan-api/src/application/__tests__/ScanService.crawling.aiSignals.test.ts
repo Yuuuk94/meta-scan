@@ -55,13 +55,13 @@ describe("ScanService.crawling — aiSignals (issue #6 ai-signals-checklist)", (
     vi.unstubAllGlobals();
   });
 
-  it("fetches /.well-known/prompts.txt in parallel with the original HTML fetch and marks promptsTxt pass with its byte count", async () => {
+  it("fetches /.well-known/prompts.txt in parallel with the original HTML fetch and marks promptsTxt pass when the content is substantial (>=10 bytes)", async () => {
     fetchMock.mockImplementation(async (url: string) => {
       if (url.includes("/.well-known/prompts.txt")) {
         return textResponse(
           200,
           "https://example.com/.well-known/prompts.txt",
-          "allow: *"
+          "allow: * # crawl everything"
         );
       }
       // original-HTML fetch (fetchFirstHtml)
@@ -85,15 +85,45 @@ describe("ScanService.crawling — aiSignals (issue #6 ai-signals-checklist)", (
       requestedUrls.some((u: string) => u.includes("/.well-known/prompts.txt"))
     ).toBe(true);
 
-    expect(result.extract.promptsTxt).toEqual({ exists: true, byteCount: 8 });
+    expect(result.extract.promptsTxt).toEqual({ exists: true, byteCount: 27 });
     expect(result.checks.aiSignals).toContainEqual({
       id: "promptsTxt",
       status: "pass",
+      detail: 27,
+    });
+  });
+
+  it("marks promptsTxt info when it exists but has next to no content (<10 bytes)", async () => {
+    fetchMock.mockImplementation(async (url: string) => {
+      if (url.includes("/.well-known/prompts.txt")) {
+        return textResponse(
+          200,
+          "https://example.com/.well-known/prompts.txt",
+          "allow: *"
+        );
+      }
+      return textResponse(200, url, "<html><body>first</body></html>");
+    });
+
+    const { browser } = fakeBrowser(baseExtracted);
+    const chrome: BrowserAutomationPort = {
+      launch: vi.fn().mockResolvedValue(browser),
+      close: vi.fn(),
+    };
+
+    const result = await new ScanService(chrome).crawling({
+      url: "https://example.com",
+    });
+
+    expect(result.extract.promptsTxt).toEqual({ exists: true, byteCount: 8 });
+    expect(result.checks.aiSignals).toContainEqual({
+      id: "promptsTxt",
+      status: "info",
       detail: 8,
     });
   });
 
-  it("marks promptsTxt info when the fetch 404s, and composes the rest of checks.aiSignals from structuredDataTypes/deltaRatio", async () => {
+  it("marks promptsTxt warning when the fetch 404s, and composes the rest of checks.aiSignals from structuredDataTypes/deltaRatio", async () => {
     fetchMock.mockImplementation(async (url: string) => {
       if (url.includes("/.well-known/prompts.txt")) {
         return textResponse(404, url, "");
@@ -121,7 +151,7 @@ describe("ScanService.crawling — aiSignals (issue #6 ai-signals-checklist)", (
       "PromptObject",
     ]);
     expect(result.checks.aiSignals).toEqual([
-      { id: "promptsTxt", status: "info" },
+      { id: "promptsTxt", status: "warning" },
       { id: "promptObject", status: "pass" },
       { id: "structuredData", status: "pass" },
       { id: "faqSection", status: "pass" },

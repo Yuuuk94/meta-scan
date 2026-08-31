@@ -9,16 +9,28 @@ import {
 } from "@/domain/checks/aiSignalsChecks.js";
 
 describe("buildPromptsTxtCheck", () => {
-  it("marks promptsTxt as pass with byte count when /.well-known/prompts.txt exists", () => {
+  it("marks promptsTxt as pass when /.well-known/prompts.txt exists with substantial content (>=10 bytes)", () => {
     expect(
       buildPromptsTxtCheck({ exists: true, byteCount: 512 })
     ).toEqual({ id: "promptsTxt", status: "pass", detail: 512 });
   });
 
-  it("marks promptsTxt as info (not a deduction) when it doesn't exist", () => {
+  it("marks promptsTxt as pass at exactly the 10-byte boundary", () => {
+    expect(
+      buildPromptsTxtCheck({ exists: true, byteCount: 10 })
+    ).toEqual({ id: "promptsTxt", status: "pass", detail: 10 });
+  });
+
+  it("marks promptsTxt as info when it exists but has next to no content (<10 bytes)", () => {
+    expect(
+      buildPromptsTxtCheck({ exists: true, byteCount: 8 })
+    ).toEqual({ id: "promptsTxt", status: "info", detail: 8 });
+  });
+
+  it("marks promptsTxt as warning when it doesn't exist", () => {
     expect(buildPromptsTxtCheck({ exists: false })).toEqual({
       id: "promptsTxt",
-      status: "info",
+      status: "warning",
     });
   });
 });
@@ -31,17 +43,17 @@ describe("buildPromptObjectCheck", () => {
     });
   });
 
-  it("marks promptObject as info when no PromptObject @type is present", () => {
+  it("marks promptObject as warning when no PromptObject @type is present", () => {
     expect(buildPromptObjectCheck(["WebPage"])).toEqual({
       id: "promptObject",
-      status: "info",
+      status: "warning",
     });
   });
 
-  it("marks promptObject as info when there's no structured data at all", () => {
+  it("marks promptObject as warning when there's no structured data at all", () => {
     expect(buildPromptObjectCheck([])).toEqual({
       id: "promptObject",
-      status: "info",
+      status: "warning",
     });
   });
 });
@@ -54,10 +66,10 @@ describe("buildStructuredDataCheck", () => {
     });
   });
 
-  it("marks structuredData as info when no JSON-LD was found", () => {
+  it("marks structuredData as warning when no JSON-LD was found", () => {
     expect(buildStructuredDataCheck([])).toEqual({
       id: "structuredData",
-      status: "info",
+      status: "warning",
     });
   });
 });
@@ -70,10 +82,10 @@ describe("buildFaqSectionCheck", () => {
     });
   });
 
-  it("marks faqSection as info when no FAQPage @type is present", () => {
+  it("marks faqSection as warning when no FAQPage @type is present", () => {
     expect(buildFaqSectionCheck(["WebPage"])).toEqual({
       id: "faqSection",
-      status: "info",
+      status: "warning",
     });
   });
 });
@@ -153,10 +165,10 @@ describe("buildAiSignalsChecksFromCrawling", () => {
     });
 
     expect(checks).toEqual([
-      { id: "promptsTxt", status: "info" },
-      { id: "promptObject", status: "info" },
-      { id: "structuredData", status: "info" },
-      { id: "faqSection", status: "info" },
+      { id: "promptsTxt", status: "warning" },
+      { id: "promptObject", status: "warning" },
+      { id: "structuredData", status: "warning" },
+      { id: "faqSection", status: "warning" },
       { id: "jsRenderDelta", status: "fail", detail: 0.5 },
     ]);
   });

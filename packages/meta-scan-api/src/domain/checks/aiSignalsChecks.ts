@@ -11,22 +11,34 @@
  * heuristic PRD §3.4 also mentions is explicitly deferred (spec-fixed.md decision log #1: high
  * false-positive rate, separate-scale design work).
  *
- * Most of this group is "presence is a nice-to-have signal, not a deduction" (PRD §3.4) — hence
- * `info` rather than `warning`/`fail` on absence for everything except `jsRenderDelta`, which is a
- * real crawler-accessibility concern (a large gap between the first-fetched HTML and the
- * JS-rendered HTML means non-JS crawlers — including most AI bots today — miss real content).
+ * 2026-08-31 redefinition (issue #6 comment "판정 기준 재정의", found during PR #29 review):
+ * absence of an AI signal is now a `warning`, not an `info` — the original "presence is a
+ * nice-to-have, not a deduction" framing (PRD §3.4) was replaced because these signals are
+ * meaningfully actionable for AEO readiness, not purely cosmetic. `promptsTxt` is the one
+ * 3-level check in the group (warning/info/pass) because `byteCount` is already collected and
+ * gives a data-backed way to distinguish "absent" from "present but essentially empty"; the other
+ * three (`promptObject`/`structuredData`/`faqSection`) stay binary (warning/pass) because there's
+ * no non-arbitrary way to grade "how much" structured data/PromptObject/FAQPage completeness
+ * means. `jsRenderDelta` is unchanged — it was already a real crawler-accessibility concern (a
+ * large gap between the first-fetched HTML and the JS-rendered HTML means non-JS crawlers —
+ * including most AI bots today — miss real content), not a "nice to have" signal.
  */
+
+// <10 bytes counts as "essentially empty" — present but not meaningfully populated.
+const PROMPTS_TXT_MIN_BYTES = 10;
 
 export function buildPromptsTxtCheck(promptsTxt: {
   exists: boolean;
   byteCount?: number;
 }): AiSignalsCheckItem {
+  if (!promptsTxt.exists) {
+    return { id: "promptsTxt", status: "warning" };
+  }
+  const byteCount = promptsTxt.byteCount ?? 0;
   return {
     id: "promptsTxt",
-    status: promptsTxt.exists ? "pass" : "info",
-    ...(promptsTxt.exists && promptsTxt.byteCount !== undefined
-      ? { detail: promptsTxt.byteCount }
-      : {}),
+    status: byteCount >= PROMPTS_TXT_MIN_BYTES ? "pass" : "info",
+    detail: byteCount,
   };
 }
 
@@ -37,7 +49,7 @@ export function buildPromptObjectCheck(
 ): AiSignalsCheckItem {
   return {
     id: "promptObject",
-    status: structuredDataTypes.includes("PromptObject") ? "pass" : "info",
+    status: structuredDataTypes.includes("PromptObject") ? "pass" : "warning",
   };
 }
 
@@ -46,7 +58,7 @@ export function buildStructuredDataCheck(
 ): AiSignalsCheckItem {
   return {
     id: "structuredData",
-    status: structuredDataTypes.length > 0 ? "pass" : "info",
+    status: structuredDataTypes.length > 0 ? "pass" : "warning",
   };
 }
 
@@ -56,7 +68,7 @@ export function buildFaqSectionCheck(
 ): AiSignalsCheckItem {
   return {
     id: "faqSection",
-    status: structuredDataTypes.includes("FAQPage") ? "pass" : "info",
+    status: structuredDataTypes.includes("FAQPage") ? "pass" : "warning",
   };
 }
 
