@@ -123,12 +123,28 @@ describe("ProcessScreen robots.txt 게이팅 (ADR-006, 이슈 #1)", () => {
 
     renderScreen();
 
-    await waitFor(() => expect(replace).toHaveBeenCalledWith("/scan"));
+    await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+    expect(replace.mock.calls[0][0]).toMatch(/^\/scan\/[0-9a-f-]{36}$/);
     expect(screen.queryByText(t.blockedTitle)).not.toBeInTheDocument();
   });
 
   it("robotsTxt 호출 자체가 실패하면 BlockedScreen이 아니라 ErrorScreen을 렌더한다", async () => {
     mockedRobotsTxt.mockRejectedValue(new Error("network error"));
+
+    renderScreen();
+
+    await waitFor(() =>
+      expect(screen.getByText(t.errorTitle)).toBeInTheDocument(),
+    );
+
+    expect(screen.queryByText(t.blockedTitle)).not.toBeInTheDocument();
+    expect(mockedSiteMap).not.toHaveBeenCalled();
+    expect(mockedCrawling).not.toHaveBeenCalled();
+    expect(mockedLsRun).not.toHaveBeenCalled();
+  });
+
+  it("renders ErrorScreen instead of throwing when robotsTxt resolves 2xx with an empty body", async () => {
+    mockedRobotsTxt.mockResolvedValue({ data: null });
 
     renderScreen();
 

@@ -115,6 +115,16 @@
     "promptObject": "PromptObject",
     "faqPage": "FAQ 섹션",
     "structuredData": "구조화 데이터",
-    "jsRenderDependency": "JS 렌더링 의존도"
+    "jsRenderDependency": "JS 렌더링 의존도",
+    "topIssuesTitle": "지금 고쳐야 할 것",
+    "topIssuesEmpty": "지금까지 확인한 항목에서 심각한 문제가 없습니다",
+    "rawResultsTitle": "스캔 결과",
+    "rawSiteMapLabel": "sitemap.xml",
+    "rawCrawlingLabel": "페이지 크롤링",
+    "rawLighthouseLabel": "Lighthouse",
+    "unavailable": "확인 불가",
+    "notFoundTitle": "표시할 결과가 없습니다",
+    "notFoundDescription": "요청한 스캔 결과를 찾을 수 없거나 만료됐다 — 스캔 결과는 10분간만 유지된다.",
+    "notFoundAction": "홈으로"
   }
 }
