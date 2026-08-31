@@ -6,23 +6,24 @@ import { AiSignalsCard } from "@/ui/organisms/AiSignalsCard";
 const t = {
   aiSignals: "AI SIGNALS",
   aiSignalsEyebrow: "Lighthouse가 다루지 않는 항목",
-  aiSignalsHint: "없어도 감점되지 않는다",
+  aiSignalsHint: "채워두면 AEO 준비도가 올라간다",
   aiSignalsPromptsTxtPass: "prompts.txt가 확인된다 ({count}바이트)",
-  aiSignalsPromptsTxtInfo: "prompts.txt가 없다",
+  aiSignalsPromptsTxtInfo: "prompts.txt가 있지만 내용이 거의 없다 ({count}바이트)",
+  aiSignalsPromptsTxtWarning: "prompts.txt가 없다",
   aiSignalsPromptObjectPass: "PromptObject 구조화 데이터가 확인된다",
-  aiSignalsPromptObjectInfo: "PromptObject 구조화 데이터가 없다",
+  aiSignalsPromptObjectWarning: "PromptObject 구조화 데이터가 없다",
   aiSignalsStructuredDataPass: "구조화 데이터(JSON-LD)가 확인된다",
-  aiSignalsStructuredDataInfo: "구조화 데이터가 없다",
+  aiSignalsStructuredDataWarning: "구조화 데이터가 없다",
   aiSignalsFaqSectionPass: "FAQPage 구조화 데이터가 확인된다",
-  aiSignalsFaqSectionInfo: "FAQPage 구조화 데이터가 없다",
+  aiSignalsFaqSectionWarning: "FAQPage 구조화 데이터가 없다",
   aiSignalsJsRenderDeltaPass: "JS 렌더링 전후 차이가 적다 ({count}%)",
   aiSignalsJsRenderDeltaWarning: "JS 렌더링 전후 차이가 크다 ({count}%)",
   aiSignalsJsRenderDeltaFail: "JS 렌더링 의존도가 매우 높다 ({count}%)",
 };
 
 const fiveChecks: AiSignalsCheckItem[] = [
-  { id: "promptsTxt", status: "info" },
-  { id: "promptObject", status: "info" },
+  { id: "promptsTxt", status: "warning" },
+  { id: "promptObject", status: "warning" },
   { id: "structuredData", status: "pass" },
   { id: "faqSection", status: "pass" },
   { id: "jsRenderDelta", status: "pass", detail: 0.05 },
@@ -36,7 +37,7 @@ describe("AiSignalsCard", () => {
 
     expect(screen.getByText("AI SIGNALS")).toBeInTheDocument();
     expect(screen.getByText("Lighthouse가 다루지 않는 항목")).toBeInTheDocument();
-    expect(screen.getByText("없어도 감점되지 않는다")).toBeInTheDocument();
+    expect(screen.getByText("채워두면 AEO 준비도가 올라간다")).toBeInTheDocument();
   });
 
   it("renders all 5 rows with a StatusBadge each and the assembled sentence", () => {
@@ -58,16 +59,30 @@ describe("AiSignalsCard", () => {
       screen.getByText("JS 렌더링 전후 차이가 적다 (5%)")
     ).toBeInTheDocument();
 
-    expect(screen.getAllByText("INFO")).toHaveLength(2);
+    expect(screen.getAllByText("WARNING")).toHaveLength(2);
     expect(screen.getAllByText("PASS")).toHaveLength(3);
   });
 
-  it("renders info-status rows as outline badges (equal weight, not a deduction) via StatusBadge's own info variant", () => {
+  it("renders promptsTxt's info status (present but nearly empty) as an outline badge via StatusBadge's own info variant", () => {
     render(
-      <AiSignalsCard lang="ko" theme="dark" t={t} checks={fiveChecks} />
+      <AiSignalsCard
+        lang="ko"
+        theme="dark"
+        t={t}
+        checks={[
+          { id: "promptsTxt", status: "info", detail: 8 },
+          { id: "promptObject", status: "pass" },
+          { id: "structuredData", status: "pass" },
+          { id: "faqSection", status: "pass" },
+          { id: "jsRenderDelta", status: "pass", detail: 0.05 },
+        ]}
+      />
     );
 
-    const infoBadge = screen.getAllByText("INFO")[0];
+    expect(
+      screen.getByText("prompts.txt가 있지만 내용이 거의 없다 (8바이트)")
+    ).toBeInTheDocument();
+    const infoBadge = screen.getByText("INFO");
     expect(infoBadge).toHaveAttribute("data-status", "info");
   });
 
@@ -86,9 +101,9 @@ describe("AiSignalsCard", () => {
         t={t}
         checks={[
           { id: "promptsTxt", status: "pass", detail: 512 },
-          { id: "promptObject", status: "info" },
-          { id: "structuredData", status: "info" },
-          { id: "faqSection", status: "info" },
+          { id: "promptObject", status: "warning" },
+          { id: "structuredData", status: "warning" },
+          { id: "faqSection", status: "warning" },
           { id: "jsRenderDelta", status: "fail", detail: 0.6 },
         ]}
       />

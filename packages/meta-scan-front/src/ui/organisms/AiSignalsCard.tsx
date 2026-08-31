@@ -11,11 +11,14 @@ import { StatusBadge } from "@/ui/molecules/StatusBadge";
 // jsRenderDelta, in that backend-composed order (aiSignalsChecks.ts's
 // `buildAiSignalsChecksFromCrawling`).
 //
-// `info` never carries less visual weight *by suppressing anything* here —
-// <StatusBadge>'s own `info` variant already renders outline-only instead of
-// a filled box (design-system.md §2/§8's "info is the one deliberate
-// exception" rule), which is what keeps an absent AI signal from reading as
-// a deduction. This card doesn't need its own extra styling on top of that.
+// 2026-08-31 redefinition (issue #6 comment "판정 기준 재정의"): absence of
+// an AI signal is now `warning` (filled box, same visual weight as the
+// other checklist cards' warnings), not `info` — the previous "absence
+// isn't a deduction" framing is gone, so this card doesn't suppress
+// anything for absent rows anymore. `info` still exists in this group, but
+// only for `promptsTxt` when it's present yet essentially empty (<10
+// bytes) — that's the one case <StatusBadge>'s outline-only `info` variant
+// (design-system.md §2/§8) still renders here.
 //
 // Like <PreviewsCard> (and unlike <BasicSeoCard>/<IndexingCard>, which are
 // cells inside <ScanResultScreen>'s shared 4-column checklist grid), this

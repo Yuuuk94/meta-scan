@@ -6,19 +6,23 @@
 // packages/meta-scan-api/src/domain/checks/aiSignalsChecks.ts), never a
 // rendered sentence.
 //
-// Keyed by `${id}:${status}` since every current aiSignals id has 2 possible
-// statuses, except jsRenderDelta which has 3 (pass/warning/fail — the only
-// id in this group that isn't "presence is a nice-to-have signal", see
-// aiSignalsChecks.ts's doc comment).
+// 2026-08-31 redefinition (issue #6 comment "판정 기준 재정의"): absence is
+// now `warning`, not `info` — see aiSignalsChecks.ts's doc comment for the
+// full rationale. `promptsTxt` keeps a 3rd status (`info`) for "exists but
+// essentially empty (<10 bytes)", the one id where `detail` (byteCount) can
+// back that distinction; `promptObject`/`structuredData`/`faqSection` are
+// binary (warning/pass). `jsRenderDelta` is unchanged (pass/warning/fail on
+// magnitude — the one id in this group that was never a "presence" signal).
 const TEMPLATE_KEY_BY_ID_STATUS: Record<string, string> = {
   "promptsTxt:pass": "aiSignalsPromptsTxtPass",
   "promptsTxt:info": "aiSignalsPromptsTxtInfo",
+  "promptsTxt:warning": "aiSignalsPromptsTxtWarning",
   "promptObject:pass": "aiSignalsPromptObjectPass",
-  "promptObject:info": "aiSignalsPromptObjectInfo",
+  "promptObject:warning": "aiSignalsPromptObjectWarning",
   "structuredData:pass": "aiSignalsStructuredDataPass",
-  "structuredData:info": "aiSignalsStructuredDataInfo",
+  "structuredData:warning": "aiSignalsStructuredDataWarning",
   "faqSection:pass": "aiSignalsFaqSectionPass",
-  "faqSection:info": "aiSignalsFaqSectionInfo",
+  "faqSection:warning": "aiSignalsFaqSectionWarning",
   "jsRenderDelta:pass": "aiSignalsJsRenderDeltaPass",
   "jsRenderDelta:warning": "aiSignalsJsRenderDeltaWarning",
   "jsRenderDelta:fail": "aiSignalsJsRenderDeltaFail",
