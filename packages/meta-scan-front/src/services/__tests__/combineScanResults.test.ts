@@ -55,13 +55,29 @@ const siteMap: SiteMapData = {
   checks: { indexing: [{ id: "sitemapExists", status: "pass" }] },
 };
 
+const lighthouse: LighthouseData = {
+  categories: {
+    performance: { title: "Performance", score: 0.9 },
+    seo: { title: "SEO", score: 1 },
+    accessibility: { title: "Accessibility", score: 0.8 },
+    "best-practices": { title: "Best Practices", score: 0.75 },
+  },
+  audits: {
+    "render-blocking-resources": {
+      id: "render-blocking-resources",
+      title: "Eliminate render-blocking resources",
+      score: 0.4,
+    },
+  },
+};
+
 describe("combineScanResults", () => {
   it("merges already-judged fields from the 4 raw responses without recomputing them", () => {
     const combined = combineScanResults("https://example.com", {
       robotsTxt,
       siteMap,
       crawling,
-      lighthouse: { fake: "lhr" },
+      lighthouse,
     });
 
     expect(combined.url).toBe("https://example.com");
@@ -232,5 +248,50 @@ describe("combineScanResults", () => {
     });
 
     expect(combined.topIssues).toEqual([]);
+  });
+
+  it("builds combined.lighthouse from raw.lighthouse's categories/audits (issue #9 req #1/#3)", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling,
+      lighthouse,
+    });
+
+    expect(combined.lighthouse).toEqual({
+      scores: {
+        performance: 0.9,
+        seo: 1,
+        accessibility: 0.8,
+        bestPractices: 0.75,
+      },
+      suggestions: [
+        {
+          id: "render-blocking-resources",
+          title: "Eliminate render-blocking resources",
+          description: undefined,
+          score: 0.4,
+        },
+      ],
+    });
+  });
+
+  it("defaults combined.lighthouse to all-null scores and no suggestions when lighthouse failed", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling,
+      lighthouse: null,
+    });
+
+    expect(combined.lighthouse).toEqual({
+      scores: {
+        performance: null,
+        seo: null,
+        accessibility: null,
+        bestPractices: null,
+      },
+      suggestions: [],
+    });
   });
 });
