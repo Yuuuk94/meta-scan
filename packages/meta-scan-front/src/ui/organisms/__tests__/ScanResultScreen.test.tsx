@@ -30,6 +30,10 @@ const t = {
   previewsGoogleMockupLabel: "구글 검색 미리보기",
   previewsTwitterMockupLabel: "트위터 카드 미리보기",
   previewsImagePlaceholderLabel: "이미지 없음",
+  aiSignals: "AI SIGNALS",
+  aiSignalsEyebrow: "Lighthouse가 다루지 않는 항목",
+  aiSignalsHint: "없어도 감점되지 않는다",
+  aiSignalsPromptsTxtInfo: "prompts.txt가 없다",
 };
 
 const combined: CombinedScanResult = {
@@ -37,7 +41,7 @@ const combined: CombinedScanResult = {
   description: "An example page used in docs",
   topIssues: [],
   failedApis: ["lighthouse"],
-  checks: { basicSeo: [], indexing: [], previews: [] },
+  checks: { basicSeo: [], indexing: [], previews: [], aiSignals: [] },
 };
 
 beforeEach(() => {
@@ -96,6 +100,7 @@ describe("ScanResultScreen", () => {
           basicSeo: [{ id: "title.length", status: "pass", detail: 42 }],
           indexing: [],
           previews: [],
+          aiSignals: [],
         },
       },
     });
@@ -144,5 +149,24 @@ describe("ScanResultScreen", () => {
     expect(screen.getByText("Previews — OG · Twitter")).toBeInTheDocument();
     expect(screen.getByText("og:image가 설정되어 있다")).toBeInTheDocument();
     expect(screen.getAllByText("Example OG Title")).toHaveLength(2);
+  });
+
+  it("renders the AI Signals card from combined.checks.aiSignals when present (issue #6)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined: {
+        ...combined,
+        checks: {
+          ...combined.checks,
+          aiSignals: [{ id: "promptsTxt", status: "info" }],
+        },
+      },
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.getByText("AI SIGNALS")).toBeInTheDocument();
+    expect(screen.getByText("prompts.txt가 없다")).toBeInTheDocument();
   });
 });

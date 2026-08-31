@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useScanStore } from "@/stores/scanStore";
 import { Button } from "@/ui/atoms/Button";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { AiSignalsCard } from "@/ui/organisms/AiSignalsCard";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { IndexingCard } from "@/ui/organisms/IndexingCard";
 import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
@@ -104,6 +105,20 @@ export function ScanResultScreen({
         <span className="mt-0.5 text-xs text-muted-foreground sm:mt-0">
           {t.analyzedAt} {timestamp}
         </span>
+      </div>
+
+      {/* "AI 신호(AI Signals/AEO)" (issue #6 ai-signals-checklist) — placed
+       * *before* <ScanHero> ("지금 고쳐야 할 것"), matching ScanZine.dc.html's
+       * top-to-bottom order (item 3 AI Signals card, then item 4 fix-now
+       * section) — this is the product's core differentiation area, so it
+       * leads even before the fix-now list. */}
+      <div className="mt-6">
+        <AiSignalsCard
+          lang={lang}
+          theme={theme}
+          t={t}
+          checks={combined.checks.aiSignals}
+        />
       </div>
 
       <div className="mt-6">
