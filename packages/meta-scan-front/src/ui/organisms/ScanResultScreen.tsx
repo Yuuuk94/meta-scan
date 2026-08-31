@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useScanStore } from "@/stores/scanStore";
 import { Button } from "@/ui/atoms/Button";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { ScanHero } from "@/ui/organisms/ScanHero";
 
 // Screen transition unit for /scan/:id and bare /scan (spec-fixed.md req #9)
@@ -89,13 +90,24 @@ export function ScanResultScreen({
         />
       </div>
 
+      {/* "기본 SEO" checklist card (issue #3 basic-seo-checklist) — renders
+       * nothing itself when checks.basicSeo is empty (crawling failed).
+       * Other grouped checklist cards (indexing/content-stats/previews)
+       * aren't built yet — out of scope for this pass. */}
+      <div className="mt-8">
+        <BasicSeoCard
+          lang={lang}
+          theme={theme}
+          t={t}
+          checks={combined.checks.basicSeo}
+        />
+      </div>
+
       {/* Per-API availability — sitemap/crawling/lighthouse only (robots.txt's
        * own gating verdict is issue #1's slice). Failed calls render a gray
        * outline placeholder, deliberately distinct from the pass/warning/
        * fail/info StatusBadge vocabulary (design-system.md §8,
-       * spec-fixed.md req #5). Grouped checklist cards (basic SEO, indexing,
-       * etc.) aren't rebuilt here — out of scope for this walking-skeleton
-       * pass (spec-fixed.md "비고"). */}
+       * spec-fixed.md req #5). */}
       <div className="mt-8">
         <h3 className="font-display text-[15px] font-extrabold text-foreground">
           {t.rawResultsTitle}

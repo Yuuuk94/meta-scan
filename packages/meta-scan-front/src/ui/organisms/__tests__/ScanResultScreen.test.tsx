@@ -21,6 +21,8 @@ const t = {
   notFoundTitle: "표시할 결과가 없습니다",
   notFoundDescription: "결과가 없거나 만료됐다",
   notFoundAction: "홈으로",
+  basicSeo: "기본 SEO",
+  basicSeoTitleLengthPass: "제목 길이가 적절하다 ({count}자)",
 };
 
 const combined: CombinedScanResult = {
@@ -28,6 +30,7 @@ const combined: CombinedScanResult = {
   description: "An example page used in docs",
   topIssues: [],
   failedApis: ["lighthouse"],
+  checks: { basicSeo: [] },
 };
 
 beforeEach(() => {
@@ -74,5 +77,23 @@ describe("ScanResultScreen", () => {
     expect(screen.getByText("Example Domain")).toBeInTheDocument();
     expect(screen.getByText("확인 불가")).toBeInTheDocument();
     expect(screen.getByText("지금까지 확인한 항목에서 심각한 문제가 없습니다")).toBeInTheDocument();
+  });
+
+  it("renders the 기본 SEO card from combined.checks.basicSeo when present", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined: {
+        ...combined,
+        checks: {
+          basicSeo: [{ id: "title.length", status: "pass", detail: 42 }],
+        },
+      },
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.getByText("기본 SEO")).toBeInTheDocument();
+    expect(screen.getByText("제목 길이가 적절하다 (42자)")).toBeInTheDocument();
   });
 });

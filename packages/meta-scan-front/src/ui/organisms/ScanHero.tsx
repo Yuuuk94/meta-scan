@@ -1,5 +1,6 @@
 import React from "react";
 
+import { buildBasicSeoMessage } from "@/services/buildBasicSeoMessage";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 
 // Replaces the old "AI Preparedness Score" big-number Hero (ADR-005 scrapped
@@ -35,8 +36,14 @@ export const ScanHero = ({ t, topIssues }: ScanHeroProps) => {
               <StatusBadge status={issue.status}>
                 {issue.status.toUpperCase()}
               </StatusBadge>
+              {/* Sentence assembled here (render time), not stored as text
+               * on TopIssue — issue #3 basic-seo-checklist req #3. Every
+               * topIssue is currently sourced from checks.basicSeo (the
+               * only checklist group wired up so far); once other groups
+               * (indexing/content-stats/previews) land, this'll need to
+               * dispatch by id namespace instead of assuming basicSeo. */}
               <span className="text-sm font-medium text-foreground">
-                {issue.message}
+                {buildBasicSeoMessage(t, issue)}
               </span>
             </div>
           ))}

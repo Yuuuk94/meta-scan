@@ -5,20 +5,23 @@
 //
 // This function's job is to merge the 4 already-judged raw responses into the single shape
 // `/scan/:id` renders — it doesn't compute any verdicts itself (ADR-003 update, PRD §4). Group
-// structure (checks.basicSeo etc.) isn't built yet — out of scope for this walking-skeleton pass
-// (docs/feature/01-seo-aeo-geo-checker/pipe-connection/spec-fixed.md).
+// structure (checks.basicSeo etc.) is built here as a straight passthrough (issue #3
+// basic-seo-checklist) — no cross-API merge needed since that group only ever comes from the
+// crawling response. Other groups (indexing/content-stats/previews) aren't built yet.
 
 const DEFAULT_TOP_ISSUES_LIMIT = 3;
 
-// Backend crawling `checks[]` levels (error/warn/info) map onto this
-// product's own pass/warning/fail/info vocabulary. `pass` never appears here
-// because `checks[]` only lists problems, not passing items.
-const LEVEL_TO_TOP_ISSUE_STATUS: Record<
-  CrawlingCheckItem["level"],
+// checks.basicSeo's pass/warning/fail/info vocabulary maps onto this
+// function's fail-first-then-warning topIssues list. `pass`/`info` never
+// surface as a topIssue — `info` means "signal present, not a deduction"
+// (design-system.md §8), and `pass` obviously isn't an issue.
+const STATUS_TO_TOP_ISSUE_STATUS: Record<
+  BasicSeoStatus,
   TopIssue["status"] | null
 > = {
-  error: "fail",
-  warn: "warning",
+  fail: "fail",
+  warning: "warning",
+  pass: null,
   info: null,
 };
 
@@ -26,15 +29,20 @@ function buildTopIssues(
   crawling: CrawlingScanData | null,
   limit: number
 ): TopIssue[] {
-  const checks = crawling?.checks ?? [];
+  // Optional-chain past `checks` itself, not just `.basicSeo` — some
+  // existing test/mock fixtures (e.g. robots-gating tests) stub crawling's
+  // response as a bare `{ status: "ok" }` without a `checks` field at all,
+  // and a real backend 2xx with a malformed body shouldn't crash this
+  // either.
+  const checks = crawling?.checks?.basicSeo ?? [];
 
   const issues = checks
     .map((check) => ({
-      status: LEVEL_TO_TOP_ISSUE_STATUS[check.level],
+      status: STATUS_TO_TOP_ISSUE_STATUS[check.status],
       check,
     }))
     .filter(
-      (entry): entry is { status: TopIssue["status"]; check: CrawlingCheckItem } =>
+      (entry): entry is { status: TopIssue["status"]; check: BasicSeoCheckItem } =>
         entry.status !== null
     );
 
@@ -47,7 +55,7 @@ function buildTopIssues(
     .map(({ status, check }) => ({
       id: check.id,
       status,
-      message: check.message,
+      detail: check.detail,
     }));
 }
 
@@ -76,5 +84,6 @@ export function combineScanResults(
     hasSitemap: raw.siteMap?.has,
     topIssues: buildTopIssues(raw.crawling, topIssuesLimit),
     failedApis,
+    checks: { basicSeo: raw.crawling?.checks?.basicSeo ?? [] },
   };
 }

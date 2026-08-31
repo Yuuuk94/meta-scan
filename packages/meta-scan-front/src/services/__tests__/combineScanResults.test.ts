@@ -20,11 +20,15 @@ const crawling: CrawlingScanData = {
     twitter: { "twitter:card": "summary" },
     duplicates: { metaName: [], metaProperty: [] },
   },
-  checks: [
-    { id: "h1.multiple", level: "info", message: "info issue" },
-    { id: "img.alt_missing", level: "warn", message: "alt missing" },
-    { id: "title.missing", level: "error", message: "no title" },
-  ],
+  checks: {
+    basicSeo: [
+      { id: "title.length", status: "pass", detail: 14 },
+      { id: "desc.length", status: "pass", detail: 16 },
+      { id: "keywords.deprecated", status: "info" },
+      { id: "img.altMissing", status: "warning", detail: 2 },
+      { id: "meta.duplicate", status: "pass", detail: 0 },
+    ],
+  },
 };
 
 const robotsTxt: RobotsTxtData = { status: "ok", has: true, url: "https://example.com" };
@@ -67,16 +71,40 @@ describe("combineScanResults", () => {
     expect(combined.url).toBe("https://example.com");
   });
 
+  it("passes checks.basicSeo through from the crawling response as-is", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.basicSeo).toEqual(crawling.checks.basicSeo);
+  });
+
+  it("defaults checks.basicSeo to an empty array when crawling failed", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling: null,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.basicSeo).toEqual([]);
+  });
+
   it("builds topIssues fail-first, backfilled with warning, capped at 3 by default", () => {
     const manyIssues: CrawlingScanData = {
       ...crawling,
-      checks: [
-        { id: "warn1", level: "warn", message: "w1" },
-        { id: "fail1", level: "error", message: "f1" },
-        { id: "warn2", level: "warn", message: "w2" },
-        { id: "fail2", level: "error", message: "f2" },
-        { id: "info1", level: "info", message: "i1" },
-      ],
+      checks: {
+        basicSeo: [
+          { id: "img.altMissing", status: "warning", detail: 2 },
+          { id: "title.missing", status: "fail" },
+          { id: "desc.length", status: "warning", detail: 9 },
+          { id: "desc.missing", status: "fail" },
+          { id: "keywords.deprecated", status: "info" },
+        ],
+      },
     };
 
     const combined = combineScanResults("https://example.com", {
@@ -89,13 +117,20 @@ describe("combineScanResults", () => {
     expect(combined.topIssues).toHaveLength(3);
     expect(combined.topIssues[0].status).toBe("fail");
     expect(combined.topIssues[1].status).toBe("fail");
-    expect(combined.topIssues.map((i) => i.id)).not.toContain("info1");
+    expect(combined.topIssues.map((i) => i.id)).not.toContain(
+      "keywords.deprecated"
+    );
   });
 
-  it("returns an empty topIssues list when there is no fail/warning (positive-state case)", () => {
+  it("returns an empty topIssues list when there is no fail/warning basicSeo item (positive-state case)", () => {
     const clean: CrawlingScanData = {
       ...crawling,
-      checks: [{ id: "info1", level: "info", message: "i1" }],
+      checks: {
+        basicSeo: [
+          { id: "title.length", status: "pass", detail: 14 },
+          { id: "keywords.deprecated", status: "info" },
+        ],
+      },
     };
 
     const combined = combineScanResults("https://example.com", {
