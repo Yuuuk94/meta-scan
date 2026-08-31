@@ -156,9 +156,10 @@ export class ScanService {
           allow,
           contents,
           sitemap,
+          checks: { indexing: [buildSitemapDeclaredInRobotsCheck(sitemap)] },
         };
       }
-      return { has };
+      return { has, checks: { indexing: [buildSitemapDeclaredInRobotsCheck([])] } };
     } catch (e) {
       throw ApiError.internal();
     }
