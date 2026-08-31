@@ -63,16 +63,16 @@ export const PreviewsCard = ({
         <CardTitle>{t.previews}</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Same hairline row-divider convention as <BasicSeoCard>/
-         * <IndexingCard> — see those files' comments for why (hairline vs.
-         * the dark card-to-card rule, items-start for sentence wrapping). */}
-        <div className="flex flex-col divide-y divide-border">
+        {/* 4 badges in one row (ScanZine.dc.html: grid-template-columns:
+         * repeat(4,1fr), real 14px gap — this specific grid was never
+         * flagged in the design-intake's gap-vs-rule-line conflict, unlike
+         * the checklist card grid and the mockup grid below, so it keeps
+         * its literal gap). Muted label + badge, justify-between per cell.
+         * 2 columns under sm since 4-across is cramped on a phone. */}
+        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
           {checks.map((check) => (
-            <div
-              key={check.id}
-              className="flex items-start justify-between gap-4 py-3.5"
-            >
-              <span className="text-sm font-medium text-foreground">
+            <div key={check.id} className="flex items-center justify-between gap-2">
+              <span className="text-[11.5px] text-muted-foreground">
                 {buildPreviewsMessage(t, check)}
               </span>
               <StatusBadge status={check.status}>
@@ -85,50 +85,45 @@ export const PreviewsCard = ({
         {/* 2 card-preview mockups (Google/Twitter-style) — 20px gap ->
          * 1px rule-line per the design intake's conflict resolution
          * (spec.md §6 decision #2: same "gap 대신 룰 라인" treatment as the
-         * checklist card grid above, applied here too). */}
+         * checklist card grid above, applied here too). Image area is a
+         * solid placeholder block (--border token, matches the mockup's
+         * literal #E4DECB fill) — no "이미지 없음" text, no visible
+         * "Google/Twitter" label; the mockup itself doesn't have either,
+         * it relies on field order alone (domain-first = Google-style,
+         * title-first = Twitter-style) to read as two different previews. */}
         <div className="mt-6 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
-          <div className="flex flex-col gap-2 bg-card p-4">
-            <span className="text-xs font-bold tracking-[.04em] text-muted-foreground">
-              {t.previewsGoogleMockupLabel}
-            </span>
-            <div
-              aria-label={t.previewsImagePlaceholderLabel as string}
-              className="flex h-24 w-full items-center justify-center border-[1.5px] border-foreground text-xs text-muted-foreground"
-            >
-              {t.previewsImagePlaceholderLabel}
-            </div>
-            <span className="text-xs text-muted-foreground">
-              {hostname?.toUpperCase()}
-            </span>
-            <span className="text-sm font-bold text-foreground">
-              {ogTitle}
-            </span>
-            {ogDescription ? (
-              <span className="text-xs text-muted-foreground">
-                {ogDescription}
+          <div className="flex flex-col bg-card">
+            <div aria-label={t.previewsImagePlaceholderLabel as string} className="h-[140px] w-full bg-border" />
+            <div className="flex flex-col gap-1 p-3.5">
+              <span className="text-[10px] tracking-[.04em] text-muted-foreground">
+                {hostname?.toUpperCase()}
               </span>
-            ) : null}
+              <span className="text-sm font-bold text-foreground">
+                {ogTitle}
+              </span>
+              {ogDescription ? (
+                <span className="text-xs text-muted-foreground">
+                  {ogDescription}
+                </span>
+              ) : null}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2 bg-card p-4">
-            <span className="text-xs font-bold tracking-[.04em] text-muted-foreground">
-              {t.previewsTwitterMockupLabel}
-            </span>
-            <div
-              aria-label={t.previewsImagePlaceholderLabel as string}
-              className="flex h-24 w-full items-center justify-center border-[1.5px] border-foreground text-xs text-muted-foreground"
-            >
-              {t.previewsImagePlaceholderLabel}
-            </div>
-            <span className="text-sm font-bold text-foreground">
-              {twitterTitle}
-            </span>
-            {twitterDescription ? (
-              <span className="text-xs text-muted-foreground">
-                {twitterDescription}
+          <div className="flex flex-col bg-card">
+            <div aria-label={t.previewsImagePlaceholderLabel as string} className="h-[140px] w-full bg-border" />
+            <div className="flex flex-col gap-1 p-3.5">
+              <span className="text-sm font-bold text-foreground">
+                {twitterTitle}
               </span>
-            ) : null}
-            <span className="text-xs text-muted-foreground">{hostname}</span>
+              {twitterDescription ? (
+                <span className="text-xs text-muted-foreground">
+                  {twitterDescription}
+                </span>
+              ) : null}
+              <span className="text-[10px] text-muted-foreground">
+                {hostname}
+              </span>
+            </div>
           </div>
         </div>
       </CardContent>
