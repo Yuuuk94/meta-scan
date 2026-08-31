@@ -33,6 +33,12 @@ const crawling: CrawlingScanData = {
       { id: "canonicalMultiple", status: "pass" },
       { id: "metaRobotsNoindex", status: "pass" },
     ],
+    previews: [
+      { id: "ogImageDimensions", status: "pass" },
+      { id: "favicon", status: "warning" },
+      { id: "ogRequiredTags", status: "pass" },
+      { id: "twitterCard", status: "warning" },
+    ],
   },
 };
 
@@ -95,6 +101,28 @@ describe("combineScanResults", () => {
     });
 
     expect(combined.checks.basicSeo).toEqual(crawling.checks.basicSeo);
+  });
+
+  it("passes checks.previews through from the crawling response as-is (issue #5)", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.previews).toEqual(crawling.checks.previews);
+  });
+
+  it("defaults checks.previews to an empty array when crawling failed", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling: null,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.previews).toEqual([]);
   });
 
   it("defaults checks.basicSeo to an empty array when crawling failed", () => {
@@ -164,6 +192,7 @@ describe("combineScanResults", () => {
           { id: "keywords.deprecated", status: "info" },
         ],
         indexing: [],
+        previews: [],
       },
     };
 
@@ -191,6 +220,7 @@ describe("combineScanResults", () => {
           { id: "keywords.deprecated", status: "info" },
         ],
         indexing: [],
+        previews: [],
       },
     };
 

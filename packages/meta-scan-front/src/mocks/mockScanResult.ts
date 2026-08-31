@@ -50,6 +50,17 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
           { id: "canonicalMultiple", status: "pass" },
           { id: "metaRobotsNoindex", status: "pass" },
         ],
+        // Synthetic, not re-captured: this fixture predates issue #5
+        // previews-checklist. Derived from the extract above (empty
+        // og:image, no twitter tags at all -> warning for all 4; favicon
+        // wasn't part of the original capture, so it's conservatively
+        // marked warning too rather than guessed as pass).
+        previews: [
+          { id: "ogImageDimensions", status: "warning" },
+          { id: "favicon", status: "warning" },
+          { id: "ogRequiredTags", status: "warning" },
+          { id: "twitterCard", status: "warning" },
+        ],
       },
     },
     lighthouse: {
@@ -87,6 +98,12 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
         { id: "canonicalMultiple", status: "pass" },
         { id: "metaRobotsNoindex", status: "pass" },
         { id: "sitemapDeclaredInRobots", status: "info" },
+      ],
+      previews: [
+        { id: "ogImageDimensions", status: "warning" },
+        { id: "favicon", status: "warning" },
+        { id: "ogRequiredTags", status: "warning" },
+        { id: "twitterCard", status: "warning" },
       ],
     },
   },

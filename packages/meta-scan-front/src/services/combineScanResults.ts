@@ -105,6 +105,10 @@ export function combineScanResults(
     checks: {
       basicSeo: raw.crawling?.checks?.basicSeo ?? [],
       indexing: buildIndexingChecks(raw),
+      // Straight passthrough, same as basicSeo — all 4 previews checks come
+      // from crawling alone, no cross-API merge needed (issue #5
+      // previews-checklist).
+      previews: raw.crawling?.checks?.previews ?? [],
     },
   };
 }
