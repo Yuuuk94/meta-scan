@@ -62,3 +62,17 @@ export function buildMetaRobotsNoindexCheck(
     status: tokens.includes("noindex") ? "fail" : "pass",
   };
 }
+
+/** Composes the 3 checks `crawling`'s DOM extraction can judge on its own (no other endpoint's
+ * data needed) — `ScanService.crawling` calls this once and assigns the result straight to
+ * `checks.indexing`. */
+export function buildIndexingChecksFromCrawling(input: {
+  canonicalLinks: string[];
+  metaRobotsContent?: string;
+}): IndexingCheckItem[] {
+  return [
+    buildCanonicalCheck(input.canonicalLinks),
+    buildCanonicalMultipleCheck(input.canonicalLinks),
+    buildMetaRobotsNoindexCheck(input.metaRobotsContent),
+  ];
+}

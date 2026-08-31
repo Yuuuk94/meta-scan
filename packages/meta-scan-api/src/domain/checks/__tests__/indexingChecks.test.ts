@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildCanonicalCheck,
   buildCanonicalMultipleCheck,
+  buildIndexingChecksFromCrawling,
   buildMetaRobotsNoindexCheck,
   buildSitemapDeclaredInRobotsCheck,
   buildSitemapExistsCheck,
@@ -142,5 +143,33 @@ describe("buildMetaRobotsNoindexCheck", () => {
       id: "metaRobotsNoindex",
       status: "fail",
     });
+  });
+});
+
+describe("buildIndexingChecksFromCrawling", () => {
+  it("returns exactly the 3 crawling-derived indexing checks, in canonical/canonicalMultiple/metaRobotsNoindex order", () => {
+    const checks = buildIndexingChecksFromCrawling({
+      canonicalLinks: ["https://example.com/page"],
+      metaRobotsContent: undefined,
+    });
+
+    expect(checks.map((c) => c.id)).toEqual([
+      "canonical",
+      "canonicalMultiple",
+      "metaRobotsNoindex",
+    ]);
+  });
+
+  it("combines the three underlying judgements for a problematic page", () => {
+    const checks = buildIndexingChecksFromCrawling({
+      canonicalLinks: ["/relative", "https://example.com/other"],
+      metaRobotsContent: "noindex, follow",
+    });
+
+    expect(checks).toEqual([
+      { id: "canonical", status: "info" },
+      { id: "canonicalMultiple", status: "fail" },
+      { id: "metaRobotsNoindex", status: "fail" },
+    ]);
   });
 });
