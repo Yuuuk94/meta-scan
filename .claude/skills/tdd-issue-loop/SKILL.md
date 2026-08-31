@@ -123,13 +123,16 @@ and test the change themselves — the automated qa stage only runs Jest/Vitest 
 it doesn't verify actual behavior in the running app. Remind them that the next issue's dev/qa
 won't start until this PR is merged.
 
-**After the user merges a PR (they tell you it's merged, or you merge it yourself once they
-explicitly say to), close its issue yourself** (`gh issue close <n> -c "PR #<pr> merged into
-dev"`) — don't assume the PR's `Closes #<n>` text handled it. GitHub only auto-closes on merge
-into the repo's *default* branch (`main` here), and this workflow always merges into `dev`
-(`main` only moves via `release/*`), so the keyword never fires and the issue is left open
-even though `status:done` is already on it (2026-08-31 — found issues #2/#3/#4 sitting open
-after merge because of exactly this).
+**Don't close the issue when its PR merges into `dev`, even though `status:done` goes on at that
+point** — GitHub's `Closes #<n>` in the PR body only auto-closes on merge into the repo's
+*default* branch (`main` here), so merging into `dev` never triggers it, and that's deliberate:
+**this project closes an issue only when it actually ships in a `main`/release deploy**, not when
+it lands in `dev` (2026-08-31, user correction — a first pass closed issues #2/#3/#4 right after
+their `dev` merge, which was wrong and got reverted). So: set `status:done` right after the `dev`
+merge as usual, but leave the GitHub issue open — don't call `gh issue close` at this point. There
+is no release process yet (see `docs/case-study/git-branching-strategy.md`'s open items), so
+`status:done`-but-open issues piling up is expected for now, not a bug to "fix" by closing them
+early.
 
 ## Re-running a stuck issue
 
