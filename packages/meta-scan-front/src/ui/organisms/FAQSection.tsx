@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/ui/molecules/Accordion";
 import { Bot, HelpCircle } from "lucide-react";
+import { heroUrlInputId } from "@/constans";
 
 export const FAQSection = ({ t }: DefaultPageProps) => {
   const faqs = [
@@ -18,6 +19,16 @@ export const FAQSection = ({ t }: DefaultPageProps) => {
     { id: "faq5", q: t.faq5Q, a: t.faq5A },
     { id: "faq6", q: t.faq6Q, a: t.faq6A },
   ];
+
+  // Scrolls back to the Hero section and focuses its URL input, so the CTA
+  // re-engages the same input the user already saw at the top instead of
+  // doing nothing (issue #15). FAQSection/HeroSection are rendered as
+  // siblings in app/[lang]/page.tsx with no shared context/store, so we
+  // reach across via the shared heroUrlInputId DOM id.
+  const handleScanNowClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.getElementById(heroUrlInputId)?.focus();
+  };
 
   return (
     <section className="py-24">
@@ -58,7 +69,7 @@ export const FAQSection = ({ t }: DefaultPageProps) => {
           <Card className="mt-10 text-center">
             <CardContent className="py-8">
               <p className="mb-4 text-foreground-secondary">{t.faqCtaText}</p>
-              <Button variant="accent">
+              <Button variant="accent" onClick={handleScanNowClick}>
                 <Bot className="h-4 w-4" />
                 {t.faqCtaButton}
               </Button>
