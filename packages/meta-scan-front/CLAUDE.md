@@ -14,9 +14,11 @@ pnpm dev:front                              # next dev, :3000
 pnpm --filter meta-scan-front build         # next build
 pnpm --filter meta-scan-front start         # next start (프로덕션 빌드 서빙)
 pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next/typescript)
+pnpm --filter meta-scan-front test          # jest (또는 루트에서 pnpm test:front)
 ```
 
-테스트 스크립트는 없습니다 — 테스트 러너가 있다고 가정하지 마세요.
+ADR-012에 따라 Jest + Testing Library가 부트스트랩돼 있습니다(`jest.config`, `jest.setup` 등 —
+`@testing-library/jest-dom`/`@testing-library/react` 포함).
 
 로컬 개발 시 `packages/meta-scan-front/.env.local`에
 `NEXT_PUBLIC_META_SCAN_API=http://localhost:8080`(또는 `meta-scan-api`가 실행 중인 위치)이

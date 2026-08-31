@@ -9,6 +9,9 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "test:api": "pnpm --filter meta-scan-api test",
+    "test:front": "pnpm --filter meta-scan-front test",
     "docker:build:api": "docker build -f packages/meta-scan-api/dockerfile -t meta-scan-api .",
     "prepare": "husky"
   },
