@@ -3,6 +3,8 @@
 // lighthouse, lighthouse trimmed to just category scores) from
 // https://dev-portfolio.withmay.com via the local API, then combined with
 // the actual `combineScanResults` so it matches production shape exactly.
+// Refreshed 2026-08-31 (issue #5 previews-checklist) — `checks.previews` is
+// now a real capture too, not the earlier synthetic placeholder.
 // Only ever used from `ScanResultScreen` when `location.hostname` is
 // localhost/127.0.0.1 (see there) — never reachable in a deployed build.
 export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
@@ -22,10 +24,10 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
       status: "ok",
       url: "https://dev-portfolio.withmay.com",
       finalUrl: "https://dev-portfolio.withmay.com/",
-      timingMs: { firstHtml: 84, onload: 1201 },
+      timingMs: { firstHtml: 271, onload: 1234 },
       html: {
         first: { length: 62941, sha1: "ca2de3ea95e08fbc055b116db839a1b4eb63f8a8" },
-        onload: { length: 63546, sha1: "02b7d2c08ba77a5cf9f4d148f30df3f75e7b68d7" },
+        onload: { length: 63546, sha1: "7fdf14584a6e47107cf543600ce2cd25c60b2223" },
         deltaRatio: 0.009520662197463255,
       },
       extract: {
@@ -50,14 +52,9 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
           { id: "canonicalMultiple", status: "pass" },
           { id: "metaRobotsNoindex", status: "pass" },
         ],
-        // Synthetic, not re-captured: this fixture predates issue #5
-        // previews-checklist. Derived from the extract above (empty
-        // og:image, no twitter tags at all -> warning for all 4; favicon
-        // wasn't part of the original capture, so it's conservatively
-        // marked warning too rather than guessed as pass).
         previews: [
           { id: "ogImageDimensions", status: "warning" },
-          { id: "favicon", status: "warning" },
+          { id: "favicon", status: "pass" },
           { id: "ogRequiredTags", status: "warning" },
           { id: "twitterCard", status: "warning" },
         ],
@@ -101,7 +98,7 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
       ],
       previews: [
         { id: "ogImageDimensions", status: "warning" },
-        { id: "favicon", status: "warning" },
+        { id: "favicon", status: "pass" },
         { id: "ogRequiredTags", status: "warning" },
         { id: "twitterCard", status: "warning" },
       ],
