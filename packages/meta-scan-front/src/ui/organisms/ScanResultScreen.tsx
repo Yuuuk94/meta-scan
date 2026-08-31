@@ -8,6 +8,7 @@ import { Button } from "@/ui/atoms/Button";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { IndexingCard } from "@/ui/organisms/IndexingCard";
+import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
 import { ScanHero } from "@/ui/organisms/ScanHero";
 import { mockScanResultEntry } from "@/mocks/mockScanResult";
 
@@ -142,6 +143,26 @@ export function ScanResultScreen({
           theme={theme}
           t={t}
           checks={combined.checks.indexing}
+        />
+      </div>
+
+      {/* "Previews — OG · Twitter" (issue #5 previews-checklist) — a
+       * standalone card *after* the 4-col checklist grid, not a cell inside
+       * it (design intake spec §3.5 item 6 lists it as its own layout
+       * block, distinct from item 5's checklist grid; see <PreviewsCard>'s
+       * comment for why it renders its own full <Card> border instead of
+       * the grid's shared rule-lines). */}
+      <div className="mt-8">
+        <PreviewsCard
+          lang={lang}
+          theme={theme}
+          t={t}
+          checks={combined.checks.previews}
+          url={combined.url}
+          title={combined.title}
+          description={combined.description}
+          openGraph={combined.openGraph}
+          twitter={combined.twitter}
         />
       </div>
 

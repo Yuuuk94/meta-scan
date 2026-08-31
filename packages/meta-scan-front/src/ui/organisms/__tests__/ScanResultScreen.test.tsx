@@ -25,6 +25,11 @@ const t = {
   basicSeoTitleLengthPass: "제목 길이가 적절하다 ({count}자)",
   indexing: "Indexing",
   indexingSitemapExistsPass: "sitemap.xml이 확인된다",
+  previews: "Previews — OG · Twitter",
+  previewsOgImageDimensionsPass: "og:image가 설정되어 있다",
+  previewsGoogleMockupLabel: "구글 검색 미리보기",
+  previewsTwitterMockupLabel: "트위터 카드 미리보기",
+  previewsImagePlaceholderLabel: "이미지 없음",
 };
 
 const combined: CombinedScanResult = {
@@ -118,5 +123,26 @@ describe("ScanResultScreen", () => {
 
     expect(screen.getByText("Indexing")).toBeInTheDocument();
     expect(screen.getByText("sitemap.xml이 확인된다")).toBeInTheDocument();
+  });
+
+  it("renders the Previews card from combined.checks.previews when present (issue #5)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined: {
+        ...combined,
+        openGraph: { "og:title": "Example OG Title" },
+        checks: {
+          ...combined.checks,
+          previews: [{ id: "ogImageDimensions", status: "pass" }],
+        },
+      },
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.getByText("Previews — OG · Twitter")).toBeInTheDocument();
+    expect(screen.getByText("og:image가 설정되어 있다")).toBeInTheDocument();
+    expect(screen.getAllByText("Example OG Title")).toHaveLength(2);
   });
 });
