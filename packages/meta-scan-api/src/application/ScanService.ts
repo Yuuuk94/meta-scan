@@ -379,6 +379,8 @@ export class ScanService {
         ogImage: onload.extracted.openGraph["og:image"],
         hasIconLink: onload.extracted.hasIconLink,
         faviconFallbackOk,
+        openGraph: onload.extracted.openGraph,
+        twitter: onload.extracted.twitter,
       });
 
       return result;

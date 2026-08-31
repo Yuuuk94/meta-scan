@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   buildFaviconCheck,
   buildOgImageDimensionsCheck,
+  buildOgRequiredTagsCheck,
   buildPreviewsChecksFromCrawling,
+  buildTwitterCardCheck,
 } from "@/domain/checks/previewsChecks.js";
 
 describe("buildOgImageDimensionsCheck", () => {
@@ -57,27 +59,102 @@ describe("buildFaviconCheck", () => {
   });
 });
 
+describe("buildOgRequiredTagsCheck", () => {
+  it("marks ogRequiredTags as pass when og:title/og:description/og:image are all present", () => {
+    expect(
+      buildOgRequiredTagsCheck({
+        "og:title": "Title",
+        "og:description": "Desc",
+        "og:image": "https://example.com/og.png",
+      })
+    ).toEqual({ id: "ogRequiredTags", status: "pass" });
+  });
+
+  it("marks ogRequiredTags as warning when og:image is missing", () => {
+    expect(
+      buildOgRequiredTagsCheck({
+        "og:title": "Title",
+        "og:description": "Desc",
+      })
+    ).toEqual({ id: "ogRequiredTags", status: "warning" });
+  });
+
+  it("marks ogRequiredTags as warning when none of the required tags are present", () => {
+    expect(buildOgRequiredTagsCheck({})).toEqual({
+      id: "ogRequiredTags",
+      status: "warning",
+    });
+  });
+
+  it("treats an empty string value the same as missing", () => {
+    expect(
+      buildOgRequiredTagsCheck({
+        "og:title": "",
+        "og:description": "Desc",
+        "og:image": "https://example.com/og.png",
+      })
+    ).toEqual({ id: "ogRequiredTags", status: "warning" });
+  });
+});
+
+describe("buildTwitterCardCheck", () => {
+  it("marks twitterCard as pass when twitter:card is present", () => {
+    expect(buildTwitterCardCheck({ "twitter:card": "summary_large_image" })).toEqual(
+      { id: "twitterCard", status: "pass" }
+    );
+  });
+
+  it("marks twitterCard as warning when twitter:card is missing", () => {
+    expect(buildTwitterCardCheck({})).toEqual({
+      id: "twitterCard",
+      status: "warning",
+    });
+  });
+
+  it("treats an empty string twitter:card the same as missing", () => {
+    expect(buildTwitterCardCheck({ "twitter:card": "" })).toEqual({
+      id: "twitterCard",
+      status: "warning",
+    });
+  });
+});
+
 describe("buildPreviewsChecksFromCrawling", () => {
-  it("returns exactly the 2 previews checks, in ogImageDimensions/favicon order", () => {
+  it("returns exactly the 4 previews checks, in ogImageDimensions/favicon/ogRequiredTags/twitterCard order", () => {
     const checks = buildPreviewsChecksFromCrawling({
       ogImage: "https://example.com/og.png",
       hasIconLink: true,
       faviconFallbackOk: false,
+      openGraph: {
+        "og:title": "Title",
+        "og:description": "Desc",
+        "og:image": "https://example.com/og.png",
+      },
+      twitter: { "twitter:card": "summary" },
     });
 
-    expect(checks.map((c) => c.id)).toEqual(["ogImageDimensions", "favicon"]);
+    expect(checks.map((c) => c.id)).toEqual([
+      "ogImageDimensions",
+      "favicon",
+      "ogRequiredTags",
+      "twitterCard",
+    ]);
   });
 
-  it("combines the two underlying judgements for a page missing both signals", () => {
+  it("combines the four underlying judgements for a page missing every signal", () => {
     const checks = buildPreviewsChecksFromCrawling({
       ogImage: undefined,
       hasIconLink: false,
       faviconFallbackOk: false,
+      openGraph: {},
+      twitter: {},
     });
 
     expect(checks).toEqual([
       { id: "ogImageDimensions", status: "warning" },
       { id: "favicon", status: "warning" },
+      { id: "ogRequiredTags", status: "warning" },
+      { id: "twitterCard", status: "warning" },
     ]);
   });
 });
