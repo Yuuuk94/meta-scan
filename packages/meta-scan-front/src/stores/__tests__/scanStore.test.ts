@@ -11,6 +11,7 @@ const combinedFixture: CombinedScanResult = {
   title: "Example",
   topIssues: [],
   failedApis: ["crawling", "lighthouse"],
+  checks: { basicSeo: [] },
 };
 
 const entryFixture = {
