@@ -1,6 +1,6 @@
 ---
 name: tdd-issue-loop
-description: Process meta-scan's GitHub Issues backlog through the issue-based TDD loop — dev-interview → (dev-backend/dev-front as needed) → (qa-backend/qa-front as needed) → PR. Interview stages run fully sequentially with a human confirmation gate each time; once an issue's spec is confirmed, its dev/qa automatic stages run in the background (no gate) while the skill immediately starts interviewing the next issue. Use when the user says things like "이슈 처리해줘", "TDD 루프 돌려", "백로그 인터뷰하자", or names a specific issue number to push through the pipeline. One-shot per invocation — does not use /loop or any polling; consumes whatever's in the queue right now and stops.
+description: Process meta-scan's GitHub Issues backlog through the issue-based TDD loop — dev-interview → (dev-backend/dev-front as needed) → (qa-backend/qa-front as needed) → PR. Interview stages run fully sequentially with a human confirmation gate each time; once an issue's spec is confirmed, its dev/qa automatic stages run in the background (no gate) while the skill immediately starts interviewing the next issue. The dev/qa queue itself processes at most one issue to PR-open per invocation and will not start a second issue's dev/qa until the first issue's PR is actually merged by the user (not just opened) — see docs/harness/tdd-issue-loop.md's 2026-08-31 update. Use when the user says things like "이슈 처리해줘", "TDD 루프 돌려", "백로그 인터뷰하자", or names a specific issue number to push through the pipeline. One-shot per invocation — does not use /loop or any polling; consumes whatever's in the queue right now and stops.
 ---
 
 # tdd-issue-loop
@@ -50,7 +50,7 @@ Process `status:needs-interview` issues one at a time, in priority order:
    asking) rather than confirmed, surface that to the user as its own question — don't guess a
    resolution yourself, and don't leave the issue in limbo without telling the user.
 
-## 2. Dev/qa queue — automatic, one issue at a time
+## 2. Dev/qa queue — automatic, one issue at a time, gated on merge (not just PR-open)
 
 **Concurrency: exactly one issue in this queue's active pipeline at any moment**, regardless of
 which packages it touches (front-only, api-only, or both all share the same slot) — no worktree
@@ -58,6 +58,18 @@ isolation exists yet, so two issues can't safely have different branches checked
 working directory at once, and `meta-scan-api` tests launch real Puppeteer/chrome-launcher
 processes that shouldn't run concurrently. If an issue arrives at this queue while another is
 still running, it waits its turn (still priority-ordered).
+
+**Before spawning `dev-backend`/`dev-front` for a new issue, check that no PR from this pipeline
+is still open/unmerged** (`gh pr list --state open --json headRefName,title` — anything whose
+branch is `feat/<n>-*`). If one is, **stop the dev/qa queue here for this invocation** — do not
+branch the next issue yet, even if its spec is `status:ready-for-dev`. Report to the user which
+issue is waiting and why (previous PR not yet merged), and let the interview queue keep going
+independently. This exists because starting a new branch before the prior one is merged forks it
+from a stale base and produces exactly the branch-divergence/conflict risk this rule prevents —
+it already happened once with issue #3 branching before issue #2's PR was merged (2026-08-31).
+
+Once the user merges that PR (outside this skill call) and re-invokes the skill, the next
+`status:ready-for-dev` issue is free to enter this queue on the next run.
 
 For the issue at the head of this queue, route by its `front`/`api` labels — **backend always
 before frontend when both are present**:
@@ -69,14 +81,22 @@ has front label? → spawn dev-front(n)  → wait for report
 → status is now status:in-test
 has api label?  → spawn qa-backend(n) → wait for report
   - report says "retry" → spawn dev-backend(n) again (fix-only, it reads the failure comment) → re-run qa-backend(n)
-  - report says "blocked" → stop this issue's chain, surface to user, move to next issue in this queue
+  - report says "blocked" → stop this issue's chain, surface to user, dev/qa queue stops here for this invocation
   - report says "handed off to qa-front" (issue also has front) → continue below
-  - report says "PR opened" (issue has no front) → this issue is done, move to next issue in this queue
+  - report says "PR opened" (issue has no front) → this issue is done; dev/qa queue stops here for this invocation (see below — don't start the next issue)
 has front label? → spawn qa-front(n) → wait for report
   - report says "retry" → spawn dev-front(n) again → re-run qa-front(n)
-  - report says "blocked" → stop this issue's chain, surface to user, move to next issue in this queue
-  - report says "PR opened" → this issue is done, move to next issue in this queue
+  - report says "blocked" → stop this issue's chain, surface to user, dev/qa queue stops here for this invocation
+  - report says "PR opened" → this issue is done; dev/qa queue stops here for this invocation (see below — don't start the next issue)
 ```
+
+**Do not loop back to pull a second issue into this queue in the same invocation** — whether the
+outcome was `blocked` or `PR opened`, the dev/qa queue's job for this invocation ends with this
+one issue. A `blocked` issue still has an incomplete branch sitting unmerged, and a `PR opened`
+issue hasn't been merged yet either — in both cases starting a second issue's branch now would
+fork it from a base that doesn't include this one, recreating the same divergence problem. Report
+what happened and, if there are more `status:ready-for-dev` issues waiting, tell the user they'll
+be picked up on the next invocation once this one is resolved/merged.
 
 Each subagent updates the issue's own labels as part of its job (see the individual agent files)
 — you don't need to move labels yourself, just read them back if you need to confirm state
@@ -87,14 +107,21 @@ agents track this themselves — you don't need to count). A second failure on t
 always means `status:blocked`, never a second automatic retry.
 
 When an issue reaches `status:blocked` or `status:in-review` (PR opened), it's out of this queue
-for this invocation — don't re-enter it even if the queue loops back around.
+for this invocation — don't re-enter it even if the queue loops back around, and per the rule
+above, don't start a different issue's dev/qa in its place either.
 
 ## 3. Wrapping up
 
 When the interview queue is empty and no issue is left waiting/running in the dev/qa queue, stop
 and report a summary: issues interviewed and their confirmed scope, issues that reached PR (link
 each), issues that hit `status:blocked` (and why, from their last comment), issues still mid-chain
-if you're stopping early for any reason. Don't merge any PR — that's always the user's call.
+if you're stopping early for any reason, and any `status:ready-for-dev` issues still waiting
+because a prior PR from this pipeline isn't merged yet. **Never merge a PR yourself** — that's
+always the user's call, and always tell them explicitly (don't assume it's implied) that before
+merging they should run the affected package's dev server (`pnpm dev:front` / `pnpm dev:api`)
+and test the change themselves — the automated qa stage only runs Jest/Vitest + lint/typecheck,
+it doesn't verify actual behavior in the running app. Remind them that the next issue's dev/qa
+won't start until this PR is merged.
 
 ## Re-running a stuck issue
 
