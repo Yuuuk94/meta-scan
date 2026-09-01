@@ -15,6 +15,11 @@ export const urlPattern = /^https?:\/\/.+\..+/;
 
 export const okStatus = "ok";
 
+// Shared DOM id so FAQSection's "지금 스캔하기" CTA (issue #15) can locate and
+// focus HeroSection's URL input across sibling organisms without a shared
+// context/store — same "read via DOM, no Context" style as the cookie helpers.
+export const heroUrlInputId = "hero-url-input";
+
 // meta-scan's own site URL (own sitemap.xml/robots.txt, issue #10) —
 // distinct from a scanned target's URL. Same placeholder domain
 // RootLayout's openGraph metadata already hardcodes; kept here as a single
