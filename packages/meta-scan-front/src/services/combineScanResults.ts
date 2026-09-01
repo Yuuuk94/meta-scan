@@ -104,6 +104,7 @@ export function combineScanResults(
     h1: extract?.h1,
     openGraph: extract?.openGraph,
     twitter: extract?.twitter,
+    structuredDataTypes: extract?.structuredDataTypes,
     hasSitemap: raw.siteMap?.has,
     topIssues: buildTopIssues(raw.crawling, topIssuesLimit),
     failedApis,
@@ -114,6 +115,11 @@ export function combineScanResults(
       // from crawling alone, no cross-API merge needed (issue #5
       // previews-checklist).
       previews: raw.crawling?.checks?.previews ?? [],
+      // Straight passthrough too — all 5 aiSignals checks
+      // (promptsTxt/promptObject/structuredData/faqSection/jsRenderDelta)
+      // come from crawling alone, no cross-API merge needed (issue #6
+      // ai-signals-checklist).
+      aiSignals: raw.crawling?.checks?.aiSignals ?? [],
     },
     lighthouse: {
       scores: buildLighthouseScores(raw.lighthouse),

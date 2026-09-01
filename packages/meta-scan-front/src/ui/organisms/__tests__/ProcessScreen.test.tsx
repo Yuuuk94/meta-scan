@@ -58,7 +58,7 @@ const crawlingFixture: CrawlingScanData = {
     twitter: {},
     duplicates: { metaName: [], metaProperty: [] },
   },
-  checks: { basicSeo: [], indexing: [], previews: [] },
+  checks: { basicSeo: [], indexing: [], previews: [], aiSignals: [] },
 };
 
 const okRes = <T,>(data: T) => Promise.resolve({ data } as { data: T });
