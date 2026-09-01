@@ -105,6 +105,13 @@ interface CrawlingScanData extends OkStatus {
     openGraph: Record<string, string>;
     twitter: Record<string, string>;
     duplicates: { metaName: string[]; metaProperty: string[] };
+    // JSON-LD @type values found on the page (e.g. ["WebPage", "FAQPage"])
+    // — backend only uses this to judge checks.aiSignals's structuredData/
+    // faqSection/promptObject rows (pass/warning), the raw list itself
+    // isn't in any check item's `detail`. Passed through as-is so
+    // <AiSignalsCard> can show it as a muted suffix next to "구조화 데이터"
+    // (ScanZine.dc.html: "구조화 데이터 WebPage, FAQPage").
+    structuredDataTypes?: string[];
   };
   // Grouped by checklist card (issue #3 basic-seo-checklist introduces the
   // first group, `basicSeo`; issue #4 indexing-checklist adds `indexing`
@@ -235,6 +242,9 @@ interface CombinedScanResult {
   h1?: string[];
   openGraph?: Record<string, string>;
   twitter?: Record<string, string>;
+  /** Straight passthrough of extract.structuredDataTypes — <AiSignalsCard>'s
+   * muted suffix next to "구조화 데이터", not used for any judgement here. */
+  structuredDataTypes?: string[];
   hasSitemap?: boolean;
   /** fail-first, backfilled with warning, capped at `topIssuesLimit` (default 3). */
   topIssues: TopIssue[];

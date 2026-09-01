@@ -7,18 +7,23 @@ const t = {
   aiSignals: "AI SIGNALS",
   aiSignalsEyebrow: "Lighthouse가 다루지 않는 항목",
   aiSignalsHint: "채워두면 AEO 준비도가 올라간다",
-  aiSignalsPromptsTxtPass: "prompts.txt가 확인된다 ({count}바이트)",
-  aiSignalsPromptsTxtInfo: "prompts.txt가 있지만 내용이 거의 없다 ({count}바이트)",
-  aiSignalsPromptsTxtWarning: "prompts.txt가 없다",
-  aiSignalsPromptObjectPass: "PromptObject 구조화 데이터가 확인된다",
-  aiSignalsPromptObjectWarning: "PromptObject 구조화 데이터가 없다",
-  aiSignalsStructuredDataPass: "구조화 데이터(JSON-LD)가 확인된다",
-  aiSignalsStructuredDataWarning: "구조화 데이터가 없다",
-  aiSignalsFaqSectionPass: "FAQPage 구조화 데이터가 확인된다",
-  aiSignalsFaqSectionWarning: "FAQPage 구조화 데이터가 없다",
-  aiSignalsJsRenderDeltaPass: "JS 렌더링 전후 차이가 적다 ({count}%)",
-  aiSignalsJsRenderDeltaWarning: "JS 렌더링 전후 차이가 크다 ({count}%)",
-  aiSignalsJsRenderDeltaFail: "JS 렌더링 의존도가 매우 높다 ({count}%)",
+  aiSignalsPromptsTxtLabel: "prompts.txt",
+  aiSignalsPromptObjectLabel: "PromptObject",
+  aiSignalsStructuredDataLabel: "구조화 데이터",
+  aiSignalsFaqSectionLabel: "FAQ 섹션",
+  aiSignalsJsRenderDeltaLabel: "JS 렌더링 의존도",
+  aiSignalsPromptsTxtPassSuffix: "{count}바이트",
+  aiSignalsPromptsTxtInfoSuffix: "내용 부족",
+  aiSignalsPromptsTxtWarningSuffix: "없음",
+  aiSignalsPromptObjectPassSuffix: "발견됨",
+  aiSignalsPromptObjectWarningSuffix: "없음",
+  aiSignalsStructuredDataPassSuffix: "발견됨",
+  aiSignalsStructuredDataWarningSuffix: "없음",
+  aiSignalsFaqSectionPassSuffix: "발견됨",
+  aiSignalsFaqSectionWarningSuffix: "없음",
+  aiSignalsJsRenderDeltaPassSuffix: "{count}%",
+  aiSignalsJsRenderDeltaWarningSuffix: "{count}%",
+  aiSignalsJsRenderDeltaFailSuffix: "{count}%",
 };
 
 const fiveChecks: AiSignalsCheckItem[] = [
@@ -40,27 +45,68 @@ describe("AiSignalsCard", () => {
     expect(screen.getByText("채워두면 AEO 준비도가 올라간다")).toBeInTheDocument();
   });
 
-  it("renders all 5 rows with a StatusBadge each and the assembled sentence", () => {
+  it("renders each row as a label + muted detail text, with a plain-status badge", () => {
     render(
       <AiSignalsCard lang="ko" theme="dark" t={t} checks={fiveChecks} />
     );
 
-    expect(screen.getByText("prompts.txt가 없다")).toBeInTheDocument();
-    expect(
-      screen.getByText("PromptObject 구조화 데이터가 없다")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("구조화 데이터(JSON-LD)가 확인된다")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("FAQPage 구조화 데이터가 확인된다")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("JS 렌더링 전후 차이가 적다 (5%)")
-    ).toBeInTheDocument();
+    expect(screen.getByText("prompts.txt")).toBeInTheDocument();
+    expect(screen.getByText("PromptObject")).toBeInTheDocument();
+    expect(screen.getByText("구조화 데이터")).toBeInTheDocument();
+    expect(screen.getByText("FAQ 섹션")).toBeInTheDocument();
+    expect(screen.getByText("JS 렌더링 의존도")).toBeInTheDocument();
+
+    expect(screen.getAllByText("없음")).toHaveLength(2);
+    expect(screen.getAllByText("발견됨")).toHaveLength(2);
+    expect(screen.getByText("5%")).toBeInTheDocument();
 
     expect(screen.getAllByText("WARNING")).toHaveLength(2);
     expect(screen.getAllByText("PASS")).toHaveLength(3);
+  });
+
+  it("shows structuredDataTypes as the detail text next to the label when structuredData passed", () => {
+    render(
+      <AiSignalsCard
+        lang="ko"
+        theme="dark"
+        t={t}
+        checks={fiveChecks}
+        structuredDataTypes={["WebPage", "FAQPage"]}
+      />
+    );
+
+    expect(screen.getByText("WebPage, FAQPage")).toBeInTheDocument();
+    // The generic "발견됨" suffix is superseded by the type list for this
+    // one row — only faqSection's own "발견됨" should remain.
+    expect(screen.getAllByText("발견됨")).toHaveLength(1);
+  });
+
+  it("falls back to the generic '발견됨' suffix when structuredData is pass but no structuredDataTypes were given", () => {
+    render(
+      <AiSignalsCard lang="ko" theme="dark" t={t} checks={fiveChecks} />
+    );
+
+    expect(screen.getAllByText("발견됨")).toHaveLength(2);
+  });
+
+  it("doesn't show the type list when structuredData is warning, even if structuredDataTypes is non-empty (stale/inconsistent data)", () => {
+    render(
+      <AiSignalsCard
+        lang="ko"
+        theme="dark"
+        t={t}
+        checks={[
+          { id: "promptsTxt", status: "warning" },
+          { id: "promptObject", status: "warning" },
+          { id: "structuredData", status: "warning" },
+          { id: "faqSection", status: "pass" },
+          { id: "jsRenderDelta", status: "pass", detail: 0.05 },
+        ]}
+        structuredDataTypes={["WebPage"]}
+      />
+    );
+
+    expect(screen.queryByText("WebPage")).not.toBeInTheDocument();
   });
 
   it("renders promptsTxt's info status (present but nearly empty) as an outline badge via StatusBadge's own info variant", () => {
@@ -79,9 +125,7 @@ describe("AiSignalsCard", () => {
       />
     );
 
-    expect(
-      screen.getByText("prompts.txt가 있지만 내용이 거의 없다 (8바이트)")
-    ).toBeInTheDocument();
+    expect(screen.getByText("내용 부족")).toBeInTheDocument();
     const infoBadge = screen.getByText("INFO");
     expect(infoBadge).toHaveAttribute("data-status", "info");
   });
@@ -109,12 +153,8 @@ describe("AiSignalsCard", () => {
       />
     );
 
-    expect(
-      screen.getByText("prompts.txt가 확인된다 (512바이트)")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("JS 렌더링 의존도가 매우 높다 (60%)")
-    ).toBeInTheDocument();
+    expect(screen.getByText("512바이트")).toBeInTheDocument();
+    expect(screen.getByText("60%")).toBeInTheDocument();
     expect(screen.getByText("FAIL")).toBeInTheDocument();
   });
 });

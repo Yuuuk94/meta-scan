@@ -119,6 +119,7 @@ export function ScanResultScreen({
           theme={theme}
           t={t}
           checks={combined.checks.aiSignals}
+          structuredDataTypes={combined.structuredDataTypes}
         />
       </div>
 

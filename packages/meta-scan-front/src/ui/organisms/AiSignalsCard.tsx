@@ -1,6 +1,6 @@
 import React from "react";
 
-import { buildAiSignalsMessage } from "@/services/buildAiSignalsMessage";
+import { getAiSignalsDetailSuffix, getAiSignalsLabel } from "@/services/buildAiSignalsMessage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 
@@ -28,9 +28,18 @@ import { StatusBadge } from "@/ui/molecules/StatusBadge";
 // not grouped with the other checklist cards.
 interface AiSignalsCardProps extends DefaultPageProps {
   checks: AiSignalsCheckItem[];
+  /** Raw passthrough of extract.structuredDataTypes (combineScanResults —
+   * no judgement here, just display). Shown as a muted suffix next to the
+   * "구조화 데이터" row's label when non-empty, matching ScanZine.dc.html
+   * ("구조화 데이터 WebPage, FAQPage"). */
+  structuredDataTypes?: string[];
 }
 
-export const AiSignalsCard = ({ t, checks }: AiSignalsCardProps) => {
+export const AiSignalsCard = ({
+  t,
+  checks,
+  structuredDataTypes,
+}: AiSignalsCardProps) => {
   // No crawling data (that call failed, or hasn't happened) — every row is
   // sourced from crawling alone, so there's nothing to show. Same "stay
   // absent rather than render an empty shell" rule as
@@ -57,23 +66,48 @@ export const AiSignalsCard = ({ t, checks }: AiSignalsCardProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Hairline row dividers, text-then-badge with justify-between —
-         * same row treatment as <BasicSeoCard>/<IndexingCard> for visual
-         * consistency across the results screen's checklist cards. */}
+        {/* Short raw label + muted detail text next to it ("없음"/"1%"/
+         * "발견됨"), badge shows only the plain status word — same pattern
+         * <BasicSeoCard>/<IndexingCard> use, and the same treatment
+         * ScanZine.dc.html itself uses for the structuredData row
+         * specifically ("구조화 데이터 WebPage, FAQPage" + a bare "PASS"
+         * badge), just applied to every row here instead of just that one
+         * (user feedback — wanted the detail out of the badge). */}
         <div className="flex flex-col divide-y divide-border">
-          {checks.map((check) => (
-            <div
-              key={check.id}
-              className="flex items-start justify-between gap-4 py-3.5"
-            >
-              <span className="text-sm font-medium text-foreground">
-                {buildAiSignalsMessage(t, check)}
-              </span>
-              <StatusBadge status={check.status}>
-                {check.status.toUpperCase()}
-              </StatusBadge>
-            </div>
-          ))}
+          {checks.map((check) => {
+            // Gated on the backend's own "pass" judgement, not on
+            // `structuredDataTypes` existing/being non-empty — deciding
+            // "present" from the raw array ourselves would be the frontend
+            // quietly re-judging, which this app never does (PRD §4: 판정은
+            // 백엔드, 프론트는 취합만). If the two ever disagreed, following
+            // status keeps the badge and this suffix from contradicting
+            // each other.
+            const detail =
+              check.id === "structuredData" &&
+              check.status === "pass" &&
+              structuredDataTypes?.length
+                ? structuredDataTypes.join(", ")
+                : getAiSignalsDetailSuffix(t, check);
+
+            return (
+              <div
+                key={check.id}
+                className="flex items-center justify-between gap-4 py-3.5"
+              >
+                <span className="text-sm font-medium text-foreground">
+                  {getAiSignalsLabel(t, check.id)}
+                  {detail ? (
+                    <span className="ml-1.5 font-normal text-muted-foreground">
+                      {detail}
+                    </span>
+                  ) : null}
+                </span>
+                <StatusBadge status={check.status}>
+                  {check.status.toUpperCase()}
+                </StatusBadge>
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>

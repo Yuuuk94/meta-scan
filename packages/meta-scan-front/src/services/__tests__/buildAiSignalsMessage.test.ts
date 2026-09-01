@@ -1,87 +1,100 @@
-import { buildAiSignalsMessage } from "@/services/buildAiSignalsMessage";
+import {
+  getAiSignalsDetailSuffix,
+  getAiSignalsLabel,
+} from "@/services/buildAiSignalsMessage";
 
 const t = {
-  aiSignalsPromptsTxtPass: "prompts.txt가 확인된다 ({count}바이트)",
-  aiSignalsPromptsTxtInfo: "prompts.txt가 있지만 내용이 거의 없다 ({count}바이트)",
-  aiSignalsPromptsTxtWarning: "prompts.txt가 없다",
-  aiSignalsPromptObjectPass: "PromptObject 구조화 데이터가 확인된다",
-  aiSignalsPromptObjectWarning: "PromptObject 구조화 데이터가 없다",
-  aiSignalsStructuredDataPass: "구조화 데이터(JSON-LD)가 확인된다",
-  aiSignalsStructuredDataWarning: "구조화 데이터가 없다",
-  aiSignalsFaqSectionPass: "FAQPage 구조화 데이터가 확인된다",
-  aiSignalsFaqSectionWarning: "FAQPage 구조화 데이터가 없다",
-  aiSignalsJsRenderDeltaPass: "JS 렌더링 전후 차이가 적다 ({count}%)",
-  aiSignalsJsRenderDeltaWarning: "JS 렌더링 전후 차이가 크다 ({count}%)",
-  aiSignalsJsRenderDeltaFail: "JS 렌더링 의존도가 매우 높다 ({count}%)",
+  aiSignalsPromptsTxtLabel: "prompts.txt",
+  aiSignalsPromptObjectLabel: "PromptObject",
+  aiSignalsStructuredDataLabel: "구조화 데이터",
+  aiSignalsFaqSectionLabel: "FAQ 섹션",
+  aiSignalsJsRenderDeltaLabel: "JS 렌더링 의존도",
+  aiSignalsPromptsTxtPassSuffix: "{count}바이트",
+  aiSignalsPromptsTxtInfoSuffix: "내용 부족",
+  aiSignalsPromptsTxtWarningSuffix: "없음",
+  aiSignalsPromptObjectPassSuffix: "발견됨",
+  aiSignalsPromptObjectWarningSuffix: "없음",
+  aiSignalsStructuredDataPassSuffix: "발견됨",
+  aiSignalsStructuredDataWarningSuffix: "없음",
+  aiSignalsFaqSectionPassSuffix: "발견됨",
+  aiSignalsFaqSectionWarningSuffix: "없음",
+  aiSignalsJsRenderDeltaPassSuffix: "{count}%",
+  aiSignalsJsRenderDeltaWarningSuffix: "{count}%",
+  aiSignalsJsRenderDeltaFailSuffix: "{count}%",
 };
 
-describe("buildAiSignalsMessage", () => {
-  it("assembles a promptsTxt:pass sentence with the byte count", () => {
-    expect(
-      buildAiSignalsMessage(t, { id: "promptsTxt", status: "pass", detail: 128 })
-    ).toBe("prompts.txt가 확인된다 (128바이트)");
+describe("getAiSignalsLabel", () => {
+  it("returns the short static label for a known id", () => {
+    expect(getAiSignalsLabel(t, "promptsTxt")).toBe("prompts.txt");
+    expect(getAiSignalsLabel(t, "jsRenderDelta")).toBe("JS 렌더링 의존도");
   });
 
-  it("assembles a promptsTxt:info sentence with the byte count when content is next to empty", () => {
+  it("falls back to the raw id for an unknown id", () => {
+    expect(getAiSignalsLabel(t, "somethingNew")).toBe("somethingNew");
+  });
+});
+
+describe("getAiSignalsDetailSuffix", () => {
+  it("builds a promptsTxt:pass suffix with the byte count", () => {
     expect(
-      buildAiSignalsMessage(t, { id: "promptsTxt", status: "info", detail: 8 })
-    ).toBe("prompts.txt가 있지만 내용이 거의 없다 (8바이트)");
+      getAiSignalsDetailSuffix(t, { id: "promptsTxt", status: "pass", detail: 128 })
+    ).toBe("128바이트");
   });
 
-  it("assembles a promptsTxt:warning sentence with no interpolation when it doesn't exist", () => {
+  it("builds a promptsTxt:info suffix when content is next to empty", () => {
     expect(
-      buildAiSignalsMessage(t, { id: "promptsTxt", status: "warning" })
-    ).toBe("prompts.txt가 없다");
+      getAiSignalsDetailSuffix(t, { id: "promptsTxt", status: "info", detail: 8 })
+    ).toBe("내용 부족");
   });
 
-  it("assembles a promptObject:pass / :warning sentence", () => {
+  it("builds a promptsTxt:warning suffix with no interpolation when it doesn't exist", () => {
     expect(
-      buildAiSignalsMessage(t, { id: "promptObject", status: "pass" })
-    ).toBe("PromptObject 구조화 데이터가 확인된다");
-    expect(
-      buildAiSignalsMessage(t, { id: "promptObject", status: "warning" })
-    ).toBe("PromptObject 구조화 데이터가 없다");
+      getAiSignalsDetailSuffix(t, { id: "promptsTxt", status: "warning" })
+    ).toBe("없음");
   });
 
-  it("assembles a structuredData:pass / :warning sentence", () => {
+  it("builds promptObject:pass / :warning suffixes", () => {
     expect(
-      buildAiSignalsMessage(t, { id: "structuredData", status: "pass" })
-    ).toBe("구조화 데이터(JSON-LD)가 확인된다");
+      getAiSignalsDetailSuffix(t, { id: "promptObject", status: "pass" })
+    ).toBe("발견됨");
     expect(
-      buildAiSignalsMessage(t, { id: "structuredData", status: "warning" })
-    ).toBe("구조화 데이터가 없다");
+      getAiSignalsDetailSuffix(t, { id: "promptObject", status: "warning" })
+    ).toBe("없음");
   });
 
-  it("assembles a faqSection:pass / :warning sentence", () => {
+  it("builds structuredData:pass / :warning suffixes", () => {
     expect(
-      buildAiSignalsMessage(t, { id: "faqSection", status: "pass" })
-    ).toBe("FAQPage 구조화 데이터가 확인된다");
+      getAiSignalsDetailSuffix(t, { id: "structuredData", status: "pass" })
+    ).toBe("발견됨");
     expect(
-      buildAiSignalsMessage(t, { id: "faqSection", status: "warning" })
-    ).toBe("FAQPage 구조화 데이터가 없다");
+      getAiSignalsDetailSuffix(t, { id: "structuredData", status: "warning" })
+    ).toBe("없음");
   });
 
-  it("formats jsRenderDelta's raw ratio detail as a rounded percentage", () => {
+  it("builds faqSection:pass / :warning suffixes", () => {
     expect(
-      buildAiSignalsMessage(t, { id: "jsRenderDelta", status: "pass", detail: 0.05 })
-    ).toBe("JS 렌더링 전후 차이가 적다 (5%)");
+      getAiSignalsDetailSuffix(t, { id: "faqSection", status: "pass" })
+    ).toBe("발견됨");
     expect(
-      buildAiSignalsMessage(t, { id: "jsRenderDelta", status: "warning", detail: 0.3 })
-    ).toBe("JS 렌더링 전후 차이가 크다 (30%)");
-    expect(
-      buildAiSignalsMessage(t, { id: "jsRenderDelta", status: "fail", detail: 0.6 })
-    ).toBe("JS 렌더링 의존도가 매우 높다 (60%)");
+      getAiSignalsDetailSuffix(t, { id: "faqSection", status: "warning" })
+    ).toBe("없음");
   });
 
-  it("keeps the sign when jsRenderDelta's raw ratio is negative", () => {
+  it("builds jsRenderDelta:pass/:warning/:fail suffixes as a rounded percentage", () => {
     expect(
-      buildAiSignalsMessage(t, { id: "jsRenderDelta", status: "fail", detail: -0.5 })
-    ).toBe("JS 렌더링 의존도가 매우 높다 (-50%)");
+      getAiSignalsDetailSuffix(t, { id: "jsRenderDelta", status: "pass", detail: 0.05 })
+    ).toBe("5%");
+    expect(
+      getAiSignalsDetailSuffix(t, { id: "jsRenderDelta", status: "warning", detail: 0.25 })
+    ).toBe("25%");
+    expect(
+      getAiSignalsDetailSuffix(t, { id: "jsRenderDelta", status: "fail", detail: 0.5 })
+    ).toBe("50%");
   });
 
-  it("falls back to the raw id for an unknown id/status combo instead of throwing", () => {
+  it("returns undefined for an unknown id/status combo", () => {
     expect(
-      buildAiSignalsMessage(t, { id: "unknownCheck", status: "pass" })
-    ).toBe("unknownCheck");
+      getAiSignalsDetailSuffix(t, { id: "somethingNew", status: "pass" })
+    ).toBeUndefined();
   });
 });

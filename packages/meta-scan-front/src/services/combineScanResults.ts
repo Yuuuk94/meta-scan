@@ -104,6 +104,7 @@ export function combineScanResults(
     h1: extract?.h1,
     openGraph: extract?.openGraph,
     twitter: extract?.twitter,
+    structuredDataTypes: extract?.structuredDataTypes,
     hasSitemap: raw.siteMap?.has,
     topIssues: buildTopIssues(raw.crawling, topIssuesLimit),
     failedApis,

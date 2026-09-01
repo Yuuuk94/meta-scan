@@ -33,7 +33,8 @@ const t = {
   aiSignals: "AI SIGNALS",
   aiSignalsEyebrow: "Lighthouse가 다루지 않는 항목",
   aiSignalsHint: "없어도 감점되지 않는다",
-  aiSignalsPromptsTxtInfo: "prompts.txt가 없다",
+  aiSignalsPromptsTxtLabel: "prompts.txt",
+  aiSignalsPromptsTxtInfoSuffix: "내용 부족",
   lighthouseScores: "Lighthouse 점수",
   performance: "Performance",
   seo: "SEO",
@@ -175,7 +176,7 @@ describe("ScanResultScreen", () => {
     render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
 
     expect(screen.getByText("AI SIGNALS")).toBeInTheDocument();
-    expect(screen.getByText("prompts.txt가 없다")).toBeInTheDocument();
+    expect(screen.getByText("prompts.txt")).toBeInTheDocument();
   });
 
   it("renders the Lighthouse card from combined.lighthouse when present (issue #9)", () => {
