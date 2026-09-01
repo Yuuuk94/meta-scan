@@ -25,9 +25,14 @@ export const FAQSection = ({ t }: DefaultPageProps) => {
   // doing nothing (issue #15). FAQSection/HeroSection are rendered as
   // siblings in app/[lang]/page.tsx with no shared context/store, so we
   // reach across via the shared heroUrlInputId DOM id.
+  //
+  // `focus({ preventScroll: true })` matters here — a plain `.focus()`
+  // makes the browser instantly scroll-into-view the focused element on
+  // its own, which cuts the smooth scrollTo above short (verified: without
+  // this, scrollY jumps straight to 0 with no animated frames at all).
   const handleScanNowClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    document.getElementById(heroUrlInputId)?.focus();
+    document.getElementById(heroUrlInputId)?.focus({ preventScroll: true });
   };
 
   return (
