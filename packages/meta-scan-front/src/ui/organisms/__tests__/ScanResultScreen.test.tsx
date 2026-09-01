@@ -30,6 +30,14 @@ const t = {
   previewsGoogleMockupLabel: "구글 검색 미리보기",
   previewsTwitterMockupLabel: "트위터 카드 미리보기",
   previewsImagePlaceholderLabel: "이미지 없음",
+  lighthouseScores: "Lighthouse 점수",
+  performance: "Performance",
+  seo: "SEO",
+  accessibility: "Accessibility",
+  bestPractices: "Best Practices",
+  lighthouseSuggestions: "Lighthouse 개선 제안",
+  lighthouseSuggestionsHint: "Lighthouse가 직접 제안하는 개선 항목이다",
+  lighthouseSuggestionsHintMobile: "Lighthouse가 직접 제안하는 개선 항목이다",
 };
 
 const combined: CombinedScanResult = {
@@ -144,5 +152,38 @@ describe("ScanResultScreen", () => {
     expect(screen.getByText("Previews — OG · Twitter")).toBeInTheDocument();
     expect(screen.getByText("og:image가 설정되어 있다")).toBeInTheDocument();
     expect(screen.getAllByText("Example OG Title")).toHaveLength(2);
+  });
+
+  it("renders the Lighthouse card from combined.lighthouse when present (issue #9)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined: {
+        ...combined,
+        lighthouse: {
+          scores: { performance: 0.9, seo: 1, accessibility: 0.8, bestPractices: 0.75 },
+          suggestions: [
+            { id: "uses-text-compression", title: "Enable text compression", score: 0.5 },
+          ],
+        },
+      },
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.getByText("Lighthouse 개선 제안")).toBeInTheDocument();
+    expect(screen.getByText("Enable text compression")).toBeInTheDocument();
+  });
+
+  it("doesn't crash and omits the Lighthouse card when combined.lighthouse is absent (older/hand-built entries)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined,
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.queryByText("Lighthouse 개선 제안")).not.toBeInTheDocument();
   });
 });

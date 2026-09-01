@@ -8,6 +8,7 @@ import { Button } from "@/ui/atoms/Button";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { IndexingCard } from "@/ui/organisms/IndexingCard";
+import { LighthouseCard } from "@/ui/organisms/LighthouseCard";
 import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
 import { ScanHero } from "@/ui/organisms/ScanHero";
 import { mockScanResultEntry } from "@/mocks/mockScanResult";
@@ -165,6 +166,34 @@ export function ScanResultScreen({
           twitter={combined.twitter}
         />
       </div>
+
+      {/* "Lighthouse 점수" + "Lighthouse 개선 제안" (issue #9
+       * lighthouse-suggestions, ADR-007) — two sibling blocks (score grid,
+       * then a standalone suggestions card), matching ScanZine.dc.html's
+       * layout rather than one combined card. No wrapping mt-8 div here —
+       * <LighthouseCard> owns its own top spacing via a thick section rule
+       * (design-system.md §5), since that rule (not a plain margin) is
+       * what's supposed to mark this as a new section.
+       * `combined.lighthouse` is optional on the type (older/hand-built
+       * fixtures may not have it) — falls back to an empty shape rather
+       * than crashing; <LighthouseCard> itself renders nothing for that
+       * case. */}
+      <LighthouseCard
+        lang={lang}
+        theme={theme}
+        t={t}
+        lighthouse={
+          combined.lighthouse ?? {
+            scores: {
+              performance: null,
+              seo: null,
+              accessibility: null,
+              bestPractices: null,
+            },
+            suggestions: [],
+          }
+        }
+      />
 
       {/* Per-API availability — sitemap/crawling/lighthouse only (robots.txt's
        * own gating verdict is issue #1's slice). Failed calls render a gray

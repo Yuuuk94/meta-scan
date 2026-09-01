@@ -134,13 +134,27 @@ export function ProcessScreen({
         () => lsRunApi(data),
       ];
 
+      // siteMap/crawling both wrap success as `{ status: "ok", ... }`
+      // (meta-scan-api CLAUDE.md "응답 스프레드 규약과 예외"), but
+      // `lighthouse run` doesn't — it returns `lhr` directly with no
+      // `status` field at all, so a `status === "ok"` check would always
+      // read a real success response as failed. Index-aligned with
+      // `remainingCalls`/`rawKeys.slice(1)`.
+      const isOkPredicates: Array<(data: unknown) => boolean> = [
+        (data) =>
+          !!(data as OkStatus)?.status &&
+          (data as OkStatus).status === okStatus,
+        (data) =>
+          !!(data as OkStatus)?.status &&
+          (data as OkStatus).status === okStatus,
+        (data) => !!data && typeof data === "object",
+      ];
+
       await Promise.allSettled(
         remainingCalls.map((call, idx) =>
           call()
             .then((res) => {
-              const isOk =
-                !!(res.data as OkStatus)?.status &&
-                (res.data as OkStatus).status === okStatus;
+              const isOk = isOkPredicates[idx](res.data);
               raw[rawKeys[idx + 1]] = isOk ? res.data : null;
               processCallback(isOk, idx + 1);
               return res;
