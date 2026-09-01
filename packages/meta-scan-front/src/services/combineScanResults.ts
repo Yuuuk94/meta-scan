@@ -11,8 +11,13 @@
 // cross-API merge — siteMap contributes sitemapExists, robotsTxt contributes
 // sitemapDeclaredInRobots, and crawling contributes canonical/canonicalMultiple/
 // metaRobotsNoindex, each already judged by the backend (domain/checks/indexingChecks.ts) — this
-// just concatenates whichever of the 3 came back. Other groups (content-stats/previews) aren't
-// built yet.
+// just concatenates whichever of the 3 came back. `lighthouse` (issue #9 lighthouse-suggestions)
+// isn't a checks[] group at all — it's Lighthouse's own category scores plus a filtered slice of
+// its own lhr.audits (ADR-007), built via buildLighthouseScores/buildLighthouseSuggestions rather
+// than our pass/warning/fail/info vocabulary. Other groups (content-stats) aren't built yet.
+
+import { buildLighthouseScores } from "@/services/buildLighthouseScores";
+import { buildLighthouseSuggestions } from "@/services/buildLighthouseSuggestions";
 
 const DEFAULT_TOP_ISSUES_LIMIT = 3;
 
@@ -114,6 +119,10 @@ export function combineScanResults(
       // come from crawling alone, no cross-API merge needed (issue #6
       // ai-signals-checklist).
       aiSignals: raw.crawling?.checks?.aiSignals ?? [],
+    },
+    lighthouse: {
+      scores: buildLighthouseScores(raw.lighthouse),
+      suggestions: buildLighthouseSuggestions(raw.lighthouse),
     },
   };
 }

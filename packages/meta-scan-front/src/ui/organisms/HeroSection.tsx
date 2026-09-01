@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/ui/atoms/Button";
 import { Input } from "@/ui/atoms/Input";
 import { AlertCircle, Scan } from "lucide-react";
-import { crrUrlKey, urlPattern } from "@/constans";
+import { crrUrlKey, heroUrlInputId, urlPattern } from "@/constans";
 import { setDocumentCookies } from "@/utils/cookies";
 
 export const HeroSection = ({ t }: DefaultPageProps) => {
@@ -58,6 +58,7 @@ export const HeroSection = ({ t }: DefaultPageProps) => {
       <div className="mt-10 max-w-2xl">
         <div className="flex flex-col items-stretch gap-3 sm:flex-row">
           <Input
+            id={heroUrlInputId}
             type="url"
             placeholder={t.urlPlaceholder as string}
             value={url}

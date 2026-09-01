@@ -34,6 +34,14 @@ const t = {
   aiSignalsEyebrow: "Lighthouse가 다루지 않는 항목",
   aiSignalsHint: "없어도 감점되지 않는다",
   aiSignalsPromptsTxtInfo: "prompts.txt가 없다",
+  lighthouseScores: "Lighthouse 점수",
+  performance: "Performance",
+  seo: "SEO",
+  accessibility: "Accessibility",
+  bestPractices: "Best Practices",
+  lighthouseSuggestions: "Lighthouse 개선 제안",
+  lighthouseSuggestionsHint: "Lighthouse가 직접 제안하는 개선 항목이다",
+  lighthouseSuggestionsHintMobile: "Lighthouse가 직접 제안하는 개선 항목이다",
 };
 
 const combined: CombinedScanResult = {
@@ -168,5 +176,38 @@ describe("ScanResultScreen", () => {
 
     expect(screen.getByText("AI SIGNALS")).toBeInTheDocument();
     expect(screen.getByText("prompts.txt가 없다")).toBeInTheDocument();
+  });
+
+  it("renders the Lighthouse card from combined.lighthouse when present (issue #9)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined: {
+        ...combined,
+        lighthouse: {
+          scores: { performance: 0.9, seo: 1, accessibility: 0.8, bestPractices: 0.75 },
+          suggestions: [
+            { id: "uses-text-compression", title: "Enable text compression", score: 0.5 },
+          ],
+        },
+      },
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.getByText("Lighthouse 개선 제안")).toBeInTheDocument();
+    expect(screen.getByText("Enable text compression")).toBeInTheDocument();
+  });
+
+  it("doesn't crash and omits the Lighthouse card when combined.lighthouse is absent (older/hand-built entries)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined,
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.queryByText("Lighthouse 개선 제안")).not.toBeInTheDocument();
   });
 });

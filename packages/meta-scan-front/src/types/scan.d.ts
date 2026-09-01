@@ -126,16 +126,48 @@ interface CrawlingScanData extends OkStatus {
   };
 }
 
+/** One Lighthouse category's raw score (0–1, Google's own grading — PRD
+ * §3.7/ADR-007: never recomputed or bucketed into our pass/warning/fail/info
+ * vocabulary, always shown as-is). */
+interface LighthouseCategoryResult {
+  title: string;
+  score: number | null;
+}
+
+/** One row of `lhr.audits` — only the fields this app actually reads, not
+ * the full upstream shape (which also carries `scoreDisplayMode`,
+ * `numericValue`, `details`, etc. — see the `lighthouse` npm package's
+ * `Audit.Result` type). */
+interface LighthouseAuditResult {
+  id: string;
+  title: string;
+  description?: string;
+  score: number | null;
+}
+
+/** `lighthouse run`'s response body. Unlike `robotsTxt`/`siteMap`/`crawling`,
+ * `LighthouseController.run` returns `result?.lhr` directly, without the
+ * `{ status: "ok", ... }` wrapper the other 3 scan endpoints use
+ * (meta-scan-api CLAUDE.md "응답 스프레드 규약과 예외") — code that treats this
+ * like the other 3 (a bare `.status === "ok"` check) will always read a
+ * real response as failed (see ProcessScreen's per-call `isOk` predicate).
+ * All fields optional since only `categories`/`audits` are consumed here;
+ * the real `lhr` carries many more (`fetchTime`, `configSettings`, ...). */
+interface LighthouseData {
+  lighthouseVersion?: string;
+  requestedUrl?: string;
+  categories?: Record<string, LighthouseCategoryResult>;
+  audits?: Record<string, LighthouseAuditResult>;
+}
+
 /** Raw response bodies for the 4 scan APIs, as ProcessScreen collects them.
  * `null` means that call never resolved with a body (still pending, or
- * failed — Promise.allSettled swallows the rejection). Lighthouse stays
- * `unknown` — its `lhr` shape isn't consumed by this walking-skeleton pass
- * (docs/feature/01-seo-aeo-geo-checker/pipe-connection/spec-fixed.md). */
+ * failed — Promise.allSettled swallows the rejection). */
 interface RawScanResponses {
   robotsTxt: RobotsTxtData | null;
   siteMap: SiteMapData | null;
   crawling: CrawlingScanData | null;
-  lighthouse: unknown | null;
+  lighthouse: LighthouseData | null;
 }
 
 type FailedScanApi = "robotsTxt" | "siteMap" | "crawling" | "lighthouse";
@@ -165,6 +197,36 @@ interface TopIssue {
  * (issue #6 ai-signals-checklist) is a straight passthrough too, same as
  * `basicSeo`/`previews` — all 5 rows only ever come from `crawling`.
  * content-stats isn't built yet. */
+/** score (0–1) is intentionally required and non-null here — this is the
+ * already-filtered output of `buildLighthouseSuggestions` (`score !== null`
+ * is part of the filter, spec-fixed.md req #1), unlike the raw
+ * `LighthouseAuditResult.score` it's built from. */
+interface LighthouseSuggestion {
+  id: string;
+  title: string;
+  description?: string;
+  score: number;
+}
+
+/** The 4 Lighthouse category scores (0–1, `null` when that category is
+ * missing from the response), plus the top-5 lowest-scoring audits
+ * (`score !== null && score < 0.9`, spec-fixed.md req #1) — built by
+ * `services/buildLighthouseScores.ts` / `services/buildLighthouseSuggestions.ts`
+ * from `raw.lighthouse`, not passed through as the full `lhr` (which also
+ * carries `details`/full-text descriptions per audit — no need to duplicate
+ * that inside `combined` when `raw.lighthouse` already has it). Optional on
+ * `CombinedScanResult` (not always present in older/hand-built fixtures),
+ * but `combineScanResults` itself always sets it. */
+interface CombinedLighthouse {
+  scores: {
+    performance: number | null;
+    seo: number | null;
+    accessibility: number | null;
+    bestPractices: number | null;
+  };
+  suggestions: LighthouseSuggestion[];
+}
+
 interface CombinedScanResult {
   url?: string;
   title?: string;
@@ -183,6 +245,8 @@ interface CombinedScanResult {
     previews: PreviewsCheckItem[];
     aiSignals: AiSignalsCheckItem[];
   };
+  /** Issue #9 lighthouse-suggestions. */
+  lighthouse?: CombinedLighthouse;
 }
 
 interface ScanResultEntry {

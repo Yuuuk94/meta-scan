@@ -1,4 +1,6 @@
 import { getDictionary } from "@/dictionaries";
+import { buildFaqSchema } from "@/services/buildFaqSchema";
+import { JsonLd } from "@/ui/atoms/JsonLd";
 import { FAQSection } from "@/ui/organisms/FAQSection";
 import { HeroSection } from "@/ui/organisms/HeroSection";
 import { ProcessSection } from "@/ui/organisms/ProcessSection";
@@ -16,6 +18,9 @@ export default async function HomePage() {
       <ProcessSection theme={theme} lang={lang} t={t} />
       {/* FAQ Section */}
       <FAQSection theme={theme} lang={lang} t={t} />
+      {/* FAQ JSON-LD (issue #11) — only rendered here, on HomePage, since
+       * FAQSection is the only place this FAQ data appears. */}
+      <JsonLd data={buildFaqSchema(t)} />
     </>
   );
 }

@@ -14,3 +14,19 @@ export const crrUrlKey = "crrUrl";
 export const urlPattern = /^https?:\/\/.+\..+/;
 
 export const okStatus = "ok";
+
+// Shared DOM id so FAQSection's "지금 스캔하기" CTA (issue #15) can locate and
+// focus HeroSection's URL input across sibling organisms without a shared
+// context/store — same "read via DOM, no Context" style as the cookie helpers.
+export const heroUrlInputId = "hero-url-input";
+
+// meta-scan's own site URL (own sitemap.xml/robots.txt, issue #10) —
+// distinct from a scanned target's URL. Same placeholder domain
+// RootLayout's openGraph metadata already hardcodes; kept here as a single
+// source of truth for the sitemap/robots routes.
+export const siteUrl = process.env.NEXT_PUBLIC_META_SCAN_URL;
+
+// Real routes that get indexed per-locale in sitemap.xml. `/scan/:id` is a
+// personalized result page (pipe-connection, issue #2) and intentionally
+// excluded.
+export const siteRoutes = ["", "/request-scan", "/scan", "/privacy", "/terms"];
