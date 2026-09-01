@@ -19,7 +19,7 @@ export const okStatus = "ok";
 // distinct from a scanned target's URL. Same placeholder domain
 // RootLayout's openGraph metadata already hardcodes; kept here as a single
 // source of truth for the sitemap/robots routes.
-export const siteUrl = "https://example.com";
+export const siteUrl = process.env.NEXT_PUBLIC_META_SCAN_URL;
 
 // Real routes that get indexed per-locale in sitemap.xml. `/scan/:id` is a
 // personalized result page (pipe-connection, issue #2) and intentionally
