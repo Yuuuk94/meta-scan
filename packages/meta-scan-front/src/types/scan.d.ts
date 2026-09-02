@@ -86,6 +86,28 @@ interface AiSignalsCheckItem {
   detail?: number;
 }
 
+/** Raw heading-tag counts backing the "headings" content check's `detail`
+ * (issue #7 content-stats-checklist) — h1 count together with h2/h3
+ * presence. Mirrors meta-scan-api's `ContentHeadingCounts`. */
+interface ContentHeadingCounts {
+  h1: number;
+  h2: number;
+  h3: number;
+}
+
+/** One row of the "콘텐츠 품질(Content Stats)" checklist card (issue #7
+ * content-stats-checklist). Reuses BasicSeoStatus's pass/warning/fail/info
+ * vocabulary, same as the other groups. Unlike every other checklist item's
+ * `detail`, `charCount`'s is a plain number, `headings`'s is the raw
+ * `ContentHeadingCounts` object (not a natural single number), and `tldr`
+ * omits it entirely (existence-only) — mirrors meta-scan-api's
+ * `ContentCheckItem` (`domain/checks/contentChecks.ts`). */
+interface ContentCheckItem {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number | ContentHeadingCounts;
+}
+
 interface CrawlingScanData extends OkStatus {
   url: string;
   finalUrl: string;
@@ -124,12 +146,15 @@ interface CrawlingScanData extends OkStatus {
   // same response's own extraction). Replaces the previous flat
   // `checks: Array<{ id, level, message, target? }>` shape that
   // `ScanService.crawling`'s old push-only-on-problem `runChecks` used to
-  // return.
+  // return. issue #7 content-stats-checklist adds `content`
+  // (`charCount`/`headings`/`tldr`), also a straight passthrough — all 3
+  // rows come from this same response's own extraction.
   checks: {
     basicSeo: BasicSeoCheckItem[];
     indexing: IndexingCheckItem[];
     previews: PreviewsCheckItem[];
     aiSignals: AiSignalsCheckItem[];
+    content: ContentCheckItem[];
   };
 }
 
@@ -203,7 +228,8 @@ interface TopIssue {
  * mockup render (issue #5 req #3/#4) — not re-derived here. `checks.aiSignals`
  * (issue #6 ai-signals-checklist) is a straight passthrough too, same as
  * `basicSeo`/`previews` — all 5 rows only ever come from `crawling`.
- * content-stats isn't built yet. */
+ * `checks.content` (issue #7 content-stats-checklist) is a straight
+ * passthrough too, same as `basicSeo`/`previews`/`aiSignals`. */
 /** score (0–1) is intentionally required and non-null here — this is the
  * already-filtered output of `buildLighthouseSuggestions` (`score !== null`
  * is part of the filter, spec-fixed.md req #1), unlike the raw
@@ -254,6 +280,7 @@ interface CombinedScanResult {
     indexing: IndexingCheckItem[];
     previews: PreviewsCheckItem[];
     aiSignals: AiSignalsCheckItem[];
+    content: ContentCheckItem[];
   };
   /** Issue #9 lighthouse-suggestions. */
   lighthouse?: CombinedLighthouse;

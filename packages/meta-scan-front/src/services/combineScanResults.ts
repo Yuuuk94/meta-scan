@@ -14,7 +14,9 @@
 // just concatenates whichever of the 3 came back. `lighthouse` (issue #9 lighthouse-suggestions)
 // isn't a checks[] group at all — it's Lighthouse's own category scores plus a filtered slice of
 // its own lhr.audits (ADR-007), built via buildLighthouseScores/buildLighthouseSuggestions rather
-// than our pass/warning/fail/info vocabulary. Other groups (content-stats) aren't built yet.
+// than our pass/warning/fail/info vocabulary. `checks.content` (issue #7
+// content-stats-checklist) is a straight passthrough too, same as
+// basicSeo/previews/aiSignals — all 3 rows only ever come from crawling.
 
 import { buildLighthouseScores } from "@/services/buildLighthouseScores";
 import { buildLighthouseSuggestions } from "@/services/buildLighthouseSuggestions";
@@ -120,6 +122,10 @@ export function combineScanResults(
       // come from crawling alone, no cross-API merge needed (issue #6
       // ai-signals-checklist).
       aiSignals: raw.crawling?.checks?.aiSignals ?? [],
+      // Straight passthrough too — all 3 content checks
+      // (charCount/headings/tldr) come from crawling alone, no cross-API
+      // merge needed (issue #7 content-stats-checklist).
+      content: raw.crawling?.checks?.content ?? [],
     },
     lighthouse: {
       scores: buildLighthouseScores(raw.lighthouse),
