@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 
 import { ProcessScreen } from "@/ui/organisms/ProcessScreen";
 import { useScanStore } from "@/stores/scanStore";
@@ -8,6 +8,7 @@ import {
   scanCrawlingApi,
   scanRobotsTxtApi,
   scanSiteMapApi,
+  sitePingApi,
 } from "@/api/scanApi";
 import { trackEvent } from "@/services/analyticsEvents";
 
@@ -18,6 +19,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/api/scanApi", () => ({
+  sitePingApi: jest.fn(),
   scanRobotsTxtApi: jest.fn(),
   scanSiteMapApi: jest.fn(),
   scanCrawlingApi: jest.fn(),
@@ -80,9 +82,56 @@ beforeEach(() => {
   jest.clearAllMocks();
   window.localStorage.clear();
   useScanStore.setState({ results: {} });
+  // Ping now runs inside ProcessScreen itself (perf fix, 2026-09-02) —
+  // default every test to a resolved ping so existing tests (which only
+  // care about what happens after) don't each need their own mock.
+  (sitePingApi as jest.Mock).mockReturnValue(okRes<SiteStatusData>(siteStatus));
 });
 
 describe("ProcessScreen", () => {
+  // perf fix, 2026-09-02 — ping moved from a server-side await (before this
+  // component ever mounted) to the component's own first client-side step,
+  // so it needs a visible pending state and its own failure handling now.
+  it("shows a pending badge while the ping is in flight, then flips to reachable once it resolves", async () => {
+    let resolvePing: (value: { data: SiteStatusData }) => void = () => {};
+    (sitePingApi as jest.Mock).mockReturnValue(
+      new Promise((resolve) => {
+        resolvePing = resolve;
+      })
+    );
+
+    render(
+      <ProcessScreen lang="ko" theme="dark" t={t} url="https://example.com" />
+    );
+
+    expect(screen.getByText("접속 확인 중")).toBeInTheDocument();
+    expect(scanRobotsTxtApi).not.toHaveBeenCalled();
+
+    // Badge flips to "reachable" as soon as ping resolves, before robotsTxt
+    // is even called — keep robotsTxt pending forever so this test only
+    // observes that transition, not the rest of the scan.
+    (scanRobotsTxtApi as jest.Mock).mockReturnValue(new Promise(() => {}));
+
+    await act(async () => {
+      resolvePing({ data: siteStatus });
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText("접속 확인 완료")).toBeInTheDocument()
+    );
+  });
+
+  it("renders ErrorScreen when the ping call itself fails, without calling robotsTxt", async () => {
+    (sitePingApi as jest.Mock).mockReturnValue(failRes());
+
+    render(
+      <ProcessScreen lang="ko" theme="dark" t={t} url="https://example.com" />
+    );
+
+    expect(await screen.findByText("error")).toBeInTheDocument();
+    expect(scanRobotsTxtApi).not.toHaveBeenCalled();
+  });
+
   it("saves the 4 raw responses + combined result and routes to /scan/:id once sitemap/crawling/lighthouse resolve", async () => {
     (scanRobotsTxtApi as jest.Mock).mockReturnValue(
       okRes<RobotsTxtData>({ status: "ok", has: true })
@@ -96,7 +145,7 @@ describe("ProcessScreen", () => {
     (lsRunApi as jest.Mock).mockReturnValue(okRes({ status: "ok" }));
 
     render(
-      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+      <ProcessScreen lang="ko" theme="dark" t={t} url={siteStatus.url} />
     );
 
     await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
@@ -128,7 +177,7 @@ describe("ProcessScreen", () => {
     (lsRunApi as jest.Mock).mockReturnValue(okRes({ status: "ok" }));
 
     render(
-      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+      <ProcessScreen lang="ko" theme="dark" t={t} url={siteStatus.url} />
     );
 
     await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
@@ -162,7 +211,7 @@ describe("ProcessScreen", () => {
     );
 
     render(
-      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+      <ProcessScreen lang="ko" theme="dark" t={t} url={siteStatus.url} />
     );
 
     await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
@@ -191,7 +240,7 @@ describe("ProcessScreen", () => {
     (lsRunApi as jest.Mock).mockReturnValue(okRes({ status: "ok" }));
 
     render(
-      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+      <ProcessScreen lang="ko" theme="dark" t={t} url={siteStatus.url} />
     );
 
     await waitFor(() => expect(scanSiteMapApi).toHaveBeenCalledTimes(1));
@@ -214,7 +263,7 @@ describe("ProcessScreen", () => {
     (lsRunApi as jest.Mock).mockReturnValue(okRes({ status: "ok" }));
 
     render(
-      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+      <ProcessScreen lang="ko" theme="dark" t={t} url={siteStatus.url} />
     );
 
     await waitFor(() => expect(scanSiteMapApi).toHaveBeenCalledTimes(1));
@@ -233,7 +282,7 @@ describe("ProcessScreen", () => {
     (lsRunApi as jest.Mock).mockReturnValue(failRes());
 
     render(
-      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+      <ProcessScreen lang="ko" theme="dark" t={t} url={siteStatus.url} />
     );
 
     expect(await screen.findByText("error")).toBeInTheDocument();
@@ -251,7 +300,7 @@ describe("ProcessScreen", () => {
     (lsRunApi as jest.Mock).mockReturnValue(failRes());
 
     render(
-      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+      <ProcessScreen lang="ko" theme="dark" t={t} url={siteStatus.url} />
     );
 
     await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
