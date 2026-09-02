@@ -35,6 +35,8 @@ const t = {
   aiSignalsHint: "없어도 감점되지 않는다",
   aiSignalsPromptsTxtLabel: "prompts.txt",
   aiSignalsPromptsTxtInfoSuffix: "내용 부족",
+  contentStats: "Content Stats",
+  contentCharCountPass: "본문 길이가 적절하다 ({count}자)",
   lighthouseScores: "Lighthouse 점수",
   performance: "Performance",
   seo: "SEO",
@@ -184,6 +186,25 @@ describe("ScanResultScreen", () => {
 
     expect(screen.getByText("AI SIGNALS")).toBeInTheDocument();
     expect(screen.getByText("prompts.txt")).toBeInTheDocument();
+  });
+
+  it("renders the Content Stats card from combined.checks.content when present (issue #7)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined: {
+        ...combined,
+        checks: {
+          ...combined.checks,
+          content: [{ id: "charCount", status: "pass", detail: 900 }],
+        },
+      },
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.getByText("Content Stats")).toBeInTheDocument();
+    expect(screen.getByText("본문 길이가 적절하다 (900자)")).toBeInTheDocument();
   });
 
   it("renders the Lighthouse card from combined.lighthouse when present (issue #9)", () => {
