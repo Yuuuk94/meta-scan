@@ -52,6 +52,20 @@ type AiSignalsCheckItem = {
   detail?: number;
 };
 
+// Raw heading-tag counts backing the "headings" content check's `detail` (issue #7
+// content-stats-checklist) — h1 count together with h2/h3 presence.
+type ContentHeadingCounts = { h1: number; h2: number; h3: number };
+
+// Result row for one "콘텐츠 품질(Content Stats)" checklist item (issue #7
+// content-stats-checklist). Reuses BasicSeoStatus's pass/warning/fail/info vocabulary, same as the
+// other groups. `detail` is a plain number for charCount (raw character count), the raw heading
+// counts object for headings, and omitted for tldr (existence-only).
+type ContentCheckItem = {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number | ContentHeadingCounts;
+};
+
 type MetaScanResult = {
   url: string;
   finalUrl: string;
@@ -103,10 +117,15 @@ type MetaScanResult = {
   // `structuredData`/`faqSection`/`jsRenderDelta`, all judged from this response's own
   // extraction (prompts.txt fetch + JSON-LD @type parsing + the already-computed
   // `html.deltaRatio`), same single-endpoint-composer pattern as basicSeo/previews.
+  // issue #7 content-stats-checklist adds `content` — `charCount`/`headings`/`tldr`, all judged
+  // from this response's own DOM extraction (body character count, h1/h2/h3 counts, TL;DR block
+  // detection). `headings` absorbs the h1-count judgement that basicSeo never actually carried
+  // (checked against code, not assumed — see contentChecks.ts doc comment).
   checks: {
     basicSeo: BasicSeoCheckItem[];
     indexing: IndexingCheckItem[];
     previews: PreviewsCheckItem[];
     aiSignals: AiSignalsCheckItem[];
+    content: ContentCheckItem[];
   };
 };
