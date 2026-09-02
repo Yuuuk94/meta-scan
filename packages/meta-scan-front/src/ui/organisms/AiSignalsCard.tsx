@@ -2,7 +2,7 @@ import React from "react";
 
 import { getAiSignalsDetailSuffix, getAiSignalsLabel } from "@/services/buildAiSignalsMessage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
-import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { StatusBadge, statusLabel } from "@/ui/molecules/StatusBadge";
 
 // "AI 신호(AI Signals/AEO)" checklist card (issue #6 ai-signals-checklist req
 // #5) — 5 rows sourced from `combined.checks.aiSignals` (a straight
@@ -49,21 +49,7 @@ export const AiSignalsCard = ({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <span className="text-[11.5px] font-bold tracking-[.04em] text-muted-foreground">
-              {t.aiSignalsEyebrow}
-            </span>
-            <CardTitle className="mt-1 text-xl">{t.aiSignals}</CardTitle>
-          </div>
-          {/* Hint is dropped entirely on mobile, not just repositioned
-           * (design intake: ScanMobile.dc.html has no right-aligned hint
-           * text at all) — `hidden sm:block` matches that, same pattern as
-           * <PreviewsCard>'s desktop-only elements. */}
-          <span className="hidden shrink-0 pt-1 text-xs text-muted-foreground sm:block">
-            {t.aiSignalsHint}
-          </span>
-        </div>
+        <CardTitle className="text-xl">{t.aiSignals}</CardTitle>
       </CardHeader>
       <CardContent>
         {/* Short raw label + muted detail text next to it ("없음"/"1%"/
@@ -103,7 +89,7 @@ export const AiSignalsCard = ({
                   ) : null}
                 </span>
                 <StatusBadge status={check.status}>
-                  {check.status.toUpperCase()}
+                  {statusLabel(check.status)}
                 </StatusBadge>
               </div>
             );

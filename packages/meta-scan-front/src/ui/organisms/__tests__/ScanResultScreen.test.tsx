@@ -13,11 +13,6 @@ const t = {
   analyzedAt: "분석 시각",
   topIssuesTitle: "지금 고쳐야 할 것",
   topIssuesEmpty: "지금까지 확인한 항목에서 심각한 문제가 없습니다",
-  rawResultsTitle: "스캔 결과",
-  rawSiteMapLabel: "sitemap.xml",
-  rawCrawlingLabel: "페이지 크롤링",
-  rawLighthouseLabel: "Lighthouse",
-  unavailable: "확인 불가",
   notFoundTitle: "표시할 결과가 없습니다",
   notFoundDescription: "결과가 없거나 만료됐다",
   notFoundAction: "홈으로",
@@ -31,8 +26,6 @@ const t = {
   previewsTwitterMockupLabel: "트위터 카드 미리보기",
   previewsImagePlaceholderLabel: "이미지 없음",
   aiSignals: "AI SIGNALS",
-  aiSignalsEyebrow: "Lighthouse가 다루지 않는 항목",
-  aiSignalsHint: "없어도 감점되지 않는다",
   aiSignalsPromptsTxtLabel: "prompts.txt",
   aiSignalsPromptsTxtInfoSuffix: "내용 부족",
   contentStats: "Content Stats",
@@ -45,8 +38,6 @@ const t = {
   accessibility: "Accessibility",
   bestPractices: "Best Practices",
   lighthouseSuggestions: "Lighthouse 개선 제안",
-  lighthouseSuggestionsHint: "Lighthouse가 직접 제안하는 개선 항목이다",
-  lighthouseSuggestionsHintMobile: "Lighthouse가 직접 제안하는 개선 항목이다",
 };
 
 const combined: CombinedScanResult = {
@@ -95,7 +86,7 @@ describe("ScanResultScreen", () => {
     jest.useRealTimers();
   });
 
-  it("renders real stored data (title) and a gray 확인 불가 placeholder for the failed API", () => {
+  it("renders real stored data (url header) and the empty-topIssues message", () => {
     const id = useScanStore.getState().saveScanResult({
       url: "https://example.com",
       raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
@@ -105,8 +96,6 @@ describe("ScanResultScreen", () => {
     render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
 
     expect(screen.getByText("https://example.com")).toBeInTheDocument();
-    expect(screen.getByText("Example Domain")).toBeInTheDocument();
-    expect(screen.getByText("확인 불가")).toBeInTheDocument();
     expect(screen.getByText("지금까지 확인한 항목에서 심각한 문제가 없습니다")).toBeInTheDocument();
   });
 
@@ -170,7 +159,7 @@ describe("ScanResultScreen", () => {
 
     expect(screen.getByText("Previews — OG · Twitter")).toBeInTheDocument();
     expect(screen.getByText("og:image가 설정되어 있다")).toBeInTheDocument();
-    expect(screen.getAllByText("Example OG Title")).toHaveLength(2);
+    expect(screen.getByText("Example OG Title")).toBeInTheDocument();
   });
 
   it("renders the AI Signals card from combined.checks.aiSignals when present (issue #6)", () => {

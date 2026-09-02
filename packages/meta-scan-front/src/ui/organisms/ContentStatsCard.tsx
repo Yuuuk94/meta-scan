@@ -2,7 +2,7 @@ import React from "react";
 
 import { buildContentMessage } from "@/services/buildContentMessage";
 import { CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
-import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { StatusBadge, statusLabel } from "@/ui/molecules/StatusBadge";
 
 // "콘텐츠 품질(Content Stats)" checklist card (issue #7 content-stats-checklist
 // req #4) — always 3 rows (charCount/headings/tldr, see
@@ -44,7 +44,7 @@ export const ContentStatsCard = ({ t, checks }: ContentStatsCardProps) => {
                 {buildContentMessage(t, check)}
               </span>
               <StatusBadge status={check.status}>
-                {check.status.toUpperCase()}
+                {statusLabel(check.status)}
               </StatusBadge>
             </div>
           ))}

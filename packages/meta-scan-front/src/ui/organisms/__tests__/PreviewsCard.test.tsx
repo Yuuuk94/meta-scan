@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
 
 const t = {
-  previews: "Previews — OG · Twitter",
+  previews: "Previews — OG 태그",
   previewsOgImageDimensionsPass: "og:image가 설정되어 있다",
   previewsOgImageDimensionsWarning: "og:image가 없다",
   previewsFaviconPass: "favicon이 확인된다",
@@ -13,8 +13,6 @@ const t = {
   previewsOgRequiredTagsWarning: "OG 필수 태그 중 일부가 없다",
   previewsTwitterCardPass: "twitter:card가 설정되어 있다",
   previewsTwitterCardWarning: "twitter:card가 없다",
-  previewsGoogleMockupLabel: "구글 검색 미리보기",
-  previewsTwitterMockupLabel: "트위터 카드 미리보기",
   previewsImagePlaceholderLabel: "이미지 없음",
 };
 
@@ -36,10 +34,10 @@ describe("PreviewsCard", () => {
         url="https://example.com"
       />
     );
-    expect(screen.getByText("Previews — OG · Twitter")).toBeInTheDocument();
+    expect(screen.getByText("Previews — OG 태그")).toBeInTheDocument();
   });
 
-  it("renders all 4 badge rows with a StatusBadge each and the assembled sentence", () => {
+  it("renders all 4 rows vertically stacked, each with a StatusBadge and the assembled sentence", () => {
     render(
       <PreviewsCard
         lang="ko"
@@ -56,7 +54,7 @@ describe("PreviewsCard", () => {
     expect(screen.getByText("twitter:card가 없다")).toBeInTheDocument();
 
     expect(screen.getAllByText("PASS")).toHaveLength(2);
-    expect(screen.getAllByText("WARNING")).toHaveLength(2);
+    expect(screen.getAllByText("WARN")).toHaveLength(2);
   });
 
   it("renders nothing when there are no checks (e.g. crawling failed)", () => {
@@ -72,7 +70,7 @@ describe("PreviewsCard", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders a Google-style mockup with an uppercase domain and og:title/og:description", () => {
+  it("renders a single Google-style mockup with an uppercase domain and og:title/og:description", () => {
     render(
       <PreviewsCard
         lang="ko"
@@ -91,17 +89,15 @@ describe("PreviewsCard", () => {
     );
 
     expect(screen.getByText("EXAMPLE.COM")).toBeInTheDocument();
-    // No `twitter` prop given, so the Twitter-style mockup falls all the
-    // way back to the same og:* values — appears once per mockup.
     expect(
-      screen.getAllByText("meta-scan — 무료 SEO/AEO 체크리스트")
-    ).toHaveLength(2);
+      screen.getByText("meta-scan — 무료 SEO/AEO 체크리스트")
+    ).toBeInTheDocument();
     expect(
-      screen.getAllByText("URL 하나로 항목별로 점검한다")
-    ).toHaveLength(2);
+      screen.getByText("URL 하나로 항목별로 점검한다")
+    ).toBeInTheDocument();
   });
 
-  it("renders a Twitter-style mockup with a lowercase domain, falling back to og:*/base title-description when twitter:* is missing", () => {
+  it("falls back to title/description props when openGraph has no og:title/og:description", () => {
     render(
       <PreviewsCard
         lang="ko"
@@ -111,40 +107,11 @@ describe("PreviewsCard", () => {
         url="https://example.com/page"
         title="Fallback Title"
         description="Fallback description"
-        openGraph={{
-          "og:title": "OG Title",
-          "og:description": "OG description",
-        }}
-        twitter={{}}
+        openGraph={{}}
       />
     );
 
-    expect(screen.getByText("example.com")).toBeInTheDocument();
-    // Both mockups fall back to the same og:*/base values here (openGraph
-    // has no separate values from twitter), so this appears once per
-    // mockup — 2 total.
-    expect(screen.getAllByText("OG Title")).toHaveLength(2);
-    expect(screen.getAllByText("OG description")).toHaveLength(2);
-  });
-
-  it("prefers twitter:title/twitter:description over og:*/base for the Twitter-style mockup when present", () => {
-    render(
-      <PreviewsCard
-        lang="ko"
-        theme="dark"
-        t={t}
-        checks={fourChecks}
-        url="https://example.com/page"
-        title="Fallback Title"
-        openGraph={{ "og:title": "OG Title" }}
-        twitter={{
-          "twitter:title": "Twitter Title",
-          "twitter:description": "Twitter description",
-        }}
-      />
-    );
-
-    expect(screen.getByText("Twitter Title")).toBeInTheDocument();
-    expect(screen.getByText("Twitter description")).toBeInTheDocument();
+    expect(screen.getByText("Fallback Title")).toBeInTheDocument();
+    expect(screen.getByText("Fallback description")).toBeInTheDocument();
   });
 });

@@ -5,8 +5,6 @@ import { AiSignalsCard } from "@/ui/organisms/AiSignalsCard";
 
 const t = {
   aiSignals: "AI SIGNALS",
-  aiSignalsEyebrow: "Lighthouse가 다루지 않는 항목",
-  aiSignalsHint: "채워두면 AEO 준비도가 올라간다",
   aiSignalsPromptsTxtLabel: "prompts.txt",
   aiSignalsPromptObjectLabel: "PromptObject",
   aiSignalsStructuredDataLabel: "구조화 데이터",
@@ -35,14 +33,12 @@ const fiveChecks: AiSignalsCheckItem[] = [
 ];
 
 describe("AiSignalsCard", () => {
-  it("renders the headline, eyebrow, and hint from the dictionary", () => {
+  it("renders the headline from the dictionary", () => {
     render(
       <AiSignalsCard lang="ko" theme="dark" t={t} checks={fiveChecks} />
     );
 
     expect(screen.getByText("AI SIGNALS")).toBeInTheDocument();
-    expect(screen.getByText("Lighthouse가 다루지 않는 항목")).toBeInTheDocument();
-    expect(screen.getByText("채워두면 AEO 준비도가 올라간다")).toBeInTheDocument();
   });
 
   it("renders each row as a label + muted detail text, with a plain-status badge", () => {
@@ -60,7 +56,7 @@ describe("AiSignalsCard", () => {
     expect(screen.getAllByText("발견됨")).toHaveLength(2);
     expect(screen.getByText("5%")).toBeInTheDocument();
 
-    expect(screen.getAllByText("WARNING")).toHaveLength(2);
+    expect(screen.getAllByText("WARN")).toHaveLength(2);
     expect(screen.getAllByText("PASS")).toHaveLength(3);
   });
 

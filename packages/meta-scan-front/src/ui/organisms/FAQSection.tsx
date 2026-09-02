@@ -38,13 +38,15 @@ export const FAQSection = ({ t }: DefaultPageProps) => {
   return (
     <section className="py-24">
       <div className="content-frame">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-12 text-center">
-            <h2 className="mb-3 font-display text-3xl font-extrabold text-foreground">
-              {t.faqTitle}
-            </h2>
-            <p className="text-foreground-secondary">{t.faqSubtitle}</p>
-          </div>
+        <div className="max-w-3xl">
+          {/* Left-aligned, no subtitle — matches the rest of the page (Hero/
+           * ProcessSection have no centering either) and the design intake
+           * spec's explicit "headline + subtitle-less accordion" (§3.1 item
+           * 4), 2026-09-02 user correction from the earlier centered
+           * headline + subtitle version. */}
+          <h2 className="mb-12 font-display text-3xl font-extrabold text-foreground">
+            {t.faqTitle}
+          </h2>
 
           {/* Uses the shared Accordion primitive (molecules/Accordion.tsx)
            * instead of hand-rolled open/close state, so this list picks up

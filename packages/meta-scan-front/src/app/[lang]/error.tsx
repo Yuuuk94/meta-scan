@@ -14,12 +14,13 @@ const readLangCookie = (): Language => {
   return (match?.[1] as Language) || defaultLang;
 };
 
-const copy: Record<Language, { title: string; description: string; retry: string; home: string }> = {
+export const copy: Record<
+  Language,
+  { title: string; description: string; retry: string; home: string }
+> = {
   ko: {
-    title: "문제가 발생했다",
-    // ProcessScreen/ErrorScreen과 함께 §6 결정 6의 "다/라 자연스럽게 섞기" 대상 —
-    // 상황 설명은 평서형, 행동 권유는 명령형으로 나눠 톤을 기계적으로 통일하지 않았다.
-    description: "일시적인 오류일 수 있다. 다시 시도해 보라.",
+    title: "문제가 발생했습니다",
+    description: "일시적인 오류일 수 있습니다. 다시 시도해 주세요.",
     retry: "다시 시도",
     home: "홈으로",
   },

@@ -1,5 +1,6 @@
 import React from "react";
 
+import { Badge } from "@/ui/atoms/Badge";
 import { NumberLabel } from "@/ui/atoms/NumberLabel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
 import { cn } from "@/utils/cn";
@@ -36,17 +37,32 @@ function toPercent(score: number | null): string | null {
 }
 
 // Lighthouse's own official score bands (chrome DevTools/CLI/report all use
-// this exact 90/50 split) — reusing *its* convention, not inventing a new
-// pass/warning/fail judgement of our own, so this doesn't conflict with req
-// #3's "no re-judging". Mapped onto this app's own color tokens per user
-// direction: >=90 our pass green, 50-89 plain ink (no special color), <50
-// our warning orange.
+// this exact 90/50 split) — reusing *its* thresholds, not inventing a new
+// pass/warning/fail judgement of our own (req #3's "no re-judging"), but
+// mapped onto this app's own color tokens rather than Lighthouse's literal
+// green/orange/red: >=90 our pass green, <50 our destructive red, and
+// 50-89 our info tone (text-info — 2026-09-02, "중간 인포라고": the middle
+// band reuses the same muted gray this app already uses for "info" status
+// elsewhere, not a 3rd distinct hue).
 function scoreColorClass(score: number | null): string | undefined {
   if (score === null) return undefined;
   const percent = Math.round(score * 100);
   if (percent >= 90) return "text-success";
-  if (percent < 50) return "text-warning";
-  return undefined;
+  if (percent < 50) return "text-destructive";
+  return "text-info";
+}
+
+// Same bands/colors as scoreColorClass, reused for the suggestion rows'
+// score chip too — matches <StatusBadge>'s own pass/fail/info treatment
+// exactly (2026-09-02): ≥90 filled green, <50 filled red, 50-89 the same
+// outline-only info style (border-info-border + text-info, no fill) as
+// <StatusBadge status="info">, not a filled box.
+function suggestionScoreBoxClass(score: number | null): string {
+  if (score === null) return "border-[1.5px] border-info-border text-info";
+  const percent = Math.round(score * 100);
+  if (percent >= 90) return "bg-success text-success-foreground";
+  if (percent < 50) return "bg-destructive text-destructive-foreground";
+  return "border-[1.5px] border-info-border text-info";
 }
 
 interface LighthouseCardProps extends DefaultPageProps {
@@ -77,7 +93,15 @@ export const LighthouseCard = ({ t, lighthouse }: LighthouseCardProps) => {
        * own visual identity being surfaced as-is (req #3: no re-judging),
        * not this app's card/popover tokens, which are identical to each
        * other in dark mode and wouldn't read as "a different source." */}
-      <div className="mt-8 border-t-[5px] border-foreground pt-8">
+      {/* The thick rule itself is full-bleed (edge-to-edge of the viewport),
+       * split out from the content below it (which stays inside
+       * content-frame like everything else) — `border-t-[5px]` on a div
+       * that's still constrained to content-frame's max-width read as
+       * "cut off" rather than a real section break (2026-09-02 user
+       * review). `w-screen` + the left-1/2/-translate-x-1/2 pair is the
+       * standard Tailwind full-bleed-inside-a-centered-container trick. */}
+      <div className="relative left-1/2 mt-8 w-screen -translate-x-1/2 border-t-[5px] border-foreground" />
+      <div className="pt-8">
         <h3 className="font-display text-[15px] font-extrabold text-foreground">
           {t.lighthouseScores}
         </h3>
@@ -110,19 +134,14 @@ export const LighthouseCard = ({ t, lighthouse }: LighthouseCardProps) => {
           <Card>
             <CardHeader>
               <CardTitle>{t.lighthouseSuggestions}</CardTitle>
-              <p className="text-xs text-muted-foreground">
-                <span className="sm:hidden">{t.lighthouseSuggestionsHintMobile}</span>
-                <span className="hidden sm:inline">{t.lighthouseSuggestionsHint}</span>
-              </p>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-px border-[1.5px] border-foreground bg-foreground">
-                {suggestions.map((suggestion, index) => (
+                {suggestions.map((suggestion) => (
                   <div
                     key={suggestion.id}
                     className="flex items-start gap-4 bg-card px-5 py-3.5"
                   >
-                    <NumberLabel value={index + 1} className="text-sm" />
                     <div className="flex flex-1 flex-col gap-0.5">
                       <span className="text-sm font-medium text-foreground">
                         {suggestion.title}
@@ -133,12 +152,24 @@ export const LighthouseCard = ({ t, lighthouse }: LighthouseCardProps) => {
                         </span>
                       ) : null}
                     </div>
-                    {/* Hairline outline number, not a colored StatusBadge —
-                     * Lighthouse's own score, not our pass/warning/fail/info
-                     * verdict (req #2). */}
-                    <span className="shrink-0 border-[1.5px] border-info-border px-[9px] py-[3px] text-xs font-bold tracking-[.04em] text-info">
+                    {/* Reuses the generic <Badge> atom (not a hand-rolled
+                     * span, not <StatusBadge> — req #2 keeps this visually
+                     * distinct from our own pass/warning/fail/info
+                     * vocabulary) with its fill overridden per Lighthouse's
+                     * own 90/50 score bands (scoreColorClass/
+                     * suggestionScoreBoxClass). */}
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        // Same fixed width as <StatusBadge> (62px) — 2026-09-02
+                        // user request to keep every badge on this page the
+                        // same size regardless of its text length.
+                        "w-[62px] shrink-0 border-transparent",
+                        suggestionScoreBoxClass(suggestion.score)
+                      )}
+                    >
                       {toPercent(suggestion.score)}
-                    </span>
+                    </Badge>
                   </div>
                 ))}
               </div>

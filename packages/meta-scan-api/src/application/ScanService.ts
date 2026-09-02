@@ -263,7 +263,12 @@ export class ScanService {
     const finalUrl = resp?.url() || url;
 
     const html = await page.content();
-    const fs = () => {
+    // Inlined directly as the page.evaluate() argument (not assigned to a named
+    // `const` first) — see the `collectTypes` comment below for why: this avoids
+    // giving esbuild's dev-mode name-preservation transform an outer binding to wrap
+    // in a `__name(...)` call too, since that call would also end up in the
+    // toString()-serialized source Puppeteer sends into the browser context.
+    const extracted = await page.evaluate(() => {
       const metas = Array.from(document.querySelectorAll("meta"));
       const metaByName: Record<string, string> = {};
       const metaByProp: Record<string, string> = {};
@@ -341,29 +346,41 @@ export class ScanService {
       // judgement. A malformed script just contributes no types (a dedicated parse-error
       // judgement is PRD §3.4 scope this issue doesn't cover).
       const structuredDataTypesSet = new Set<string>();
-      const collectTypes = (node: unknown): void => {
-        if (Array.isArray(node)) {
-          node.forEach(collectTypes);
-          return;
+      // Iterative (explicit stack), not a recursive named helper function — any named
+      // function inside this page.evaluate() callback (`const`-assigned or a `function`
+      // declaration, doesn't matter which) gets esbuild's dev-mode `__name(...)` wrapper
+      // injected around it (for stack-trace-friendly names). `page.evaluate()` serializes
+      // this whole callback via `Function.prototype.toString()` to run it inside the
+      // browser's isolated context, so that wrapper call ends up in the string too — but
+      // `__name` only exists in the Node process, not the page, so it threw
+      // `ReferenceError: __name is not defined` there (2026-09-02, found via a real manual
+      // scan — the ScanService unit tests mock `page.evaluate` entirely, so this never
+      // surfaced in Vitest). Going stack-based sidesteps the whole problem: no named
+      // function, nothing for esbuild to wrap.
+      const jsonLdStack: unknown[] = [];
+      for (const script of document.querySelectorAll(
+        'script[type="application/ld+json"]'
+      )) {
+        try {
+          jsonLdStack.push(JSON.parse(script.textContent || ""));
+        } catch {
+          // malformed JSON-LD — skip, see comment above
         }
-        if (!node || typeof node !== "object") return;
+      }
+      while (jsonLdStack.length > 0) {
+        const node = jsonLdStack.pop();
+        if (Array.isArray(node)) {
+          jsonLdStack.push(...node);
+          continue;
+        }
+        if (!node || typeof node !== "object") continue;
         const obj = node as Record<string, unknown>;
         const t = obj["@type"];
         if (typeof t === "string") structuredDataTypesSet.add(t);
         else if (Array.isArray(t)) {
           t.forEach((tt) => typeof tt === "string" && structuredDataTypesSet.add(tt));
         }
-        if (Array.isArray(obj["@graph"])) collectTypes(obj["@graph"]);
-      };
-      const jsonLdScripts = Array.from(
-        document.querySelectorAll('script[type="application/ld+json"]')
-      );
-      for (const script of jsonLdScripts) {
-        try {
-          collectTypes(JSON.parse(script.textContent || ""));
-        } catch {
-          // malformed JSON-LD — skip, see comment above
-        }
+        if (Array.isArray(obj["@graph"])) jsonLdStack.push(...obj["@graph"]);
       }
       const structuredDataTypes = Array.from(structuredDataTypesSet);
       return {
@@ -396,8 +413,7 @@ export class ScanService {
         // issue #6 ai-signals-checklist
         structuredDataTypes,
       };
-    };
-    const extracted = await page.evaluate(fs);
+    });
 
     await page.close();
 

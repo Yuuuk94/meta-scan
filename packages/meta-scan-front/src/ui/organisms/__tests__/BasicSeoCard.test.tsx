@@ -47,7 +47,7 @@ describe("BasicSeoCard", () => {
     expect(screen.getByText("중복된 meta 태그가 없다")).toBeInTheDocument();
 
     expect(screen.getAllByText("PASS")).toHaveLength(2);
-    expect(screen.getAllByText("WARNING")).toHaveLength(2);
+    expect(screen.getAllByText("WARN")).toHaveLength(2);
     expect(screen.getAllByText("INFO")).toHaveLength(1);
   });
 

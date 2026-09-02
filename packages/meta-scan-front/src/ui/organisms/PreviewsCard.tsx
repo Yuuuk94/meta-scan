@@ -2,7 +2,7 @@ import React from "react";
 
 import { buildPreviewsMessage } from "@/services/buildPreviewsMessage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
-import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { StatusBadge, statusLabel } from "@/ui/molecules/StatusBadge";
 
 // "미리보기(Previews) — OG · Twitter" card (issue #5 previews-checklist req
 // #4) — 4 badge rows sourced from `combined.checks.previews` (a straight
@@ -42,11 +42,10 @@ export const PreviewsCard = ({
   title,
   description,
   openGraph,
-  twitter,
 }: PreviewsCardProps) => {
   // No crawling data (that call failed, or hasn't happened) — every row and
-  // both mockups are sourced from crawling alone, so there's nothing to
-  // show. Same "stay absent rather than render an empty shell" rule as
+  // the mockup are sourced from crawling alone, so there's nothing to show.
+  // Same "stay absent rather than render an empty shell" rule as
   // <BasicSeoCard>/<IndexingCard>.
   if (checks.length === 0) return null;
 
@@ -54,8 +53,6 @@ export const PreviewsCard = ({
 
   const ogTitle = openGraph?.["og:title"] || title;
   const ogDescription = openGraph?.["og:description"] || description;
-  const twitterTitle = twitter?.["twitter:title"] || ogTitle;
-  const twitterDescription = twitter?.["twitter:description"] || ogDescription;
 
   return (
     <Card>
@@ -63,67 +60,43 @@ export const PreviewsCard = ({
         <CardTitle>{t.previews}</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* 4 badges in one row (ScanZine.dc.html: grid-template-columns:
-         * repeat(4,1fr), real 14px gap — this specific grid was never
-         * flagged in the design-intake's gap-vs-rule-line conflict, unlike
-         * the checklist card grid and the mockup grid below, so it keeps
-         * its literal gap). Muted label + badge, justify-between per cell.
-         * 2 columns under sm since 4-across is cramped on a phone. */}
-        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
+        {/* Vertical stacked rows — same hairline-divider/label+badge pattern
+         * as <IndexingCard> (2026-09-02 user request: "indexing 카드처럼
+         * 텍스트 보여주고"), replacing the earlier 4-across grid. */}
+        <div className="flex flex-col divide-y divide-border">
           {checks.map((check) => (
-            <div key={check.id} className="flex items-center justify-between gap-2">
-              <span className="text-[11.5px] text-muted-foreground">
+            <div
+              key={check.id}
+              className="flex items-start justify-between gap-4 py-3.5"
+            >
+              <span className="text-sm font-medium text-foreground">
                 {buildPreviewsMessage(t, check)}
               </span>
               <StatusBadge status={check.status}>
-                {check.status.toUpperCase()}
+                {statusLabel(check.status)}
               </StatusBadge>
             </div>
           ))}
         </div>
 
-        {/* 2 card-preview mockups (Google/Twitter-style) — 20px gap ->
-         * 1px rule-line per the design intake's conflict resolution
-         * (spec.md §6 decision #2: same "gap 대신 룰 라인" treatment as the
-         * checklist card grid above, applied here too). Image area is a
-         * solid placeholder block (--border token, matches the mockup's
-         * literal #E4DECB fill) — no "이미지 없음" text, no visible
-         * "Google/Twitter" label; the mockup itself doesn't have either,
-         * it relies on field order alone (domain-first = Google-style,
-         * title-first = Twitter-style) to read as two different previews. */}
-        <div className="mt-6 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
-          <div className="flex flex-col bg-card">
-            <div aria-label={t.previewsImagePlaceholderLabel as string} className="h-[140px] w-full bg-border" />
-            <div className="flex flex-col gap-1 p-3.5">
-              <span className="text-[10px] tracking-[.04em] text-muted-foreground">
-                {hostname?.toUpperCase()}
+        {/* Single Google-style mockup — the Twitter-style card was dropped
+         * (2026-09-02 user request: "아래 카드하나로 통일 왼쪽껄로", also
+         * issue #24's confirmed direction). Image area is a solid
+         * placeholder block (--border token) — no "이미지 없음" text. */}
+        <div className="mt-6 border-[1.5px] border-foreground bg-card">
+          <div aria-label={t.previewsImagePlaceholderLabel as string} className="h-[140px] w-full bg-border" />
+          <div className="flex flex-col gap-1 p-3.5">
+            <span className="text-[10px] tracking-[.04em] text-muted-foreground">
+              {hostname?.toUpperCase()}
+            </span>
+            <span className="text-sm font-bold text-foreground">
+              {ogTitle}
+            </span>
+            {ogDescription ? (
+              <span className="text-xs text-muted-foreground">
+                {ogDescription}
               </span>
-              <span className="text-sm font-bold text-foreground">
-                {ogTitle}
-              </span>
-              {ogDescription ? (
-                <span className="text-xs text-muted-foreground">
-                  {ogDescription}
-                </span>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="flex flex-col bg-card">
-            <div aria-label={t.previewsImagePlaceholderLabel as string} className="h-[140px] w-full bg-border" />
-            <div className="flex flex-col gap-1 p-3.5">
-              <span className="text-sm font-bold text-foreground">
-                {twitterTitle}
-              </span>
-              {twitterDescription ? (
-                <span className="text-xs text-muted-foreground">
-                  {twitterDescription}
-                </span>
-              ) : null}
-              <span className="text-[10px] text-muted-foreground">
-                {hostname}
-              </span>
-            </div>
+            ) : null}
           </div>
         </div>
       </CardContent>

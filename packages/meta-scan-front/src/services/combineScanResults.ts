@@ -25,9 +25,9 @@ import { buildLighthouseSuggestions } from "@/services/buildLighthouseSuggestion
 
 const DEFAULT_TOP_ISSUES_LIMIT = 3;
 
-// checks.basicSeo's pass/warning/fail/info vocabulary maps onto this
-// function's fail-first-then-warning topIssues list. `pass`/`info` never
-// surface as a topIssue — `info` means "signal present, not a deduction"
+// checks.*'s pass/warning/fail/info vocabulary maps onto this function's
+// fail-first-then-warning topIssues list. `pass`/`info` never surface as a
+// topIssue — `info` means "signal present, not a deduction"
 // (design-system.md §8), and `pass` obviously isn't an issue.
 const STATUS_TO_TOP_ISSUE_STATUS: Record<
   BasicSeoStatus,
@@ -39,37 +39,66 @@ const STATUS_TO_TOP_ISSUE_STATUS: Record<
   info: null,
 };
 
+// Group priority order — 2026-09-02 user correction: topIssues used to only
+// look at checks.basicSeo (a scope gap from issue #2, before the other 5
+// checklist groups existed — see git history). Expanded to pull from every
+// group, with AI Signals ranked first: this product's whole differentiation
+// is AEO/GEO discoverability (docs/prd/meta-scan-plus-prd.md), so an AI
+// Signals issue is more central to "지금 고쳐야 할 것" than a basicSeo one,
+// not an afterthought behind traditional SEO. The rest follow in roughly
+// the same order the checklist grid itself renders in.
+const GROUP_PRIORITY: TopIssueGroup[] = [
+  "aiSignals",
+  "content",
+  "basicSeo",
+  "indexing",
+  "previews",
+  "i18nUx",
+];
+
+interface GenericCheckItem {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number | ContentHeadingCounts;
+}
+
 function buildTopIssues(
-  crawling: CrawlingScanData | null,
+  checksByGroup: Record<TopIssueGroup, GenericCheckItem[]>,
   limit: number
 ): TopIssue[] {
-  // Optional-chain past `checks` itself, not just `.basicSeo` — some
-  // existing test/mock fixtures (e.g. robots-gating tests) stub crawling's
-  // response as a bare `{ status: "ok" }` without a `checks` field at all,
-  // and a real backend 2xx with a malformed body shouldn't crash this
-  // either.
-  const checks = crawling?.checks?.basicSeo ?? [];
+  const issuesByGroup = GROUP_PRIORITY.map((group) => {
+    const checks = checksByGroup[group] ?? [];
+    return checks
+      .map((check) => ({
+        group,
+        status: STATUS_TO_TOP_ISSUE_STATUS[check.status],
+        check,
+      }))
+      .filter(
+        (
+          entry
+        ): entry is {
+          group: TopIssueGroup;
+          status: TopIssue["status"];
+          check: GenericCheckItem;
+        } => entry.status !== null
+      );
+  });
 
-  const issues = checks
-    .map((check) => ({
-      status: STATUS_TO_TOP_ISSUE_STATUS[check.status],
-      check,
-    }))
-    .filter(
-      (entry): entry is { status: TopIssue["status"]; check: BasicSeoCheckItem } =>
-        entry.status !== null
-    );
+  const allIssues = issuesByGroup.flat();
 
-  // fail 우선, 모자라면 warning으로 채움 (PRD §4)
-  const fails = issues.filter((entry) => entry.status === "fail");
-  const warnings = issues.filter((entry) => entry.status === "warning");
+  // fail 우선(전 그룹 통틀어), 모자라면 warning으로 채움 (PRD §4) — 그룹 내
+  // 우선순위는 GROUP_PRIORITY 순서(AI Signals 최우선) 그대로 유지.
+  const fails = allIssues.filter((entry) => entry.status === "fail");
+  const warnings = allIssues.filter((entry) => entry.status === "warning");
 
   return [...fails, ...warnings]
     .slice(0, limit)
-    .map(({ status, check }) => ({
+    .map(({ group, status, check }) => ({
       id: check.id,
       status,
       detail: check.detail,
+      group,
     }));
 }
 
@@ -97,6 +126,28 @@ export function combineScanResults(
 
   const extract = raw.crawling?.extract;
 
+  const checks = {
+    basicSeo: raw.crawling?.checks?.basicSeo ?? [],
+    indexing: buildIndexingChecks(raw),
+    // Straight passthrough, same as basicSeo — all 4 previews checks come
+    // from crawling alone, no cross-API merge needed (issue #5
+    // previews-checklist).
+    previews: raw.crawling?.checks?.previews ?? [],
+    // Straight passthrough too — all 5 aiSignals checks
+    // (promptsTxt/promptObject/structuredData/faqSection/jsRenderDelta)
+    // come from crawling alone, no cross-API merge needed (issue #6
+    // ai-signals-checklist).
+    aiSignals: raw.crawling?.checks?.aiSignals ?? [],
+    // Straight passthrough too — all 3 content checks
+    // (charCount/headings/tldr) come from crawling alone, no cross-API
+    // merge needed (issue #7 content-stats-checklist).
+    content: raw.crawling?.checks?.content ?? [],
+    // Straight passthrough too — both i18nUx checks (hreflang/viewport)
+    // come from crawling alone, no cross-API merge needed (issue #8
+    // i18n-ux-checklist).
+    i18nUx: raw.crawling?.checks?.i18nUx ?? [],
+  };
+
   return {
     // The scanned page's URL, passed in explicitly by the caller — not
     // derived from raw.robotsTxt.url/raw.siteMap.url, which are the
@@ -110,29 +161,14 @@ export function combineScanResults(
     twitter: extract?.twitter,
     structuredDataTypes: extract?.structuredDataTypes,
     hasSitemap: raw.siteMap?.has,
-    topIssues: buildTopIssues(raw.crawling, topIssuesLimit),
+    // Same merged `checks` object topIssues is built from below — not
+    // `raw.crawling?.checks` again — so a real cross-API group like
+    // `indexing` (siteMap + robotsTxt + crawling) is represented
+    // consistently in both places instead of topIssues silently missing
+    // its siteMap/robotsTxt-sourced rows.
+    topIssues: buildTopIssues(checks, topIssuesLimit),
     failedApis,
-    checks: {
-      basicSeo: raw.crawling?.checks?.basicSeo ?? [],
-      indexing: buildIndexingChecks(raw),
-      // Straight passthrough, same as basicSeo — all 4 previews checks come
-      // from crawling alone, no cross-API merge needed (issue #5
-      // previews-checklist).
-      previews: raw.crawling?.checks?.previews ?? [],
-      // Straight passthrough too — all 5 aiSignals checks
-      // (promptsTxt/promptObject/structuredData/faqSection/jsRenderDelta)
-      // come from crawling alone, no cross-API merge needed (issue #6
-      // ai-signals-checklist).
-      aiSignals: raw.crawling?.checks?.aiSignals ?? [],
-      // Straight passthrough too — all 3 content checks
-      // (charCount/headings/tldr) come from crawling alone, no cross-API
-      // merge needed (issue #7 content-stats-checklist).
-      content: raw.crawling?.checks?.content ?? [],
-      // Straight passthrough too — both i18nUx checks (hreflang/viewport)
-      // come from crawling alone, no cross-API merge needed (issue #8
-      // i18n-ux-checklist).
-      i18nUx: raw.crawling?.checks?.i18nUx ?? [],
-    },
+    checks,
     lighthouse: {
       scores: buildLighthouseScores(raw.lighthouse),
       suggestions: buildLighthouseSuggestions(raw.lighthouse),

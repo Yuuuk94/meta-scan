@@ -63,11 +63,14 @@ export const HeroSection = ({ t }: DefaultPageProps) => {
             placeholder={t.urlPlaceholder as string}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleAnalyze();
+            }}
             className="h-14 flex-1 border-2 border-foreground bg-card px-5 text-base"
           />
           <Button
             onClick={handleAnalyze}
-            className="h-14 shrink-0 px-8 text-base"
+            className="h-14 shrink-0 px-8 text-base hover:bg-accent hover:text-accent-foreground"
           >
             {t.analyzeButton}
             <Scan className="h-4 w-4" />

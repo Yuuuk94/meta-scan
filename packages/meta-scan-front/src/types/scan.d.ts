@@ -226,10 +226,24 @@ type FailedScanApi = "robotsTxt" | "siteMap" | "crawling" | "lighthouse";
  * req #3) instead of being baked into `localStorage`-persisted state in
  * whatever locale was active at scan time. See
  * `services/buildBasicSeoMessage.ts` + `<ScanHero>`. */
+/** Which checklist group a topIssue was sourced from — needed so
+ * <ScanHero> can dispatch to the right build*Message function per row
+ * (2026-09-02: topIssues expanded from basicSeo-only to all 6 groups,
+ * AI Signals given top priority — see combineScanResults.ts's
+ * buildTopIssues). */
+type TopIssueGroup =
+  | "basicSeo"
+  | "indexing"
+  | "previews"
+  | "aiSignals"
+  | "content"
+  | "i18nUx";
+
 interface TopIssue {
   id: string;
   status: "fail" | "warning";
-  detail?: number;
+  detail?: number | ContentHeadingCounts;
+  group: TopIssueGroup;
 }
 
 /** Already-judged fields merged from the 4 raw responses — `combineScanResults`

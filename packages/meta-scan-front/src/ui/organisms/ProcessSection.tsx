@@ -10,9 +10,13 @@ export const ProcessSection = ({ t }: DefaultPageProps) => {
 
   return (
     // Bold top/bottom rules frame the section, background tone shifts to
-    // Card Paper — the section-break pattern this system uses instead of
-    // card shadows (design-system.md §5).
-    <section className="border-y-4 border-foreground bg-card py-16">
+    // "Card Paper" (`--card-paper`, #fff9f0) — the section-break pattern
+    // this system uses instead of card shadows (design-system.md §5,
+    // zine-index intake §3.1/§4/tokens). Uses the dedicated token, not
+    // `--card` — 2026-09-02: `--card` moved to pure white for the
+    // /scan/:id result cards, which would read as a harsh stark-white band
+    // if applied to a whole full-bleed section background like this one.
+    <section className="border-y-4 border-foreground bg-card-paper py-16">
       <div className="content-frame">
         <h2 className="font-display text-3xl font-extrabold text-foreground">
           {t.howItWorksTitle}
@@ -28,7 +32,7 @@ export const ProcessSection = ({ t }: DefaultPageProps) => {
             // then desc) — not just a column-count collapse (zine-index intake §3.1).
             <div
               key={index}
-              className="flex items-start gap-3 bg-card p-4 sm:flex-col sm:gap-2.5 sm:p-6"
+              className="flex items-start gap-3 bg-card-paper p-4 sm:flex-col sm:gap-2.5 sm:p-6"
             >
               <NumberLabel
                 value={index + 1}
