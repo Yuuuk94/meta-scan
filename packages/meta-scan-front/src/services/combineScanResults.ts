@@ -17,6 +17,8 @@
 // than our pass/warning/fail/info vocabulary. `checks.content` (issue #7
 // content-stats-checklist) is a straight passthrough too, same as
 // basicSeo/previews/aiSignals — all 3 rows only ever come from crawling.
+// `checks.i18nUx` (issue #8 i18n-ux-checklist) is a straight passthrough
+// too — both rows (hreflang/viewport) only ever come from crawling.
 
 import { buildLighthouseScores } from "@/services/buildLighthouseScores";
 import { buildLighthouseSuggestions } from "@/services/buildLighthouseSuggestions";
@@ -126,6 +128,10 @@ export function combineScanResults(
       // (charCount/headings/tldr) come from crawling alone, no cross-API
       // merge needed (issue #7 content-stats-checklist).
       content: raw.crawling?.checks?.content ?? [],
+      // Straight passthrough too — both i18nUx checks (hreflang/viewport)
+      // come from crawling alone, no cross-API merge needed (issue #8
+      // i18n-ux-checklist).
+      i18nUx: raw.crawling?.checks?.i18nUx ?? [],
     },
     lighthouse: {
       scores: buildLighthouseScores(raw.lighthouse),

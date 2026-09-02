@@ -161,13 +161,17 @@ interface CrawlingScanData extends OkStatus {
   // `ScanService.crawling`'s old push-only-on-problem `runChecks` used to
   // return. issue #7 content-stats-checklist adds `content`
   // (`charCount`/`headings`/`tldr`), also a straight passthrough — all 3
-  // rows come from this same response's own extraction.
+  // rows come from this same response's own extraction. issue #8
+  // i18n-ux-checklist adds `i18nUx` (`hreflang`/`viewport`), also a
+  // straight passthrough — both rows come from this same response's own
+  // extraction.
   checks: {
     basicSeo: BasicSeoCheckItem[];
     indexing: IndexingCheckItem[];
     previews: PreviewsCheckItem[];
     aiSignals: AiSignalsCheckItem[];
     content: ContentCheckItem[];
+    i18nUx: I18nUxCheckItem[];
   };
 }
 
@@ -242,7 +246,9 @@ interface TopIssue {
  * (issue #6 ai-signals-checklist) is a straight passthrough too, same as
  * `basicSeo`/`previews` — all 5 rows only ever come from `crawling`.
  * `checks.content` (issue #7 content-stats-checklist) is a straight
- * passthrough too, same as `basicSeo`/`previews`/`aiSignals`. */
+ * passthrough too, same as `basicSeo`/`previews`/`aiSignals`. `checks.i18nUx`
+ * (issue #8 i18n-ux-checklist) is a straight passthrough too, same as the
+ * above — both rows only ever come from `crawling`. */
 /** score (0–1) is intentionally required and non-null here — this is the
  * already-filtered output of `buildLighthouseSuggestions` (`score !== null`
  * is part of the filter, spec-fixed.md req #1), unlike the raw
@@ -294,6 +300,7 @@ interface CombinedScanResult {
     previews: PreviewsCheckItem[];
     aiSignals: AiSignalsCheckItem[];
     content: ContentCheckItem[];
+    i18nUx: I18nUxCheckItem[];
   };
   /** Issue #9 lighthouse-suggestions. */
   lighthouse?: CombinedLighthouse;

@@ -17,6 +17,7 @@ const combinedFixture: CombinedScanResult = {
     previews: [],
     aiSignals: [],
     content: [],
+    i18nUx: [],
   },
 };
 

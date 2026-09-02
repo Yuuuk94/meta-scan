@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { I18nUxCard } from "@/ui/organisms/I18nUxCard";
 
 const t = {
-  i18nUx: "국제화/UX",
+  intlUx: "국제화·UX",
   i18nUxHreflangPass: "hreflang 대체 링크가 있다",
   i18nUxHreflangInfo: "hreflang 대체 링크가 없다",
   i18nUxViewportPass: "viewport 메타 태그가 있다",
@@ -19,7 +19,7 @@ const twoRows: I18nUxCheckItem[] = [
 describe("I18nUxCard", () => {
   it("renders the card title from the dictionary", () => {
     render(<I18nUxCard lang="ko" theme="dark" t={t} checks={twoRows} />);
-    expect(screen.getByText("국제화/UX")).toBeInTheDocument();
+    expect(screen.getByText("국제화·UX")).toBeInTheDocument();
   });
 
   it("renders both rows with a StatusBadge each and the assembled sentence", () => {

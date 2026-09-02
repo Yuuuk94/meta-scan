@@ -64,6 +64,7 @@ const crawlingFixture: CrawlingScanData = {
     previews: [],
     aiSignals: [],
     content: [],
+    i18nUx: [],
   },
 };
 

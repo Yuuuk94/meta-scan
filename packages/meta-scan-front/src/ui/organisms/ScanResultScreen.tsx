@@ -9,6 +9,7 @@ import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { AiSignalsCard } from "@/ui/organisms/AiSignalsCard";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { ContentStatsCard } from "@/ui/organisms/ContentStatsCard";
+import { I18nUxCard } from "@/ui/organisms/I18nUxCard";
 import { IndexingCard } from "@/ui/organisms/IndexingCard";
 import { LighthouseCard } from "@/ui/organisms/LighthouseCard";
 import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
@@ -140,16 +141,15 @@ export function ScanResultScreen({
        * below and ProcessScreen's step grid) — so the cards themselves
        * render border-less (see <BasicSeoCard>/<IndexingCard>).
        *
-       * Column count is deliberately `sm:grid-cols-2` (not `lg:grid-cols-4`
-       * yet) — only 3 of the 4 planned cards exist (i18n-ux is a separate,
-       * not-yet-built issue #8). Sizing the grid for 4 before 4 exist left
-       * the other quarter of the row as a huge solid `bg-foreground` block
-       * (user feedback — looked like a stray dark panel, not empty grid
-       * space). Bump to `lg:grid-cols-4` once #8 lands. This doesn't handle
-       * a card going empty at *runtime* (its source API failed) leaving a
-       * gap either — same accepted limitation as the raw-results tiles
-       * below, just smaller in scope now. */}
-      <div className="mt-8 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
+       * `lg:grid-cols-4` (issue #8 i18n-ux-checklist landed the 4th card) —
+       * previously `sm:grid-cols-2` while only 3 of the 4 planned cards
+       * existed, since sizing the grid for 4 before 4 exist left the other
+       * quarter of the row as a huge solid `bg-foreground` block (user
+       * feedback — looked like a stray dark panel, not empty grid space).
+       * This doesn't handle a card going empty at *runtime* (its source API
+       * failed) leaving a gap either — same accepted limitation as the
+       * raw-results tiles below, just smaller in scope now. */}
+      <div className="mt-8 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2 lg:grid-cols-4">
         <BasicSeoCard
           lang={lang}
           theme={theme}
@@ -169,6 +169,14 @@ export function ScanResultScreen({
           theme={theme}
           t={t}
           checks={combined.checks.content}
+        />
+        {/* "국제화/UX(i18n/UX)" (issue #8 i18n-ux-checklist) — 4th and final
+         * cell in this checklist grid. */}
+        <I18nUxCard
+          lang={lang}
+          theme={theme}
+          t={t}
+          checks={combined.checks.i18nUx}
         />
       </div>
 
