@@ -8,6 +8,7 @@ import {
   scanCrawlingApi,
   scanRobotsTxtApi,
   scanSiteMapApi,
+  sitePingApi,
 } from "@/api/scanApi";
 import { shouldBlockScan } from "@/services/scanGating";
 import { BlockedScreen } from "@/ui/organisms/BlockedScreen";
@@ -44,14 +45,9 @@ const stepIds = ["ai", "meta", "analysis", "gen"];
 const fatalIndices = ["crawling"] as const;
 
 interface ProcessScreenProps extends DefaultPageProps {
-  siteStatus: SiteStatusData;
+  url: string;
 }
-export function ProcessScreen({
-  lang,
-  theme,
-  t,
-  siteStatus,
-}: ProcessScreenProps) {
+export function ProcessScreen({ lang, theme, t, url }: ProcessScreenProps) {
   const router = useRouter();
   const saveScanResult = useScanStore((state) => state.saveScanResult);
 
@@ -59,6 +55,16 @@ export function ProcessScreen({
   const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>(
     Array(stepIds.length).fill(null)
   );
+  // Ping runs client-side now (perf fix, 2026-09-02 — see request-scan
+  // page.tsx comment) instead of being awaited server-side before this
+  // component ever mounted, so the badge below needs a pending state to
+  // show while it's in flight. `displayUrl` starts as the raw input url and
+  // updates to the ping response's (possibly redirected) url once resolved
+  // — everything downstream (robots.txt call, saveScanResult, etc.) uses
+  // the resolved url, matching the old server-resolved-siteStatus.url
+  // behavior exactly.
+  const [pingState, setPingState] = useState<"checking" | "ok">("checking");
+  const [displayUrl, setDisplayUrl] = useState(url);
   // Bumping this re-runs the main effect below (it's in that effect's
   // dependency array) — the only way "다시 시도" on <ErrorScreen> actually
   // retries the scan, instead of a no-op `router.refresh()` that a client
@@ -79,9 +85,33 @@ export function ProcessScreen({
     if (didRunRef.current) return; // 두 번째 실행 막기
     didRunRef.current = true;
 
-    if (siteStatus.status !== okStatus) return;
+    const runScan = async () => {
+      // Ping first (perf fix, 2026-09-02) — this used to be awaited
+      // server-side before this component ever mounted; now it's the
+      // component's own first async step, so any failure here needs the
+      // same error handling that a failed robotsTxt call gets below.
+      let siteStatus: SiteStatusData;
+      try {
+        const res = await sitePingApi({ url });
+        siteStatus = res.data;
+        if (!siteStatus) {
+          throw new Error("ping API returned an empty response");
+        }
+      } catch (e) {
+        console.error(e);
+        setScreenState("error");
+        return;
+      }
 
-    const data = { url: siteStatus.url };
+      if (siteStatus.status !== okStatus) {
+        setScreenState("error");
+        return;
+      }
+
+      setDisplayUrl(siteStatus.url);
+      setPingState("ok");
+
+      const data = { url: siteStatus.url };
     // Response bodies for each of the 4 calls, keyed by rawKeys — filled in
     // as each settles, then handed to combineScanResults once all 4 are
     // done (spec-fixed.md req #1/#6). Plain object (not state): only read
@@ -203,17 +233,22 @@ export function ProcessScreen({
         trackEvent("scan_completed", { url: siteStatus.url });
         router.replace(`/scan/${id}`);
       });
+      };
+
+      process();
     };
 
-    process();
+    runScan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retryKey]);
+  }, [retryKey, url]);
 
   const handleRetry = () => {
     didRunRef.current = false;
     setProgress(10);
     setCurrentProcess(Array(stepIds.length).fill(null));
     setScreenState("processing");
+    setPingState("checking");
+    setDisplayUrl(url);
     setRetryKey((k) => k + 1);
   };
 
@@ -224,7 +259,7 @@ export function ProcessScreen({
   }
 
   if (screenState === "blocked") {
-    return <BlockedScreen t={t} url={siteStatus.url} />;
+    return <BlockedScreen t={t} url={displayUrl} />;
   }
 
   return (
@@ -232,11 +267,17 @@ export function ProcessScreen({
       {/* URL chip + live status, mirrors RequestScanProcessZine's header row */}
       <div className="flex items-center gap-3 border-[1.5px] border-foreground bg-card px-5 py-3">
         <span className="text-[13px] font-semibold text-foreground">
-          {siteStatus.url}
+          {displayUrl}
         </span>
-        <span className="bg-success px-[9px] py-[3px] text-[10.5px] font-extrabold tracking-[.04em] text-success-foreground">
-          {lang === "ko" ? "접속 확인 완료" : "SITE REACHABLE"}
-        </span>
+        {pingState === "checking" ? (
+          <span className="bg-accent px-[9px] py-[3px] text-[10.5px] font-extrabold tracking-[.04em] text-accent-foreground">
+            {lang === "ko" ? "접속 확인 중" : "CHECKING"}
+          </span>
+        ) : (
+          <span className="bg-success px-[9px] py-[3px] text-[10.5px] font-extrabold tracking-[.04em] text-success-foreground">
+            {lang === "ko" ? "접속 확인 완료" : "SITE REACHABLE"}
+          </span>
+        )}
       </div>
 
       <div>

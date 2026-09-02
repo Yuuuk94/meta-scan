@@ -9,6 +9,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/api/scanApi", () => ({
+  sitePingApi: jest.fn(),
   scanRobotsTxtApi: jest.fn(),
   scanSiteMapApi: jest.fn(),
   scanCrawlingApi: jest.fn(),
@@ -24,10 +25,12 @@ import {
   scanCrawlingApi,
   scanRobotsTxtApi,
   scanSiteMapApi,
+  sitePingApi,
 } from "@/api/scanApi";
 import { ProcessScreen } from "@/ui/organisms/ProcessScreen";
 import { trackEvent } from "@/services/analyticsEvents";
 
+const mockedPing = sitePingApi as jest.Mock;
 const mockedRobotsTxt = scanRobotsTxtApi as jest.Mock;
 const mockedSiteMap = scanSiteMapApi as jest.Mock;
 const mockedCrawling = scanCrawlingApi as jest.Mock;
@@ -58,12 +61,12 @@ const siteStatus: SiteStatusData = {
 };
 
 const renderScreen = () =>
-  render(
-    <ProcessScreen theme="dark" lang="ko" t={t} siteStatus={siteStatus} />,
-  );
+  render(<ProcessScreen theme="dark" lang="ko" t={t} url={siteStatus.url} />);
 
 beforeEach(() => {
   jest.clearAllMocks();
+  // Ping now runs inside ProcessScreen itself (perf fix, 2026-09-02).
+  mockedPing.mockResolvedValue({ data: siteStatus });
 });
 
 describe("ProcessScreen robots.txt 게이팅 (ADR-006, 이슈 #1)", () => {
@@ -80,7 +83,9 @@ describe("ProcessScreen robots.txt 게이팅 (ADR-006, 이슈 #1)", () => {
 
     renderScreen();
 
-    expect(mockedRobotsTxt).toHaveBeenCalledTimes(1);
+    // Ping (now the component's own first step, perf fix 2026-09-02)
+    // resolves before robotsTxt is ever called.
+    await waitFor(() => expect(mockedRobotsTxt).toHaveBeenCalledTimes(1));
     expect(mockedSiteMap).not.toHaveBeenCalled();
     expect(mockedCrawling).not.toHaveBeenCalled();
     expect(mockedLsRun).not.toHaveBeenCalled();
