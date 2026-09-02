@@ -9,6 +9,7 @@ import {
   scanRobotsTxtApi,
   scanSiteMapApi,
 } from "@/api/scanApi";
+import { trackEvent } from "@/services/analyticsEvents";
 
 const replace = jest.fn();
 const push = jest.fn();
@@ -21,6 +22,10 @@ jest.mock("@/api/scanApi", () => ({
   scanSiteMapApi: jest.fn(),
   scanCrawlingApi: jest.fn(),
   lsRunApi: jest.fn(),
+}));
+
+jest.mock("@/services/analyticsEvents", () => ({
+  trackEvent: jest.fn(),
 }));
 
 const t = {
@@ -105,6 +110,32 @@ describe("ProcessScreen", () => {
     expect(stored?.raw.crawling?.extract.title).toBe("Example Domain");
     expect(stored?.combined.title).toBe("Example Domain");
     expect(stored?.combined.failedApis).toEqual([]);
+  });
+
+  // issue #19 analytics-integration — scan_completed fires at the same
+  // point combineScanResults runs and routing to /scan/:id happens
+  // (normal completion path).
+  it("fires a scan_completed analytics event on the normal completion path", async () => {
+    (scanRobotsTxtApi as jest.Mock).mockReturnValue(
+      okRes<RobotsTxtData>({ status: "ok", has: true })
+    );
+    (scanSiteMapApi as jest.Mock).mockReturnValue(
+      okRes<SiteMapData>({ status: "ok", has: true })
+    );
+    (scanCrawlingApi as jest.Mock).mockReturnValue(
+      okRes<CrawlingScanData>(crawlingFixture)
+    );
+    (lsRunApi as jest.Mock).mockReturnValue(okRes({ status: "ok" }));
+
+    render(
+      <ProcessScreen lang="ko" theme="dark" t={t} siteStatus={siteStatus} />
+    );
+
+    await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+
+    expect(trackEvent).toHaveBeenCalledWith("scan_completed", {
+      url: siteStatus.url,
+    });
   });
 
   it("stores a real lighthouse response even though it has no {status:'ok'} wrapper (issue #9)", async () => {

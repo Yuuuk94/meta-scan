@@ -15,6 +15,10 @@ jest.mock("@/api/scanApi", () => ({
   lsRunApi: jest.fn(),
 }));
 
+jest.mock("@/services/analyticsEvents", () => ({
+  trackEvent: jest.fn(),
+}));
+
 import {
   lsRunApi,
   scanCrawlingApi,
@@ -22,6 +26,7 @@ import {
   scanSiteMapApi,
 } from "@/api/scanApi";
 import { ProcessScreen } from "@/ui/organisms/ProcessScreen";
+import { trackEvent } from "@/services/analyticsEvents";
 
 const mockedRobotsTxt = scanRobotsTxtApi as jest.Mock;
 const mockedSiteMap = scanSiteMapApi as jest.Mock;
@@ -111,6 +116,24 @@ describe("ProcessScreen robots.txt 게이팅 (ADR-006, 이슈 #1)", () => {
     expect(mockedCrawling).not.toHaveBeenCalled();
     expect(mockedLsRun).not.toHaveBeenCalled();
     expect(replace).not.toHaveBeenCalled();
+  });
+
+  // issue #19 analytics-integration — robots_blocked fires at the same
+  // point BlockedScreen gets rendered (ADR-006 hard gate).
+  it("robots.txt가 비허용이면 robots_blocked 애널리틱스 이벤트를 전송한다", async () => {
+    mockedRobotsTxt.mockResolvedValue({
+      data: { status: "ok", has: true, allow: { "*": false } },
+    });
+
+    renderScreen();
+
+    await waitFor(() =>
+      expect(screen.getByText(t.blockedTitle)).toBeInTheDocument(),
+    );
+
+    expect(trackEvent).toHaveBeenCalledWith("robots_blocked", {
+      url: siteStatus.url,
+    });
   });
 
   it("robots.txt가 없으면(has: false) 허용으로 간주하고 진행한다", async () => {

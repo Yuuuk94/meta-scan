@@ -9,6 +9,11 @@
     "privacy": "개인정보처리방침",
     "terms": "이용약관"
   },
+  "cookieConsent": {
+    "message": "Meta-Scan은 방문자가 이 사이트를 어떻게 이용하는지 파악하기 위해 Google Analytics를 사용합니다. 익명 분석 쿠키에 대한 동의 여부는 자유롭게 선택할 수 있습니다.",
+    "accept": "동의",
+    "reject": "거부"
+  },
   "notFound": {
     "title": "페이지를 찾을 수 없습니다",
     "description": "요청하신 페이지가 존재하지 않거나 이동되었습니다",

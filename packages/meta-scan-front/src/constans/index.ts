@@ -30,3 +30,8 @@ export const siteUrl = process.env.NEXT_PUBLIC_META_SCAN_URL;
 // personalized result page (pipe-connection, issue #2) and intentionally
 // excluded.
 export const siteRoutes = ["", "/request-scan", "/scan", "/privacy", "/terms"];
+
+// localStorage key for the GA4 cookie-consent decision (issue #19
+// analytics-integration). Distinct namespace prefix (`ms_`) since this is
+// localStorage, not one of the `document.cookie` keys above.
+export const analyticsConsentKey = "ms_analytics_consent";
