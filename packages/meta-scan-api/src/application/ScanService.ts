@@ -15,6 +15,7 @@ import {
 } from "@/domain/checks/indexingChecks.js";
 import { buildPreviewsChecksFromCrawling } from "@/domain/checks/previewsChecks.js";
 import { buildAiSignalsChecksFromCrawling } from "@/domain/checks/aiSignalsChecks.js";
+import { buildContentChecksFromCrawling } from "@/domain/checks/contentChecks.js";
 
 export class ScanService {
   constructor(private readonly chrome: BrowserAutomationPort) {}
@@ -305,6 +306,23 @@ export class ScanService {
       const h1 = Array.from(document.querySelectorAll("h1"))
         .map((el) => (el.textContent || "").trim())
         .filter(Boolean);
+      // issue #7 content-stats-checklist: h2/h3 counts collected alongside h1 (spec req #1) — only
+      // counts are needed (not the text content, unlike h1 which the frontend renders directly).
+      const headings = {
+        h1: h1.length,
+        h2: document.querySelectorAll("h2").length,
+        h3: document.querySelectorAll("h3").length,
+      };
+      // Body character count (spec-fixed.md decision log #1: character count, not word count,
+      // despite the PRD's original "본문 단어 수" label — its own 600–2,000 thresholds were already
+      // in characters). `innerText` (not `textContent`) so hidden/script/style content that isn't
+      // actually rendered doesn't inflate the count.
+      const charCount = (document.body?.innerText || "").trim().length;
+      // PRD §3.5: a `[role="doc-abstract"]` element, or literal "TL;DR" text anywhere in the
+      // rendered body, counts as a TL;DR/summary block.
+      const hasTldr =
+        !!document.querySelector('[role="doc-abstract"]') ||
+        /tl;?dr/i.test(document.body?.innerText || "");
       const imgs = Array.from(document.images || []);
       const totalImgs = imgs.length;
       const altMissing = imgs.filter(
@@ -353,6 +371,10 @@ export class ScanService {
         metaRobots: metaByName["robots"],
         hasIconLink,
         h1,
+        // issue #7 content-stats-checklist
+        charCount,
+        headings,
+        hasTldr,
         images: { total: totalImgs, altMissing },
         openGraph: og,
         twitter: tw,
@@ -418,7 +440,7 @@ export class ScanService {
           structuredDataTypes: onload.extracted.structuredDataTypes,
           promptsTxt,
         },
-        checks: { basicSeo: [], indexing: [], previews: [], aiSignals: [] },
+        checks: { basicSeo: [], indexing: [], previews: [], aiSignals: [], content: [] },
       };
 
       result.checks.basicSeo = buildBasicSeoChecks(onload.extracted);
@@ -449,6 +471,12 @@ export class ScanService {
         promptsTxt,
         structuredDataTypes: onload.extracted.structuredDataTypes,
         deltaRatio: result.html.deltaRatio,
+      });
+
+      result.checks.content = buildContentChecksFromCrawling({
+        charCount: onload.extracted.charCount,
+        headings: onload.extracted.headings,
+        hasTldr: onload.extracted.hasTldr,
       });
 
       return result;
