@@ -108,6 +108,19 @@ interface ContentCheckItem {
   detail?: number | ContentHeadingCounts;
 }
 
+/** One row of the "국제화/UX(i18n/UX)" checklist card (issue #8
+ * i18n-ux-checklist). Like `checks.basicSeo`/`checks.previews`/
+ * `checks.aiSignals`/`checks.content`, both rows (hreflang/viewport) come
+ * from the `crawling` response alone (no cross-API merge) — mirrors
+ * meta-scan-api's `I18nUxCheckItem` (`domain/checks/i18nUxChecks.ts`).
+ * Neither id ever carries `detail` (existence-only checks), but the field is
+ * kept optional for parity with the other CheckItem shapes. */
+interface I18nUxCheckItem {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number;
+}
+
 interface CrawlingScanData extends OkStatus {
   url: string;
   finalUrl: string;
