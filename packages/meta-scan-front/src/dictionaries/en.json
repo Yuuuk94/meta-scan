@@ -82,7 +82,6 @@
     ],
     "analyzingText": "Collecting checklist items",
     "analyzingSubtext": "Sit tight while the site gets analyzed.",
-    "stepsHint": "Each step reacts the moment its API actually completes.",
     "errorTitle": "Site can't be reached",
     "errorSubtitle": "Double-check the URL, or try again in a moment.",
     "goBack": "Home",

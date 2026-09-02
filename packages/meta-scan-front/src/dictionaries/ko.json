@@ -82,7 +82,6 @@
     ],
     "analyzingText": "체크리스트 항목을 수집하고 있습니다",
     "analyzingSubtext": "사이트를 분석하는 동안 잠시 기다려 주세요",
-    "stepsHint": "각 스텝은 실제 API 완료 시점에 반응합니다",
     "errorTitle": "사이트에 접속할 수 없습니다",
     "errorSubtitle": "URL을 다시 확인하거나 잠시 후 다시 시도해 주세요",
     "goBack": "홈으로",

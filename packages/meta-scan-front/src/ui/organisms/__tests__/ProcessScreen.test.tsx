@@ -34,7 +34,6 @@ const t = {
   analyzingText: "analyzing",
   analyzingSubtext: "sub",
   steps: ["robots.txt", "sitemap.xml", "crawling", "lighthouse"],
-  stepsHint: "hint",
   errorTitle: "error",
   errorSubtitle: "error sub",
   retryButton: "retry",
