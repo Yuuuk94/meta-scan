@@ -131,8 +131,16 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
     openGraph: { "og:image": "" },
     twitter: {},
     hasSitemap: false,
+    // Matches what buildTopIssues would actually produce from this
+    // fixture's checks below (fail-first across all 6 groups, AI Signals
+    // ranked first among warnings — 2026-09-02 topIssues expansion):
+    // only fail is indexing's canonicalMultiple, then aiSignals' 4
+    // warnings (promptsTxt/promptObject/structuredData/faqSection) beat
+    // out content/basicSeo/previews' warnings by group priority.
     topIssues: [
-      { id: "desc.length", status: "warning", detail: 13, group: "basicSeo" },
+      { id: "canonicalMultiple", status: "fail", group: "indexing" },
+      { id: "promptsTxt", status: "warning", group: "aiSignals" },
+      { id: "promptObject", status: "warning", group: "aiSignals" },
     ],
     failedApis: [],
     checks: {
