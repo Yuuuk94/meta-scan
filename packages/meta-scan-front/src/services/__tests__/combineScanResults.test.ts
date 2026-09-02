@@ -46,6 +46,11 @@ const crawling: CrawlingScanData = {
       { id: "faqSection", status: "info" },
       { id: "jsRenderDelta", status: "pass", detail: 0.05 },
     ],
+    content: [
+      { id: "charCount", status: "pass", detail: 900 },
+      { id: "headings", status: "pass", detail: { h1: 1, h2: 2, h3: 0 } },
+      { id: "tldr", status: "info" },
+    ],
   },
 };
 
@@ -170,6 +175,28 @@ describe("combineScanResults", () => {
     expect(combined.checks.aiSignals).toEqual([]);
   });
 
+  it("passes checks.content through from the crawling response as-is (issue #7)", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.content).toEqual(crawling.checks.content);
+  });
+
+  it("defaults checks.content to an empty array when crawling failed", () => {
+    const combined = combineScanResults("https://example.com", {
+      robotsTxt,
+      siteMap,
+      crawling: null,
+      lighthouse: {},
+    });
+
+    expect(combined.checks.content).toEqual([]);
+  });
+
   it("defaults checks.basicSeo to an empty array when crawling failed", () => {
     const combined = combineScanResults("https://example.com", {
       robotsTxt,
@@ -239,6 +266,7 @@ describe("combineScanResults", () => {
         indexing: [],
         previews: [],
         aiSignals: [],
+        content: [],
       },
     };
 
@@ -268,6 +296,7 @@ describe("combineScanResults", () => {
         indexing: [],
         previews: [],
         aiSignals: [],
+        content: [],
       },
     };
 

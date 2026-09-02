@@ -32,6 +32,11 @@ const baseExtracted = {
   metaRobots: undefined,
   hasIconLink: true, // skip the favicon-fallback HEAD request — not this test's concern
   h1: ["Example"],
+  // issue #7 content-stats-checklist: neutral values, not this test's concern (see
+  // ScanService.crawling.content.test.ts for the actual charCount/headings/tldr assertions).
+  charCount: 1000,
+  headings: { h1: 1, h2: 1, h3: 0 },
+  hasTldr: false,
   images: { total: 0, altMissing: 0 },
   openGraph: {},
   twitter: {},

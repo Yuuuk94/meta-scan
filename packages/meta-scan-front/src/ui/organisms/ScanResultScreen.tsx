@@ -8,6 +8,7 @@ import { Button } from "@/ui/atoms/Button";
 import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { AiSignalsCard } from "@/ui/organisms/AiSignalsCard";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
+import { ContentStatsCard } from "@/ui/organisms/ContentStatsCard";
 import { IndexingCard } from "@/ui/organisms/IndexingCard";
 import { LighthouseCard } from "@/ui/organisms/LighthouseCard";
 import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
@@ -140,14 +141,14 @@ export function ScanResultScreen({
        * render border-less (see <BasicSeoCard>/<IndexingCard>).
        *
        * Column count is deliberately `sm:grid-cols-2` (not `lg:grid-cols-4`
-       * yet) — only 2 of the 4 planned cards exist (content-stats/i18n-ux
-       * are separate, not-yet-built issues #7/#8). Sizing the grid for 4
-       * before 4 exist left the other half of the row as a huge solid
-       * `bg-foreground` block (user feedback — looked like a stray dark
-       * panel, not empty grid space). Bump to `lg:grid-cols-4` once both
-       * land. This doesn't handle a card going empty at *runtime* (its
-       * source API failed) leaving a gap either — same accepted limitation
-       * as the raw-results tiles below, just smaller in scope now. */}
+       * yet) — only 3 of the 4 planned cards exist (i18n-ux is a separate,
+       * not-yet-built issue #8). Sizing the grid for 4 before 4 exist left
+       * the other quarter of the row as a huge solid `bg-foreground` block
+       * (user feedback — looked like a stray dark panel, not empty grid
+       * space). Bump to `lg:grid-cols-4` once #8 lands. This doesn't handle
+       * a card going empty at *runtime* (its source API failed) leaving a
+       * gap either — same accepted limitation as the raw-results tiles
+       * below, just smaller in scope now. */}
       <div className="mt-8 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
         <BasicSeoCard
           lang={lang}
@@ -160,6 +161,14 @@ export function ScanResultScreen({
           theme={theme}
           t={t}
           checks={combined.checks.indexing}
+        />
+        {/* "콘텐츠 품질(Content Stats)" (issue #7 content-stats-checklist) —
+         * 3rd cell in this 4-card checklist grid. */}
+        <ContentStatsCard
+          lang={lang}
+          theme={theme}
+          t={t}
+          checks={combined.checks.content}
         />
       </div>
 
