@@ -23,17 +23,41 @@ export const HeroSection = ({ t }: DefaultPageProps) => {
   }, [url, isValidUrl]);
 
   const handleAnalyze = () => {
-    const checkUrl = url.length > 1 && urlPattern.test(url);
+    // issue #34 url-input-protocol-ux — validation order per confirmed spec:
+    // 1) min-length gate (unchanged regression), 2) reject whitespace,
+    // 3) reject a missing "." (TLD-less input like `localhost` stays
+    // out of scope / still an error), 4) only then normalize a missing
+    // protocol to https:// and re-check against the (now protocol-optional)
+    // urlPattern.
+    const hasMinLength = url.length > 1;
+    const hasWhitespace = /\s/.test(url);
+    const hasDot = url.includes(".");
 
-    if (!checkUrl) {
-      setIsValidUrl(checkUrl);
+    if (!hasMinLength || hasWhitespace || !hasDot) {
+      setIsValidUrl(false);
       return;
     }
-    setDocumentCookies(crrUrlKey, encodeURI(url));
+
+    const hasProtocol = /^https?:\/\//.test(url);
+    const normalizedUrl = hasProtocol ? url : `https://${url}`;
+
+    if (!urlPattern.test(normalizedUrl)) {
+      setIsValidUrl(false);
+      return;
+    }
+
+    setIsValidUrl(true);
+    if (normalizedUrl !== url) {
+      // Reflect the normalized value back into the input so the user sees
+      // what actually gets scanned, rather than keeping it as an internal
+      // variable only.
+      setUrl(normalizedUrl);
+    }
+    setDocumentCookies(crrUrlKey, encodeURI(normalizedUrl));
     // issue #19 analytics-integration — fired at the same point the crrUrl
     // cookie is set / navigation to /request-scan happens (spec-fixed
     // comment). No-ops when GA4 isn't loaded (dev/no consent/rejected).
-    trackEvent("scan_requested", { url });
+    trackEvent("scan_requested", { url: normalizedUrl });
     router.push("/request-scan");
   };
   return (

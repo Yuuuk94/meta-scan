@@ -11,7 +11,14 @@ export const langKey = "lang";
 
 export const crrUrlKey = "crrUrl";
 
-export const urlPattern = /^https?:\/\/.+\..+/;
+// Protocol is optional (issue #34 url-input-protocol-ux) — HeroSection's
+// handleAnalyze auto-prepends https:// when missing before proceeding, but
+// this pattern itself also needs to accept protocol-less input directly
+// since it's reused as-is for the live useEffect revalidation. Whitespace
+// anywhere and a missing "." are still rejected (both sides of the "."
+// disallow \s so a stray space anywhere in the string can never match the
+// full anchored pattern).
+export const urlPattern = /^(https?:\/\/)?[^\s]+\.[^\s]+$/;
 
 export const okStatus = "ok";
 
