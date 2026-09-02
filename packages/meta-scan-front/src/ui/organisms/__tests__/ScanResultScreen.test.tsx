@@ -251,4 +251,71 @@ describe("ScanResultScreen", () => {
 
     expect(screen.queryByText("Lighthouse 개선 제안")).not.toBeInTheDocument();
   });
+
+  // issue #18 adsense-integration
+  describe("AdSlot placement (issue #18)", () => {
+    const ORIGINAL_ENV = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+
+    afterEach(() => {
+      if (ORIGINAL_ENV === undefined) {
+        delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+      } else {
+        process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = ORIGINAL_ENV;
+      }
+    });
+
+    it("does not render an ad slot when NEXT_PUBLIC_ADSENSE_CLIENT_ID is unset, even with a valid result", () => {
+      delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+      const id = useScanStore.getState().saveScanResult({
+        url: "https://example.com",
+        raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+        combined,
+      });
+
+      render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+      expect(screen.queryByTestId("ad-slot")).not.toBeInTheDocument();
+      expect(
+        document.querySelector('script[src*="adsbygoogle"]')
+      ).not.toBeInTheDocument();
+    });
+
+    it("renders exactly one ad slot at the bottom of the page content when the client ID is set and a result exists", () => {
+      process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-test-1234";
+      const id = useScanStore.getState().saveScanResult({
+        url: "https://example.com",
+        raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+        combined,
+      });
+
+      render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+      const slots = screen.getAllByTestId("ad-slot");
+      expect(slots).toHaveLength(1);
+      expect(slots[0]).toHaveAttribute("data-ad-client", "ca-pub-test-1234");
+
+      // last rendered element among the page's content-frame children —
+      // i.e. content-frame's own last child is (a wrapper containing) the
+      // ad slot, not one of the checklist/preview/lighthouse cards above it.
+      const frame = document.querySelector(".content-frame");
+      expect(frame?.lastElementChild?.contains(slots[0])).toBe(true);
+    });
+
+    it("does not render an ad slot on the not-found screen even when the client ID is set", () => {
+      process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-test-1234";
+
+      render(<ScanResultScreen lang="ko" theme="dark" t={t} id="unknown-id" />);
+
+      expect(screen.getByText("표시할 결과가 없습니다")).toBeInTheDocument();
+      expect(screen.queryByTestId("ad-slot")).not.toBeInTheDocument();
+    });
+
+    it("does not render an ad slot on bare /scan (no id) even when the client ID is set", () => {
+      process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-test-1234";
+
+      render(<ScanResultScreen lang="ko" theme="dark" t={t} />);
+
+      expect(screen.queryByTestId("ad-slot")).not.toBeInTheDocument();
+    });
+  });
 });

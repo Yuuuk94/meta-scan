@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { useScanStore } from "@/stores/scanStore";
 import { Button } from "@/ui/atoms/Button";
+import { AdSlot } from "@/ui/organisms/AdSlot";
 import { AiSignalsCard } from "@/ui/organisms/AiSignalsCard";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { ContentStatsCard } from "@/ui/organisms/ContentStatsCard";
@@ -220,6 +221,14 @@ export function ScanResultScreen({
         }
       />
 
+      {/* Google AdSense placeholder slot (issue #18 adsense-integration) —
+       * page content's very last block, after the Lighthouse card/
+       * suggestions. Self-gates on `NEXT_PUBLIC_ADSENSE_CLIENT_ID` and
+       * renders nothing when unset, so this is safe to always mount here
+       * regardless of approval status; also unreachable from the
+       * not-found/no-entry branch above, so a thin/empty result page
+       * never gets an ad slot (AdSense policy risk). */}
+      <AdSlot />
     </div>
   );
 }
