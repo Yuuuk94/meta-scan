@@ -16,6 +16,7 @@ import {
 import { buildPreviewsChecksFromCrawling } from "@/domain/checks/previewsChecks.js";
 import { buildAiSignalsChecksFromCrawling } from "@/domain/checks/aiSignalsChecks.js";
 import { buildContentChecksFromCrawling } from "@/domain/checks/contentChecks.js";
+import { buildI18nUxChecksFromCrawling } from "@/domain/checks/i18nUxChecks.js";
 
 export class ScanService {
   constructor(private readonly chrome: BrowserAutomationPort) {}
@@ -303,6 +304,13 @@ export class ScanService {
       // conventional /favicon.ico fallback (spec decision log #1) is checked afterwards by
       // ScanService, outside page.evaluate (this callback only has DOM access, not `fetch`).
       const hasIconLink = !!document.querySelector('link[rel~="icon"]');
+      // issue #8 i18n-ux-checklist: existence-only checks, same style as hasIconLink above —
+      // hreflang cares only about presence of at least one alternate-language link, not which
+      // locales it declares.
+      const hasHreflang = !!document.querySelector(
+        'link[rel="alternate"][hreflang]'
+      );
+      const hasViewport = !!document.querySelector('meta[name="viewport"]');
       const h1 = Array.from(document.querySelectorAll("h1"))
         .map((el) => (el.textContent || "").trim())
         .filter(Boolean);
@@ -370,6 +378,9 @@ export class ScanService {
         // this is just surfacing it under an explicit key (issue #4 indexing-checklist).
         metaRobots: metaByName["robots"],
         hasIconLink,
+        // issue #8 i18n-ux-checklist
+        hasHreflang,
+        hasViewport,
         h1,
         // issue #7 content-stats-checklist
         charCount,
@@ -440,7 +451,14 @@ export class ScanService {
           structuredDataTypes: onload.extracted.structuredDataTypes,
           promptsTxt,
         },
-        checks: { basicSeo: [], indexing: [], previews: [], aiSignals: [], content: [] },
+        checks: {
+          basicSeo: [],
+          indexing: [],
+          previews: [],
+          aiSignals: [],
+          content: [],
+          i18nUx: [],
+        },
       };
 
       result.checks.basicSeo = buildBasicSeoChecks(onload.extracted);
@@ -477,6 +495,11 @@ export class ScanService {
         charCount: onload.extracted.charCount,
         headings: onload.extracted.headings,
         hasTldr: onload.extracted.hasTldr,
+      });
+
+      result.checks.i18nUx = buildI18nUxChecksFromCrawling({
+        hasHreflang: onload.extracted.hasHreflang,
+        hasViewport: onload.extracted.hasViewport,
       });
 
       return result;
