@@ -14,6 +14,10 @@
 // Refreshed 2026-08-31 (issue #9 lighthouse-suggestions) — added
 // raw.lighthouse.audits (trimmed, real ids/titles) and combined.lighthouse
 // so the new card has something to render in dev.
+// Refreshed again (issue #7 content-stats-checklist) — `checks.content`
+// added; this site's actual body is short (well under the 600-char floor)
+// and has no heading structure or TL;DR block, so all 3 rows read as
+// warning/warning/info.
 // Only ever used from `ScanResultScreen` when `location.hostname` is
 // localhost/127.0.0.1 (see there) — never reachable in a deployed build.
 export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
@@ -73,6 +77,15 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
           { id: "structuredData", status: "warning" },
           { id: "faqSection", status: "warning" },
           { id: "jsRenderDelta", status: "pass", detail: 0.009520662197463255 },
+        ],
+        content: [
+          { id: "charCount", status: "warning", detail: 42 },
+          {
+            id: "headings",
+            status: "warning",
+            detail: { h1: 1, h2: 0, h3: 0 },
+          },
+          { id: "tldr", status: "info" },
         ],
       },
     },
@@ -140,6 +153,11 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
         { id: "structuredData", status: "warning" },
         { id: "faqSection", status: "warning" },
         { id: "jsRenderDelta", status: "pass", detail: 0.009520662197463255 },
+      ],
+      content: [
+        { id: "charCount", status: "warning", detail: 42 },
+        { id: "headings", status: "warning", detail: { h1: 1, h2: 0, h3: 0 } },
+        { id: "tldr", status: "info" },
       ],
     },
     lighthouse: {

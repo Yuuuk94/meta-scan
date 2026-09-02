@@ -50,7 +50,13 @@ const combined: CombinedScanResult = {
   description: "An example page used in docs",
   topIssues: [],
   failedApis: ["lighthouse"],
-  checks: { basicSeo: [], indexing: [], previews: [], aiSignals: [] },
+  checks: {
+    basicSeo: [],
+    indexing: [],
+    previews: [],
+    aiSignals: [],
+    content: [],
+  },
 };
 
 beforeEach(() => {
@@ -110,6 +116,7 @@ describe("ScanResultScreen", () => {
           indexing: [],
           previews: [],
           aiSignals: [],
+          content: [],
         },
       },
     });
