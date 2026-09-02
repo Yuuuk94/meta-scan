@@ -77,8 +77,8 @@ describe("ScanService.crawling — content (issue #7 content-stats-checklist)", 
     });
 
     expect(result.checks.content).toEqual([
-      { id: "charCount", status: "pass", detail: 1340 },
       { id: "headings", status: "pass", detail: { h1: 1, h2: 6, h3: 12 } },
+      { id: "charCount", status: "pass", detail: 1340 },
       { id: "tldr", status: "pass" },
     ]);
   });
@@ -101,8 +101,8 @@ describe("ScanService.crawling — content (issue #7 content-stats-checklist)", 
     });
 
     expect(result.checks.content).toEqual([
-      { id: "charCount", status: "warning", detail: 80 },
       { id: "headings", status: "warning", detail: { h1: 1, h2: 0, h3: 0 } },
+      { id: "charCount", status: "warning", detail: 80 },
       { id: "tldr", status: "info" },
     ]);
   });

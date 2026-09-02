@@ -79,12 +79,12 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
           { id: "jsRenderDelta", status: "pass", detail: 0.009520662197463255 },
         ],
         content: [
-          { id: "charCount", status: "warning", detail: 42 },
           {
             id: "headings",
             status: "warning",
             detail: { h1: 1, h2: 0, h3: 0 },
           },
+          { id: "charCount", status: "warning", detail: 42 },
           { id: "tldr", status: "info" },
         ],
       },
@@ -155,8 +155,8 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
         { id: "jsRenderDelta", status: "pass", detail: 0.009520662197463255 },
       ],
       content: [
-        { id: "charCount", status: "warning", detail: 42 },
         { id: "headings", status: "warning", detail: { h1: 1, h2: 0, h3: 0 } },
+        { id: "charCount", status: "warning", detail: 42 },
         { id: "tldr", status: "info" },
       ],
     },

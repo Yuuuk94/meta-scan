@@ -36,15 +36,17 @@ export function buildTldrCheck(hasTldr: boolean): ContentCheckItem {
 }
 
 /** Composes all 3 content checks — `ScanService.crawling` calls this once (after the DOM
- * extraction) and assigns the result straight to `checks.content`. */
+ * extraction) and assigns the result straight to `checks.content`. Order is headings (제목) then
+ * charCount (본문) then tldr — title-level structure read before body-length, per user review of
+ * PR #31 (2026-09-02: "제목 먼저 본문 다음 순서"). */
 export function buildContentChecksFromCrawling(input: {
   charCount: number;
   headings: ContentHeadingCounts;
   hasTldr: boolean;
 }): ContentCheckItem[] {
   return [
-    buildCharCountCheck(input.charCount),
     buildHeadingsCheck(input.headings),
+    buildCharCountCheck(input.charCount),
     buildTldrCheck(input.hasTldr),
   ];
 }

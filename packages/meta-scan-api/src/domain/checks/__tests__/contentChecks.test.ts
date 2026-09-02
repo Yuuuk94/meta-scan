@@ -93,15 +93,15 @@ describe("buildTldrCheck", () => {
 });
 
 describe("buildContentChecksFromCrawling", () => {
-  it("composes exactly 3 rows: charCount, headings, tldr", () => {
+  it("composes exactly 3 rows in order: headings, charCount, tldr", () => {
     const checks = buildContentChecksFromCrawling({
       charCount: 1340,
       headings: { h1: 1, h2: 6, h3: 12 },
       hasTldr: true,
     });
     expect(checks).toEqual([
-      { id: "charCount", status: "pass", detail: 1340 },
       { id: "headings", status: "pass", detail: { h1: 1, h2: 6, h3: 12 } },
+      { id: "charCount", status: "pass", detail: 1340 },
       { id: "tldr", status: "pass" },
     ]);
   });
