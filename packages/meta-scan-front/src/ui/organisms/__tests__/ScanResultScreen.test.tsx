@@ -37,6 +37,8 @@ const t = {
   aiSignalsPromptsTxtInfoSuffix: "내용 부족",
   contentStats: "Content Stats",
   contentCharCountPass: "본문 길이가 적절하다 ({count}자)",
+  intlUx: "국제화·UX",
+  i18nUxHreflangPass: "hreflang 대체 링크가 있다",
   lighthouseScores: "Lighthouse 점수",
   performance: "Performance",
   seo: "SEO",
@@ -58,6 +60,7 @@ const combined: CombinedScanResult = {
     previews: [],
     aiSignals: [],
     content: [],
+    i18nUx: [],
   },
 };
 
@@ -119,6 +122,7 @@ describe("ScanResultScreen", () => {
           previews: [],
           aiSignals: [],
           content: [],
+          i18nUx: [],
         },
       },
     });
@@ -205,6 +209,25 @@ describe("ScanResultScreen", () => {
 
     expect(screen.getByText("Content Stats")).toBeInTheDocument();
     expect(screen.getByText("본문 길이가 적절하다 (900자)")).toBeInTheDocument();
+  });
+
+  it("renders the I18nUxCard from combined.checks.i18nUx when present (issue #8)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined: {
+        ...combined,
+        checks: {
+          ...combined.checks,
+          i18nUx: [{ id: "hreflang", status: "pass" }],
+        },
+      },
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(screen.getByText("국제화·UX")).toBeInTheDocument();
+    expect(screen.getByText("hreflang 대체 링크가 있다")).toBeInTheDocument();
   });
 
   it("renders the Lighthouse card from combined.lighthouse when present (issue #9)", () => {
