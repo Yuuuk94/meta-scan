@@ -66,6 +66,15 @@ type ContentCheckItem = {
   detail?: number | ContentHeadingCounts;
 };
 
+// Result row for one "국제화/UX(i18n/UX)" checklist item (issue #8 i18n-ux-checklist). Reuses
+// BasicSeoStatus's pass/warning/fail/info vocabulary, same as the other groups. Both ids
+// (hreflang/viewport) are existence-only — no numeric `detail`.
+type I18nUxCheckItem = {
+  id: string;
+  status: BasicSeoStatus;
+  detail?: number;
+};
+
 type MetaScanResult = {
   url: string;
   finalUrl: string;
@@ -121,11 +130,16 @@ type MetaScanResult = {
   // from this response's own DOM extraction (body character count, h1/h2/h3 counts, TL;DR block
   // detection). `headings` absorbs the h1-count judgement that basicSeo never actually carried
   // (checked against code, not assumed — see contentChecks.ts doc comment).
+  // issue #8 i18n-ux-checklist adds `i18nUx` — `hreflang`/`viewport`, both judged from this
+  // response's own DOM extraction (`<link rel="alternate" hreflang>` / `<meta name="viewport">`
+  // presence). Kept as its own card per spec-fixed.md "비고" (not merged into another group despite
+  // having only 2 items).
   checks: {
     basicSeo: BasicSeoCheckItem[];
     indexing: IndexingCheckItem[];
     previews: PreviewsCheckItem[];
     aiSignals: AiSignalsCheckItem[];
     content: ContentCheckItem[];
+    i18nUx: I18nUxCheckItem[];
   };
 };
