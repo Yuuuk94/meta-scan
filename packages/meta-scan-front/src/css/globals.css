@@ -22,8 +22,20 @@
   /* Paper / Ink neutrals (warm, never pure white/black) */
   --background: #faf6ed;
   --foreground: #141311;
-  --card: #fff9f0;
+  /* Light-theme cards are pure white (2026-09-02 user correction — repeated
+   * feedback that the warm #fff9f0 cream read as visibly yellow next to the
+   * page's own #faf6ed background instead of standing out as a card). */
+  --card: #ffffff;
   --card-foreground: #141311;
+  /* "Card Paper" — the design intake spec's own name (zine-index §3.1/§4)
+   * for the warm #FFF9F0 section-break tint used on the main landing page
+   * (ProcessSection, FAQ's expanded accordion panel, the active step tile
+   * on /request-scan) — kept as its own token, separate from `--card`
+   * once that moved to pure white, instead of repeating the literal hex
+   * in every component that still needs the original spec color
+   * (2026-09-02 user request: "bg 카드를 같이 쓰면 배경 색을 커스텀하게 해"). */
+  --card-paper: #fff9f0;
+  --card-paper-foreground: #141311;
   --popover: #ffffff;
   --popover-foreground: #141311;
   --muted: #efe9d8;
@@ -114,6 +126,11 @@
   --foreground: #faf6ed;
   --card: #1f1d19;
   --card-foreground: #faf6ed;
+  /* No separate dark-mode value in the design intake spec (dark mode is
+   * still "provisional" per the comment above) — reuses --card's own dark
+   * value rather than inventing a new one. */
+  --card-paper: #1f1d19;
+  --card-paper-foreground: #faf6ed;
   --popover: #1f1d19;
   --popover-foreground: #faf6ed;
   --muted: #26231d;
@@ -175,6 +192,8 @@
   --color-foreground-secondary: var(--foreground-secondary);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-card-paper: var(--card-paper);
+  --color-card-paper-foreground: var(--card-paper-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);

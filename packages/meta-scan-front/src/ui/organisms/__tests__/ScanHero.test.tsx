@@ -13,8 +13,8 @@ const t = {
 describe("ScanHero", () => {
   it("assembles and renders each topIssue's message from the dictionary + detail", () => {
     const topIssues: TopIssue[] = [
-      { id: "title.missing", status: "fail" },
-      { id: "img.altMissing", status: "warning", detail: 2 },
+      { id: "title.missing", status: "fail", group: "basicSeo" },
+      { id: "img.altMissing", status: "warning", detail: 2, group: "basicSeo" },
     ];
 
     render(<ScanHero lang="ko" theme="dark" t={t} topIssues={topIssues} />);

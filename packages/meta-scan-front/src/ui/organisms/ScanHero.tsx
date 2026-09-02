@@ -1,7 +1,12 @@
 import React from "react";
 
+import { getAiSignalsDetailSuffix, getAiSignalsLabel } from "@/services/buildAiSignalsMessage";
 import { buildBasicSeoMessage } from "@/services/buildBasicSeoMessage";
-import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { buildContentMessage } from "@/services/buildContentMessage";
+import { buildI18nUxMessage } from "@/services/buildI18nUxMessage";
+import { buildIndexingMessage } from "@/services/buildIndexingMessage";
+import { buildPreviewsMessage } from "@/services/buildPreviewsMessage";
+import { StatusBadge, statusLabel } from "@/ui/molecules/StatusBadge";
 
 // Replaces the old "AI Preparedness Score" big-number Hero (ADR-005 scrapped
 // the scoring engine) with topIssues — fail-first, backfilled with warning,
@@ -9,6 +14,41 @@ import { StatusBadge } from "@/ui/molecules/StatusBadge";
 // fix now"), not "your score is low" (spec-fixed.md "Hero 교체").
 interface ScanHeroProps extends DefaultPageProps {
   topIssues: TopIssue[];
+}
+
+// Dispatches to the right group's message builder — topIssues now pulls
+// from all 6 checklist groups, not just basicSeo (2026-09-02, see
+// combineScanResults.ts's buildTopIssues comment), so a single hardcoded
+// buildBasicSeoMessage call is no longer correct for every row. AI Signals
+// doesn't have its own "assembled sentence" builder like the others (its
+// card renders label + muted detail text as two separate pieces, see
+// AiSignalsCard) — joined here into one sentence to fit this row's
+// single-line layout.
+function buildTopIssueMessage(
+  t: DefaultPageProps["t"],
+  issue: TopIssue
+): string {
+  switch (issue.group) {
+    case "indexing":
+      return buildIndexingMessage(t, issue as unknown as IndexingCheckItem);
+    case "previews":
+      return buildPreviewsMessage(t, issue as unknown as PreviewsCheckItem);
+    case "content":
+      return buildContentMessage(t, issue as unknown as ContentCheckItem);
+    case "i18nUx":
+      return buildI18nUxMessage(t, issue as unknown as I18nUxCheckItem);
+    case "aiSignals": {
+      const label = getAiSignalsLabel(t, issue.id);
+      const suffix = getAiSignalsDetailSuffix(
+        t,
+        issue as unknown as AiSignalsCheckItem
+      );
+      return suffix ? `${label} ${suffix}` : label;
+    }
+    case "basicSeo":
+    default:
+      return buildBasicSeoMessage(t, issue as unknown as BasicSeoCheckItem);
+  }
 }
 
 export const ScanHero = ({ t, topIssues }: ScanHeroProps) => {
@@ -41,16 +81,15 @@ export const ScanHero = ({ t, topIssues }: ScanHeroProps) => {
               }`}
             >
               <StatusBadge status={issue.status}>
-                {issue.status.toUpperCase()}
+                {statusLabel(issue.status)}
               </StatusBadge>
               {/* Sentence assembled here (render time), not stored as text
-               * on TopIssue — issue #3 basic-seo-checklist req #3. Every
-               * topIssue is currently sourced from checks.basicSeo (the
-               * only checklist group wired up so far); once other groups
-               * (indexing/content-stats/previews) land, this'll need to
-               * dispatch by id namespace instead of assuming basicSeo. */}
+               * on TopIssue — issue #3 basic-seo-checklist req #3.
+               * Dispatches by `issue.group` (buildTopIssueMessage above) —
+               * topIssues now pulls from all 6 checklist groups, not just
+               * basicSeo (2026-09-02). */}
               <span className="text-sm font-medium text-foreground">
-                {buildBasicSeoMessage(t, issue)}
+                {buildTopIssueMessage(t, issue)}
               </span>
             </div>
           ))}

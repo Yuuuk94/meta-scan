@@ -46,7 +46,7 @@ describe("I18nUxCard", () => {
     expect(screen.getByText("hreflang 대체 링크가 없다")).toBeInTheDocument();
     expect(screen.getByText("viewport 메타 태그가 없다")).toBeInTheDocument();
     expect(screen.getByText("INFO")).toBeInTheDocument();
-    expect(screen.getByText("WARNING")).toBeInTheDocument();
+    expect(screen.getByText("WARN")).toBeInTheDocument();
   });
 
   it("renders nothing when there are no checks (e.g. crawling failed)", () => {

@@ -31,12 +31,16 @@ const rawKeys: (keyof RawScanResponses)[] = [
 // duplicated as a 5th tile (zine-index intake §3.2 decision).
 const stepIds = ["ai", "meta", "analysis", "gen"];
 
-// rawKeys indices that must ALL fail to hard-error (pipe-connection
-// spec-fixed.md req #4). robots.txt (index 0) failing alone isn't fatal
-// here — that's the separate BlockedScreen/ErrorScreen path from
-// robots-gating (issue #1), handled before this Promise.allSettled ever
-// fires.
-const fatalIndices = [1, 2, 3];
+// `crawling` alone failing is fatal — nearly every checklist card
+// (basicSeo/indexing/previews/aiSignals/content/i18nUx) is sourced from its
+// `checks.*`, so losing it leaves /scan/:id showing an almost-empty page
+// with no visible indication anything went wrong (2026-09-02, found via a
+// real manual scan after removing the raw-results "확인 불가" fallback
+// tiles that used to at least surface a failed API). siteMap/lighthouse
+// failing alone still isn't fatal — their cards degrade gracefully
+// (IndexingCard still has crawling's checks, LighthouseCard renders
+// nothing for a missing `combined.lighthouse`).
+const fatalIndices = ["crawling"] as const;
 
 interface ProcessScreenProps extends DefaultPageProps {
   siteStatus: SiteStatusData;
@@ -54,6 +58,12 @@ export function ProcessScreen({
   const [currentProcess, setCurrentProcess] = useState<Array<null | boolean>>(
     Array(stepIds.length).fill(null)
   );
+  // Bumping this re-runs the main effect below (it's in that effect's
+  // dependency array) — the only way "다시 시도" on <ErrorScreen> actually
+  // retries the scan, instead of a no-op `router.refresh()` that a client
+  // component's local state never notices (see handleRetry / ErrorScreen's
+  // onRetry comment).
+  const [retryKey, setRetryKey] = useState(0);
   // "processing" = existing step-tile grid, "blocked" = ADR-006 hard block
   // (BlockedScreen), "error" = robotsTxt call itself failed, or all 3
   // remaining calls failed (both render ErrorScreen — distinct from an
@@ -171,9 +181,7 @@ export function ProcessScreen({
           state.map((v) => (v === null ? false : v))
         );
 
-        const isFatal = fatalIndices.every(
-          (idx) => raw[rawKeys[idx]] == null
-        );
+        const isFatal = fatalIndices.some((key) => raw[key] == null);
         if (isFatal) {
           setScreenState("error");
           return;
@@ -191,10 +199,21 @@ export function ProcessScreen({
     };
 
     process();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retryKey]);
+
+  const handleRetry = () => {
+    didRunRef.current = false;
+    setProgress(10);
+    setCurrentProcess(Array(stepIds.length).fill(null));
+    setScreenState("processing");
+    setRetryKey((k) => k + 1);
+  };
 
   if (screenState === "error") {
-    return <ErrorScreen theme={theme} lang={lang} t={t} />;
+    return (
+      <ErrorScreen theme={theme} lang={lang} t={t} onRetry={handleRetry} />
+    );
   }
 
   if (screenState === "blocked") {
@@ -209,7 +228,7 @@ export function ProcessScreen({
           {siteStatus.url}
         </span>
         <span className="bg-success px-[9px] py-[3px] text-[10.5px] font-extrabold tracking-[.04em] text-success-foreground">
-          {lang === "ko" ? "생존 확인 완료" : "SITE REACHABLE"}
+          {lang === "ko" ? "접속 확인 완료" : "SITE REACHABLE"}
         </span>
       </div>
 
@@ -243,8 +262,6 @@ export function ProcessScreen({
           style={{ width: `${progress}%` }}
         />
       </div>
-
-      <span className="text-[11px] text-muted-foreground">{t.stepsHint}</span>
     </div>
   );
 }

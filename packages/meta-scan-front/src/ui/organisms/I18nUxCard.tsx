@@ -2,7 +2,7 @@ import React from "react";
 
 import { buildI18nUxMessage } from "@/services/buildI18nUxMessage";
 import { CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
-import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { StatusBadge, statusLabel } from "@/ui/molecules/StatusBadge";
 
 // "국제화/UX(i18n/UX)" checklist card (issue #8 i18n-ux-checklist req #3) —
 // always 2 rows (hreflang/viewport, see
@@ -55,7 +55,7 @@ export const I18nUxCard = ({ t, checks }: I18nUxCardProps) => {
                 {buildI18nUxMessage(t, check)}
               </span>
               <StatusBadge status={check.status}>
-                {check.status.toUpperCase()}
+                {statusLabel(check.status)}
               </StatusBadge>
             </div>
           ))}

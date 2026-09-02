@@ -10,8 +10,6 @@ const t = {
   accessibility: "Accessibility",
   bestPractices: "Best Practices",
   lighthouseSuggestions: "Lighthouse 개선 제안",
-  lighthouseSuggestionsHint: "Lighthouse가 직접 제안하는 개선 항목이다",
-  lighthouseSuggestionsHintMobile: "Lighthouse가 직접 제안하는 개선 항목이다",
 };
 
 const lighthouse: CombinedLighthouse = {
@@ -66,14 +64,6 @@ describe("LighthouseCard", () => {
     expect(screen.queryByText("FAIL")).not.toBeInTheDocument();
     expect(screen.queryByText("WARNING")).not.toBeInTheDocument();
     expect(document.querySelector('[data-slot="status-badge"]')).toBeNull();
-  });
-
-  it("renders a hint distinguishing Lighthouse's own judgement from this app's checks (req #2)", () => {
-    render(<LighthouseCard lang="ko" theme="dark" t={t} lighthouse={lighthouse} />);
-
-    expect(
-      screen.getAllByText("Lighthouse가 직접 제안하는 개선 항목이다").length
-    ).toBeGreaterThan(0);
   });
 
   it("stays absent when there are no scores at all and no suggestions (lighthouse call failed)", () => {

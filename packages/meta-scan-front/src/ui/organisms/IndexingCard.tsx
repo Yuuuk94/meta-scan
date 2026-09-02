@@ -2,7 +2,7 @@ import React from "react";
 
 import { buildIndexingMessage } from "@/services/buildIndexingMessage";
 import { CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
-import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { StatusBadge, statusLabel } from "@/ui/molecules/StatusBadge";
 
 // "색인/크롤링(Indexing)" checklist card (issue #4 indexing-checklist req
 // #5) — up to 5 rows sourced from 3 different responses and already merged
@@ -46,7 +46,7 @@ export const IndexingCard = ({ t, checks }: IndexingCardProps) => {
                 {buildIndexingMessage(t, check)}
               </span>
               <StatusBadge status={check.status}>
-                {check.status.toUpperCase()}
+                {statusLabel(check.status)}
               </StatusBadge>
             </div>
           ))}

@@ -2,7 +2,7 @@ import React from "react";
 
 import { buildBasicSeoMessage } from "@/services/buildBasicSeoMessage";
 import { CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
-import { StatusBadge } from "@/ui/molecules/StatusBadge";
+import { StatusBadge, statusLabel } from "@/ui/molecules/StatusBadge";
 
 // "기본 SEO" checklist card (issue #3 basic-seo-checklist req #6) — always 5
 // rows (title/desc/keywords/img-alt/meta-duplicate, see
@@ -56,7 +56,7 @@ export const BasicSeoCard = ({ t, checks }: BasicSeoCardProps) => {
                 {buildBasicSeoMessage(t, check)}
               </span>
               <StatusBadge status={check.status}>
-                {check.status.toUpperCase()}
+                {statusLabel(check.status)}
               </StatusBadge>
             </div>
           ))}

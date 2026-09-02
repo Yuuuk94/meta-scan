@@ -19,7 +19,12 @@ import { cn } from "@/utils/cn";
  * only, no fill, because an absent AEO/GEO signal isn't a deduction.
  */
 const statusBadgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center justify-center gap-1 whitespace-nowrap border px-[9px] py-[3px] text-xs font-bold tracking-[.04em]",
+  // Fixed width (not w-fit) so PASS/WARN/FAIL/INFO badges line up evenly in
+  // a column instead of each hugging its own text width (2026-09-02 user
+  // request — "WARN" is now the same 4 characters as the other 3 labels,
+  // but "W" is wider than "P"/"F"/"I" so w-fit still produced visibly
+  // uneven badges).
+  "inline-flex w-[62px] shrink-0 items-center justify-center gap-1 whitespace-nowrap border px-[9px] py-[3px] text-xs font-bold tracking-[.04em]",
   {
     variants: {
       status: {
@@ -37,6 +42,20 @@ export interface StatusBadgeProps
     VariantProps<typeof statusBadgeVariants> {
   status: NonNullable<VariantProps<typeof statusBadgeVariants>["status"]>;
   children: React.ReactNode;
+}
+
+/**
+ * Display label for a status — every checklist card renders this as the
+ * badge's children (`<StatusBadge status={check.status}>{statusLabel(check.status)}</StatusBadge>`).
+ * "warning" shortens to "WARN" (2026-09-02 user request — "WARNING" reads
+ * visibly longer than PASS/FAIL/INFO, unbalancing the badge row); the other
+ * 3 are just their own uppercased status.
+ */
+export function statusLabel(
+  status: NonNullable<VariantProps<typeof statusBadgeVariants>["status"]>
+): string {
+  if (status === "warning") return "WARN";
+  return status.toUpperCase();
 }
 
 function StatusBadge({ status, className, children, ...props }: StatusBadgeProps) {

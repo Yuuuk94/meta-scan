@@ -65,7 +65,7 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
         ],
         indexing: [
           { id: "canonical", status: "info" },
-          { id: "canonicalMultiple", status: "pass" },
+          { id: "canonicalMultiple", status: "fail" },
           { id: "metaRobotsNoindex", status: "pass" },
         ],
         previews: [
@@ -100,7 +100,7 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
       lighthouseVersion: "12.8.2",
       requestedUrl: "https://dev-portfolio.withmay.com/",
       categories: {
-        performance: { title: "Performance", score: 0.98 },
+        performance: { title: "Performance", score: 0.42 },
         accessibility: { title: "Accessibility", score: 0.95 },
         "best-practices": { title: "Best Practices", score: 1 },
         seo: { title: "SEO", score: 1 },
@@ -118,7 +118,7 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
           title: "Reduce unused JavaScript",
           description:
             "Reduce unused JavaScript and defer loading scripts until they are required.",
-          score: 0.5,
+          score: 0.28,
         },
       },
     },
@@ -131,7 +131,9 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
     openGraph: { "og:image": "" },
     twitter: {},
     hasSitemap: false,
-    topIssues: [{ id: "desc.length", status: "warning", detail: 13 }],
+    topIssues: [
+      { id: "desc.length", status: "warning", detail: 13, group: "basicSeo" },
+    ],
     failedApis: [],
     checks: {
       basicSeo: [
@@ -144,7 +146,7 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
       indexing: [
         { id: "sitemapExists", status: "warning" },
         { id: "canonical", status: "info" },
-        { id: "canonicalMultiple", status: "pass" },
+        { id: "canonicalMultiple", status: "fail" },
         { id: "metaRobotsNoindex", status: "pass" },
         { id: "sitemapDeclaredInRobots", status: "info" },
       ],
@@ -173,7 +175,7 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
     },
     lighthouse: {
       scores: {
-        performance: 0.98,
+        performance: 0.42,
         seo: 1,
         accessibility: 0.95,
         bestPractices: 1,
@@ -184,7 +186,7 @@ export const mockScanResultEntry: Omit<ScanResultEntry, "scannedAt"> = {
           title: "Reduce unused JavaScript",
           description:
             "Reduce unused JavaScript and defer loading scripts until they are required.",
-          score: 0.5,
+          score: 0.28,
         },
         {
           id: "uses-responsive-images",

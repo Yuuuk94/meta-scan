@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 import { useScanStore } from "@/stores/scanStore";
 import { Button } from "@/ui/atoms/Button";
-import { StatusBadge } from "@/ui/molecules/StatusBadge";
 import { AiSignalsCard } from "@/ui/organisms/AiSignalsCard";
 import { BasicSeoCard } from "@/ui/organisms/BasicSeoCard";
 import { ContentStatsCard } from "@/ui/organisms/ContentStatsCard";
@@ -41,12 +40,6 @@ function isMockableLocalDev(id?: string) {
 interface ScanResultScreenProps extends DefaultPageProps {
   id?: string;
 }
-
-const rawTiles: Array<{ key: FailedScanApi; labelKey: string }> = [
-  { key: "siteMap", labelKey: "rawSiteMapLabel" },
-  { key: "crawling", labelKey: "rawCrawlingLabel" },
-  { key: "lighthouse", labelKey: "rawLighthouseLabel" },
-];
 
 export function ScanResultScreen({
   lang,
@@ -227,47 +220,6 @@ export function ScanResultScreen({
         }
       />
 
-      {/* Per-API availability — sitemap/crawling/lighthouse only (robots.txt's
-       * own gating verdict is issue #1's slice). Failed calls render a gray
-       * outline placeholder, deliberately distinct from the pass/warning/
-       * fail/info StatusBadge vocabulary (design-system.md §8,
-       * spec-fixed.md req #5). */}
-      <div className="mt-8">
-        <h3 className="font-display text-[15px] font-extrabold text-foreground">
-          {t.rawResultsTitle}
-        </h3>
-        <div className="mt-3 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-3">
-          {rawTiles.map(({ key, labelKey }) => {
-            const isUnavailable = combined.failedApis.includes(key);
-            return (
-              <div key={key} className="bg-card p-5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-foreground">
-                    {t[labelKey as keyof typeof t]}
-                  </span>
-                  {isUnavailable ? (
-                    <span className="border-[1.5px] border-muted-foreground px-[9px] py-[3px] text-xs font-bold tracking-[.04em] text-muted-foreground">
-                      {t.unavailable}
-                    </span>
-                  ) : (
-                    <StatusBadge status="pass">OK</StatusBadge>
-                  )}
-                </div>
-                {key === "crawling" && !isUnavailable ? (
-                  <div className="mt-3 text-xs text-muted-foreground">
-                    <div className="text-sm font-medium text-foreground">
-                      {combined.title}
-                    </div>
-                    {combined.description ? (
-                      <div className="mt-1">{combined.description}</div>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }

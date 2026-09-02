@@ -51,15 +51,18 @@ describe("dictionaries/ko.json specific tone replacements (issue #17 AC2-AC4)", 
   });
 });
 
-// AC7 — 영어 카피(en.json)는 스코프 밖, 이번 이슈로 내용이 전혀 바뀌지 않아야 한다.
+// AC7 — 영어 카피(en.json)는 이슈 #17의 톤(해라체→합니다체) 스코프 밖, 그 변경으로는 내용이
+// 바뀌지 않아야 한다. 단, PR #33 리뷰 중 사용자가 별도로 요청한 구분자 통일(슬래시 →
+// 가운데점, 2026-09-02)은 en.json에도 적용됐으므로 그 결과값으로 갱신됨 — 이건 톤 회귀가
+// 아니라 의도된 구두점 변경.
 describe("dictionaries/en.json regression (out of scope for issue #17)", () => {
   it("main.errorTitle stays in English, untouched", () => {
     expect(en.main.errorTitle).toBe("Analysis failed. Please check your URL.");
   });
 
-  it("main.faqCtaText stays in English, untouched", () => {
+  it("main.faqCtaText stays in English, tone untouched (punctuation updated separately)", () => {
     expect(en.main.faqCtaText).toBe(
-      "Still have questions? Run the SEO/AEO/GEO checklist on your site."
+      "Still have questions? Run the SEO・AEO・GEO checklist on your site."
     );
   });
 });

@@ -60,7 +60,7 @@ describe("ContentStatsCard", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("TL;DR 섹션이 있다")).toBeInTheDocument();
 
-    expect(screen.getAllByText("WARNING")).toHaveLength(2);
+    expect(screen.getAllByText("WARN")).toHaveLength(2);
     expect(screen.getAllByText("PASS")).toHaveLength(1);
   });
 
