@@ -166,6 +166,12 @@ Claude Code 세션에서 색상/레이아웃 관련 요청을 받으면 감으�
 `NEXT_PUBLIC_META_SCAN_API` — `meta-scan-api`의 base URL. 로컬 개발 시 `.env.local`에 설정해야
 하고(위 명령어 섹션 참고), 프로덕션(Vercel)에서는 빌드/배포 시점 환경변수로 설정합니다.
 
+`NEXT_PUBLIC_ADSENSE_CLIENT_ID`(이슈 #18) — Google 애드센스 client ID. `/scan/:id` 결과 페이지
+최하단 `AdSlot`(`src/ui/organisms/AdSlot.tsx`)이 이 값의 존재 여부만으로 렌더 여부를 게이팅합니다
+— 미설정(undefined/빈 문자열)이면 스크립트 태그도 `<ins>` 마크업도 전혀 렌더하지 않아, 애드센스
+승인 전에도 안전하게 배포할 수 있습니다. 승인 후 이 값만 채우면 자동 활성화되며, 코드 변경은
+필요 없습니다. `ads.txt`·실제 광고 단위(slot) ID 발급은 이번 스코프 밖(별도 이슈).
+
 `NEXT_PUBLIC_CONTACT_EMAIL` — `/privacy`, `/terms` 페이지 하단 문의 이메일. 미설정 시 코드
 기본값(`yuuuk94@gmail.com`)으로 폴백하므로 로컬에선 없어도 되지만, 실제 배포(Vercel)에서
 다른 연락처로 바꾸려면 여기서 설정합니다.
