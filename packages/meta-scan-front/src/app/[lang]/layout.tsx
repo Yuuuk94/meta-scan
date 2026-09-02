@@ -4,9 +4,11 @@ import { Big_Shoulders, IBM_Plex_Sans } from "next/font/google";
 import { okStatus, pageTitle } from "@/constans";
 import { RootHeader } from "@/ui/organisms/RootHeader";
 import { RootFooter } from "@/ui/organisms/RootFooter";
+import { AnalyticsGate } from "@/ui/organisms/AnalyticsGate";
 import { Loading } from "@/ui/atoms/Loading";
 import { getSiteSetting } from "@/utils/siteSetting";
 import { pingApi } from "@/api/statusApi";
+import { getDictionary } from "@/dictionaries";
 
 import "@/css/globals.css";
 
@@ -57,6 +59,7 @@ export default async function RootLayout({
       console.log(e);
       return false;
     });
+  const cookieConsentT = (await getDictionary(lang)).cookieConsent;
   return (
     <html lang={lang} data-theme={theme} suppressHydrationWarning>
       <body
@@ -68,6 +71,10 @@ export default async function RootLayout({
             <Suspense fallback={<Loading />}>{children}</Suspense>
           </main>
           <RootFooter theme={theme} lang={lang} ready={ready} />
+          {/* issue #19 analytics-integration — GA4, gated on
+           * NEXT_PUBLIC_GA_MEASUREMENT_ID + user consent. Mounted at the
+           * root layout so it covers every route, not just the scan flow. */}
+          <AnalyticsGate theme={theme} lang={lang} t={cookieConsentT} />
         </div>
       </body>
     </html>

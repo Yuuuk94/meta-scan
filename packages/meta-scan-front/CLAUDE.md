@@ -175,3 +175,14 @@ Claude Code 세션에서 색상/레이아웃 관련 요청을 받으면 감으�
 `NEXT_PUBLIC_CONTACT_EMAIL` — `/privacy`, `/terms` 페이지 하단 문의 이메일. 미설정 시 코드
 기본값(`yuuuk94@gmail.com`)으로 폴백하므로 로컬에선 없어도 되지만, 실제 배포(Vercel)에서
 다른 연락처로 바꾸려면 여기서 설정합니다.
+
+`NEXT_PUBLIC_GA_MEASUREMENT_ID`(이슈 #19) — Google Analytics 4(GA4) 측정 ID. 루트 레이아웃에
+붙는 `AnalyticsGate`(`src/ui/organisms/AnalyticsGate.tsx`)가 `AdSlot`과 동일한 패턴으로 이 값의
+존재 여부만으로 전체 기능(쿠키 동의 배너 + GA4 스크립트 로딩)을 게이팅합니다 — `.env.local`에는
+설정하지 않고 Vercel 프로덕션 배포 환경변수에만 설정하므로, 로컬 개발에서는 동의 여부와 무관하게
+GA4가 항상 완전히 비활성화됩니다. 값이 있어도 사용자가 동의 배너에서 "동의"를 누르기 전까지는
+GA4 스크립트가 로드되지 않으며(쿠키 기반이라 동의가 로드의 전제조건), 동의/거부 여부는
+`localStorage`(`analyticsConsentKey`, `@/constans`)에 저장되어 재방문 시 배너가 다시 뜨지
+않습니다. 커스텀 이벤트(`scan_requested`/`scan_completed`/`robots_blocked`)는
+`@/services/analyticsEvents`의 `trackEvent`가 `window.gtag`가 정의돼 있을 때만(=GA4가 실제로
+로드된 상태일 때만) 전송하고, 그 외에는 조용히 no-op합니다.

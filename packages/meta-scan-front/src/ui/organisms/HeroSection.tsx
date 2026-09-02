@@ -8,6 +8,7 @@ import { Input } from "@/ui/atoms/Input";
 import { AlertCircle, Scan } from "lucide-react";
 import { crrUrlKey, heroUrlInputId, urlPattern } from "@/constans";
 import { setDocumentCookies } from "@/utils/cookies";
+import { trackEvent } from "@/services/analyticsEvents";
 
 export const HeroSection = ({ t }: DefaultPageProps) => {
   const router = useRouter();
@@ -29,6 +30,10 @@ export const HeroSection = ({ t }: DefaultPageProps) => {
       return;
     }
     setDocumentCookies(crrUrlKey, encodeURI(url));
+    // issue #19 analytics-integration — fired at the same point the crrUrl
+    // cookie is set / navigation to /request-scan happens (spec-fixed
+    // comment). No-ops when GA4 isn't loaded (dev/no consent/rejected).
+    trackEvent("scan_requested", { url });
     router.push("/request-scan");
   };
   return (

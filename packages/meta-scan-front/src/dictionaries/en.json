@@ -9,6 +9,11 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
   },
+  "cookieConsent": {
+    "message": "We use Google Analytics to understand how visitors use this site. You can accept or decline anonymous analytics cookies.",
+    "accept": "Accept",
+    "reject": "Reject"
+  },
   "notFound": {
     "title": "Page not found",
     "description": "The page you requested doesn't exist or has moved.",

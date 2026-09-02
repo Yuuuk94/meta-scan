@@ -15,6 +15,7 @@ import { ErrorScreen } from "@/ui/organisms/ErrorScreen";
 import { ProcessStep } from "@/ui/molecules/ProcessStep";
 import { combineScanResults } from "@/services/combineScanResults";
 import { useScanStore } from "@/stores/scanStore";
+import { trackEvent } from "@/services/analyticsEvents";
 
 // Order-matched to promistList — which raw-response key each call's body
 // gets stored under.
@@ -124,6 +125,9 @@ export function ProcessScreen({
       }
 
       if (shouldBlockScan(robotsTxtResult)) {
+        // issue #19 analytics-integration — fired at the same point
+        // BlockedScreen gets rendered (ADR-006 hard gate).
+        trackEvent("robots_blocked", { url: siteStatus.url });
         setScreenState("blocked");
         return;
       }
@@ -194,6 +198,9 @@ export function ProcessScreen({
           raw: rawResponses,
           combined,
         });
+        // issue #19 analytics-integration — fired at the normal completion
+        // point, right before routing to the result page.
+        trackEvent("scan_completed", { url: siteStatus.url });
         router.replace(`/scan/${id}`);
       });
     };
