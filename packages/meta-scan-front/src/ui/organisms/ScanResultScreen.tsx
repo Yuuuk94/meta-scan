@@ -134,22 +134,21 @@ export function ScanResultScreen({
         />
       </div>
 
-      {/* Checklist card group — design-system.md §5: "체크리스트 카드 그룹은
-       * 4열 균등 그리드(기본 SEO/Indexing/Content Stats/국제화·UX)", §4:
-       * cells share 1px rule-lines instead of a real gap (same
-       * gap-px + bg-foreground container trick as the raw-results grid
-       * below and ProcessScreen's step grid) — so the cards themselves
-       * render border-less (see <BasicSeoCard>/<IndexingCard>).
+      {/* Checklist card group — cells share 1px rule-lines instead of a real
+       * gap (same gap-px + bg-foreground container trick as the
+       * raw-results grid below and ProcessScreen's step grid) — so the
+       * cards themselves render border-less (see
+       * <BasicSeoCard>/<IndexingCard>).
        *
-       * `lg:grid-cols-4` (issue #8 i18n-ux-checklist landed the 4th card) —
-       * previously `sm:grid-cols-2` while only 3 of the 4 planned cards
-       * existed, since sizing the grid for 4 before 4 exist left the other
-       * quarter of the row as a huge solid `bg-foreground` block (user
-       * feedback — looked like a stray dark panel, not empty grid space).
-       * This doesn't handle a card going empty at *runtime* (its source API
-       * failed) leaving a gap either — same accepted limitation as the
-       * raw-results tiles below, just smaller in scope now. */}
-      <div className="mt-8 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2 lg:grid-cols-4">
+       * 2x2 (`sm:grid-cols-2`, never bumped to `lg:grid-cols-4`) — issue #8
+       * i18n-ux-checklist landed the 4th card and briefly went to
+       * `lg:grid-cols-4`, but a single row of 4 read as too cramped once all
+       * 4 were real content (user feedback, 2026-09-02) — reverted to 2
+       * columns / 2 rows, which design-system.md §5 needs updating to
+       * reflect (still describes "4열 균등 그리드"). This doesn't handle a
+       * card going empty at *runtime* (its source API failed) leaving a gap
+       * either — same accepted limitation as the raw-results tiles below. */}
+      <div className="mt-8 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
         <BasicSeoCard
           lang={lang}
           theme={theme}
