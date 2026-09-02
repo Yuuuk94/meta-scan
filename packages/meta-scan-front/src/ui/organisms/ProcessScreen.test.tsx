@@ -40,7 +40,6 @@ const t = {
   analyzingText: "analyzing",
   analyzingSubtext: "sub",
   steps: ["robots.txt", "sitemap.xml", "crawl", "lighthouse"],
-  stepsHint: "hint",
   errorTitle: "site cant be reached",
   errorSubtitle: "check url",
   retryButton: "retry",
