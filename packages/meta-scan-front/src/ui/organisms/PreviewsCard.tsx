@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { buildPreviewsMessage } from "@/services/buildPreviewsMessage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/molecules/Card";
@@ -43,6 +43,13 @@ export const PreviewsCard = ({
   description,
   openGraph,
 }: PreviewsCardProps) => {
+  // Issue #24 req #3/#5: prefer a real <img> from og:image over the solid
+  // placeholder block, but fall back to the placeholder if the URL 404s or
+  // otherwise fails to load (broken-image icon is worse than no image).
+  // Declared before the early return below — Rules of Hooks forbids
+  // calling useState conditionally / after a conditional return.
+  const [imageLoadFailed, setImageLoadFailed] = useState(false);
+
   // No crawling data (that call failed, or hasn't happened) — every row and
   // the mockup are sourced from crawling alone, so there's nothing to show.
   // Same "stay absent rather than render an empty shell" rule as
@@ -53,6 +60,8 @@ export const PreviewsCard = ({
 
   const ogTitle = openGraph?.["og:title"] || title;
   const ogDescription = openGraph?.["og:description"] || description;
+  const ogImage = openGraph?.["og:image"];
+  const showImage = Boolean(ogImage) && !imageLoadFailed;
 
   return (
     <Card>
@@ -84,7 +93,23 @@ export const PreviewsCard = ({
          * issue #24's confirmed direction). Image area is a solid
          * placeholder block (--border token) — no "이미지 없음" text. */}
         <div className="mt-6 border-[1.5px] border-foreground bg-card">
-          <div aria-label={t.previewsImagePlaceholderLabel as string} className="h-[140px] w-full bg-border" />
+          {showImage ? (
+            // og:image is an arbitrary external URL supplied by the scanned
+            // site, not a static/known-domain asset, so next/image's
+            // remotePatterns allowlist doesn't fit here.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={ogImage}
+              alt={ogTitle || hostname || ""}
+              className="h-[140px] w-full object-cover"
+              onError={() => setImageLoadFailed(true)}
+            />
+          ) : (
+            <div
+              aria-label={t.previewsImagePlaceholderLabel as string}
+              className="h-[140px] w-full bg-border"
+            />
+          )}
           <div className="flex flex-col gap-1 p-3.5">
             <span className="text-[10px] tracking-[.04em] text-muted-foreground">
               {hostname?.toUpperCase()}
