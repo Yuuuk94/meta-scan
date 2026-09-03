@@ -92,7 +92,7 @@ export const PreviewsCard = ({
          * (2026-09-02 user request: "아래 카드하나로 통일 왼쪽껄로", also
          * issue #24's confirmed direction). Image area is a solid
          * placeholder block (--border token) — no "이미지 없음" text. */}
-        <div className="mt-6 max-w-[320px] border-[1.5px] border-foreground bg-card">
+        <div className="mt-6 max-w-[480px] border-[1.5px] border-foreground bg-card">
           {showImage ? (
             // og:image is an arbitrary external URL supplied by the scanned
             // site, not a static/known-domain asset, so next/image's
@@ -101,13 +101,13 @@ export const PreviewsCard = ({
             <img
               src={ogImage}
               alt={ogTitle || hostname || ""}
-              className="aspect-[4/3] w-full bg-border object-contain"
+              className="aspect-[16/9] w-full bg-border object-cover"
               onError={() => setImageLoadFailed(true)}
             />
           ) : (
             <div
               aria-label={t.previewsImagePlaceholderLabel as string}
-              className="aspect-[4/3] w-full bg-border"
+              className="aspect-[16/9] w-full bg-border"
             />
           )}
           <div className="flex flex-col gap-1 p-3.5">
