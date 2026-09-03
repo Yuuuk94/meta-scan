@@ -101,13 +101,13 @@ export const PreviewsCard = ({
             <img
               src={ogImage}
               alt={ogTitle || hostname || ""}
-              className="aspect-[4/3] w-full object-contain"
+              className="aspect-[4/3] max-h-[220px] w-full bg-border object-contain"
               onError={() => setImageLoadFailed(true)}
             />
           ) : (
             <div
               aria-label={t.previewsImagePlaceholderLabel as string}
-              className="aspect-[4/3] w-full bg-border"
+              className="aspect-[4/3] max-h-[220px] w-full bg-border"
             />
           )}
           <div className="flex flex-col gap-1 p-3.5">
