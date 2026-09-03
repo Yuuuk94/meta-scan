@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
 
@@ -113,5 +113,69 @@ describe("PreviewsCard", () => {
 
     expect(screen.getByText("Fallback Title")).toBeInTheDocument();
     expect(screen.getByText("Fallback description")).toBeInTheDocument();
+  });
+
+  it("renders a real <img> from og:image instead of the placeholder block (issue #24)", () => {
+    render(
+      <PreviewsCard
+        lang="ko"
+        theme="dark"
+        t={t}
+        checks={fourChecks}
+        url="https://example.com/page"
+        openGraph={{
+          "og:title": "meta-scan",
+          "og:image": "https://example.com/og.png",
+        }}
+      />
+    );
+
+    const img = screen.getByRole("img");
+    expect(img).toHaveAttribute("src", "https://example.com/og.png");
+    expect(
+      screen.queryByLabelText(t.previewsImagePlaceholderLabel as string)
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders the placeholder block when there is no og:image (issue #24)", () => {
+    render(
+      <PreviewsCard
+        lang="ko"
+        theme="dark"
+        t={t}
+        checks={fourChecks}
+        url="https://example.com/page"
+        openGraph={{ "og:title": "meta-scan" }}
+      />
+    );
+
+    expect(
+      screen.getByLabelText(t.previewsImagePlaceholderLabel as string)
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the placeholder block when the og:image fails to load (issue #24)", () => {
+    render(
+      <PreviewsCard
+        lang="ko"
+        theme="dark"
+        t={t}
+        checks={fourChecks}
+        url="https://example.com/page"
+        openGraph={{
+          "og:title": "meta-scan",
+          "og:image": "https://example.com/broken.png",
+        }}
+      />
+    );
+
+    const img = screen.getByRole("img");
+    fireEvent.error(img);
+
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    expect(
+      screen.getByLabelText(t.previewsImagePlaceholderLabel as string)
+    ).toBeInTheDocument();
   });
 });
