@@ -1,0 +1,20 @@
+# meta-scan-api Cloud Build config.
+#
+# Why this file exists (not the trigger's built-in "Dockerfile" build type):
+# packages/meta-scan-api/dockerfile needs the monorepo ROOT as build context
+# (it COPYs pnpm-workspace.yaml / pnpm-lock.yaml / sibling package.json files),
+# but the trigger's "Dockerfile" build type ties build context to the same
+# directory the Dockerfile lives in — there's no way to separate them there.
+# Specifying -f and the context separately here is the workaround.
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-f"
+      - "packages/meta-scan-api/dockerfile"
+      - "-t"
+      - "gcr.io/$PROJECT_ID/github.com/yuuuk94/meta-scan:$COMMIT_SHA"
+      - "."
+
+images:
+  - "gcr.io/$PROJECT_ID/github.com/yuuuk94/meta-scan:$COMMIT_SHA"
