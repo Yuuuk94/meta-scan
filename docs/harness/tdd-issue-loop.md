@@ -7,6 +7,13 @@
 > 레이팅 스킬(`.claude/skills/tdd-issue-loop/SKILL.md`)까지 실제로 만들었습니다. **아직 실제
 > 이슈로 시범 실행은 안 해봄** — 아래 "다음 단계" 4번 참고.
 >
+> **2026-08-31 수정**: 실제로 이슈 #2(pipe-connection) PR이 아직 머지되지 않은 상태에서 이슈
+> #3(basic-seo-checklist)의 dev-backend가 이미 브랜치를 파고 커밋까지 들어간 사례가 발생함 —
+> `feat/3-basic-seo-checklist`가 #2의 커밋을 포함하지 않는 지점(`95a5b5c`)에서 갈라져 있었음.
+> 원래 정책("PR 오픈 시점에 다음 이슈의 dev/qa 큐가 넘어감")이 브랜치 발산·충돌을 실제로
+> 만들어낸 것을 확인하고, 아래 "이슈 동시 처리"/"스킬 진입점"을 **"PR 머지" 기준으로 게이팅**
+> 하도록 수정함(사용자 요청). 상세는 해당 절 참고.
+>
 > **이슈는 수직 슬라이싱(기능 단위)으로 쪼갭니다.** 하나의 이슈는 "프론트 이슈"/"백엔드 이슈"가
 > 아니라 사용자에게 의미 있는 기능 하나(예: "AI Signals 카드가 실제 스캔 데이터를 pass/fail로
 > 보여준다")이고, 그 수용 기준은 보통 백엔드(신호 추출·판정)와 프론트(렌더링·취합)를 함께
@@ -50,9 +57,11 @@ TDD 개발 → 테스트 검증**을 거치는 루프를 스킬로 만들고 싶
 | 실패 시 재처리 정책 | **제한 재시도 후 blocked** | `qa-backend`/`qa-front`가 테스트/lint/typecheck 실패를 발견하면 대응하는 `dev-backend`/`dev-front`에게 자동으로 돌려보내 재시도(기본 1회, 필요시 조정 가능) — Puppeteer/chrome-launcher처럼 무거운 리소스를 계속 돌리는 무한 루프를 막으면서도 사소한 실수는 자동 복구. 재시도 후에도 실패하면 `status:blocked`로 바꾸고 사람 호출. |
 | 패키지 라벨 공유 | **공유 — `docs/harness/dev-lifecycle-harness.md`와 동일한 `front`/`api` 라벨 재사용**(`pkg:` 접두사 없음) | `dev-lifecycle-harness.md`가 이미 `front`/`api`/`design`/`infra` 라벨을 제안해뒀음(아직 저장소엔 없음, 두 문서 모두 생성 필요). 이 문서는 그중 `front`/`api`만 씀(`design`/`infra`는 이 파이프라인 범위 밖). |
 | 이슈 우선순위 | **`priority:high`/`priority:medium`/`priority:low` 라벨 우선, 없으면 이슈 번호(FIFO)** | 우선순위 라벨이 붙은 이슈를 먼저 처리, 동일 우선순위 내에서는(또는 라벨이 아예 없는 이슈끼리는) 번호(=생성) 순. |
-| Git/커밋/PR 정책 | **이슈별 브랜치 생성, PR 오픈까지 자동, PR 머지(→ `dev` push)는 항상 사람** | 저장소 규칙(승인 없는 commit/push 금지)에 "PR까지는 자동 허용"이라는 예외를 명시적으로 추가하는 것. 브랜치는 저장소의 `feat/*` Git Flow 컨벤션(`docs/case-study/git-branching-strategy.md`)을 따름. PR은 그 이슈의 마지막 qa 단계(보통 `qa-front`, 백엔드만 있는 이슈면 `qa-backend`)가 오픈. |
+| Git/커밋/PR 정책 | **이슈별 브랜치 생성, PR 오픈까지 자동, PR 머지(→ `dev` push)는 항상 사람 — 머지 전 사람이 반드시 서버를 직접 실행해 수동으로 확인** | 저장소 규칙(승인 없는 commit/push 금지)에 "PR까지는 자동 허용"이라는 예외를 명시적으로 추가하는 것. 브랜치는 저장소의 `feat/*` Git Flow 컨벤션(`docs/case-study/git-branching-strategy.md`)을 따름. PR은 그 이슈의 마지막 qa 단계(보통 `qa-front`, 백엔드만 있는 이슈면 `qa-backend`)가 오픈. 자동 qa(Jest/Vitest+lint+typecheck)는 회귀만 잡을 뿐 실제 화면/동작 확인이 아니므로, **PR 오픈 후 머지 승인 전에 사람이 `pnpm dev:front`/`dev:api`로 서버를 띄워 직접 테스트하는 걸 건너뛸 수 없는 필수 단계로 둠**(2026-08-31 추가). 스킬/에이전트는 어떤 경우에도 자동으로 머지하지 않고, 매번 명시적으로 사람에게 머지 여부를 확인받음. PR 본문의 `Closes #N`은 저장소 기본 브랜치(`main`)로 머지될 때만 GitHub가 자동으로 이슈를 닫는데, 이 워크플로우는 항상 `dev`로 머지하므로(`main`은 `release/*`가 돌 때만 갱신) 자동 클로즈가 절대 발동하지 않음 — 아래 "이슈 클로즈 시점" 행 참고, `status:done` 라벨과 GitHub open/close는 서로 다른 걸 가리키는 별개 신호임. |
+| 이슈 클로즈 시점 | **`main`(release) 배포 시점 — `dev` 머지만으론 안 닫음** | 2026-08-31 결정(초안은 반대로 갔다가 정정됨 — 아래 "정정" 참고). `status:done` 라벨은 "`dev` 머지까지 끝남"을 뜻하고, GitHub 이슈 open/close는 "실제로 `main`에 배포됐는가"를 뜻하는 별개 신호로 둠 — 라벨이 워크플로우 상태, open/close가 배포 상태. 이 저장소는 아직 release 주기가 없어서(`git-branching-strategy.md` 미해결 항목) 당분간 이슈들이 `status:done`인 채로 계속 열려있게 되는데, 이건 의도된 상태(release가 실제로 돌기 전까지는 "아직 사용자에게 안 나갔다"가 맞는 표현이므로). **정정**: 처음엔 "PR이 `dev`로 머지되면 그 즉시 `gh issue close`"로 갔었고 실제로 이슈 #2/#3/#4를 그렇게 닫았다가, 사용자 지적("메인 배포가 안됐잖아")으로 셋 다 재오픈하고 정책을 뒤집음 — `status:done` 라벨은 그대로 뒀음(그 자체는 맞는 상태라서). |
+| 이슈 간 dev/qa 진입 조건 | **이전 이슈의 PR이 "머지 완료"일 것 — "PR 오픈"만으론 부족** | 2026-08-31 수정. 원래는 "PR 오픈 = 그 이슈가 dev/qa 큐에서 빠짐 = 다음 이슈가 곧바로 진입" 이었는데, 이러면 아직 `dev`에 안 들어간 이전 이슈의 변경분을 다음 이슈의 브랜치가 반영하지 못한 채 갈라져 나가 충돌 위험이 쌓임(이슈 #3에서 실제 발생). 그래서 **한 번의 스킬 호출에서 dev/qa 자동 구간은 최대 한 이슈만 PR 오픈까지 진행**하고, 그 PR이 머지될 때까지 다음 이슈의 dev/qa는 시작하지 않음(사람이 머지한 뒤 스킬을 다시 호출하면 그때 다음 이슈로 진입). 인터뷰 큐는 이 제약과 무관하게 계속 앞서갈 수 있음(코드/브랜치를 안 건드리므로). |
 | 트리거 | **`/loop` 스킬 사용 안 함** — 사용자가 매번 명시적으로 스킬을 1회성 호출 | cron/webhook 같은 무인 폴링 인프라를 만들지 않음. 스킬 호출 시점에 대기 중인 이슈 백로그를 처리. |
-| 이슈 동시 처리 | **interview만 파이프라이닝, dev/qa 자동 구간은 이슈당 항상 1개씩만** | 이슈 A가 dev/qa 자동 구간(사람 개입 없음)을 도는 동안, 이슈 B의 interview(사람 자원 필요)를 곧바로 시작해 사람을 기다리게 하지 않음. 한 이슈 안에서 `dev-backend`→`dev-front`는 애초에 순차 설계(위 "크로스 패키지 실행 순서" 참고)라 동시 실행 이슈가 없음 — 남은 건 **다른 이슈**끼리(예: 이슈 A의 dev-backend가 도는 동안 이슈 B의 dev-front를 동시에 돌릴지)의 상한인데, 이건 여전히 1개(전역)로 결정됨. worktree 격리 인프라(`isolation: "worktree"`)를 지금 시점에 만들지 않기로 했고, `meta-scan-api` 테스트가 Puppeteer/chrome-launcher를 띄우는 것도 동시 실행을 피하는 이유. |
+| 이슈 동시 처리 | **interview만 파이프라이닝, dev/qa 자동 구간은 이슈당 항상 1개씩만 + 이전 이슈 PR 머지 전엔 다음 이슈 진입 안 함** | 이슈 A가 dev/qa 자동 구간(사람 개입 없음)을 도는 동안, 이슈 B의 interview(사람 자원 필요)는 곧바로 시작해 사람을 기다리게 하지 않음. 한 이슈 안에서 `dev-backend`→`dev-front`는 애초에 순차 설계(위 "크로스 패키지 실행 순서" 참고)라 동시 실행 이슈가 없음. **다른 이슈**끼리의 dev/qa 상한은 1개(전역)이고, worktree 격리 인프라(`isolation: "worktree"`)가 없는 것과 `meta-scan-api` 테스트가 Puppeteer/chrome-launcher를 띄우는 것도 동시 실행을 피하는 이유. 여기에 더해(2026-08-31, 위 "이슈 간 dev/qa 진입 조건" 행 참고) **다음 이슈가 이 슬롯에 들어가려면 이전 이슈의 PR이 머지까지 완료돼야 함** — 슬롯이 "비었다"는 게 "PR 오픈"이 아니라 "머지 완료"를 뜻하도록 기준을 올림. |
 | 테스트 러너 | **결정됨 (2026-08-24) — `meta-scan-front`는 Jest, `meta-scan-api`는 Vitest** | `docs/case-study/test-runner-survey.md` 참고. 리소스/마찰 관점에서는 "두 패키지 다 Vitest"가 더 효율적이라고 추천했었지만, 프로젝트가 학습을 겸하고 있어 프론트/백엔드에서 서로 다른 러너를 각각 경험해보는 쪽을 의도적으로 선택함 — `dev-lifecycle-harness.md`의 "Vitest(front/api 둘 다)" 제안과는 다른 방향으로 확정됨. `dev-front`/`qa-front`는 `pnpm --filter meta-scan-front test`(Jest), `dev-backend`/`qa-backend`는 `pnpm --filter meta-scan-api test`(Vitest)를 씀. |
 
 ## 전체 흐름
@@ -92,14 +101,18 @@ flowchart TD
 
   BLOCKED --> HUMANBLOCK{{"사람 호출"}}
   PR --> L3["라벨: status:in-review"]
-  L3 --> HUMAN{{"사람이 PR 리뷰 + 머지"}}
-  HUMAN --> DONE["라벨: status:done"]
+  L3 --> HUMAN{{"사람이 서버 직접 실행 + 수동 테스트 + PR 리뷰 → 머지 승인 (건너뛸 수 없음)"}}
+  HUMAN --> DONE["라벨: status:done (dev 머지 완료, 이슈는 열어둠 — main 배포 시 클로즈)"]
+  DONE -.->|"이제 다음 이슈가 dev/qa 슬롯에 진입 가능"| L1
 ```
 
 도형 범례: **사각형** = 단계(agent/스킬), **마름모** = 분기 판단, **육각형** = 사람 확인 게이트,
 **스타디움** = 시작/종료, **원통** = 미해결 지점. `api`/`front` 라벨이 둘 다 있는(수직 슬라이스)
 이슈는 `dev-backend`→`dev-front`, `qa-backend`→`qa-front` 순으로 전부 거치고, 하나만 있는
-(순수 리팩터/인프라) 이슈는 해당하는 쪽만 거칩니다.
+(순수 리팩터/인프라) 이슈는 해당하는 쪽만 거칩니다. 맨 아래 점선 화살표(`DONE -.-> L1`)가
+2026-08-31에 추가된 크로스 이슈 게이트입니다 — 이 이슈가 실제로 머지(`status:done`)돼야
+dev/qa 자동 구간 슬롯이 비워져 대기 중인 다음 이슈가 들어갈 수 있습니다. PR이 열린 것만으로는
+(`status:in-review`) 다음 이슈가 진입하지 않습니다.
 
 ## 에이전트별 역할
 
@@ -123,7 +136,8 @@ flowchart TD
 - `status:in-dev` — `dev-backend`/`dev-front` 진행 중
 - `status:in-test` — `qa-backend`/`qa-front` 진행 중
 - `status:in-review` — PR 오픈, 사람 리뷰 대기
-- `status:done` — PR 머지 완료
+- `status:done` — PR `dev` 머지 완료(**GitHub 이슈 자체는 계속 열어둠** — `main`/release 배포
+  시점에만 `gh issue close`, 위 "이슈 클로즈 시점" 행 참고)
 - `status:blocked` — 재시도 소진 등 어느 단계에서든 막힌 경우
 
 패키지 구분 라벨은 `docs/harness/dev-lifecycle-harness.md`와 공유하는 `front`/`api`(위 "확정된
@@ -142,23 +156,30 @@ flowchart TD
    라벨을 직접 부여
 3. 어떤 이슈가 `status:ready-for-dev`가 되면, **그 이슈의 dev→qa 자동 구간을 백그라운드로
    넘기고 곧바로 다음 이슈의 interview를 시작**(파이프라이닝) — 사람을 기다리게 하지 않는 게
-   목적
-4. **dev→qa 자동 구간은 이슈당(그리고 이슈 간에도) 항상 하나씩만** — 여러 이슈가 동시에
-   `status:ready-for-dev`여도 dev/qa 자동 구간은 큐에서 순서대로 하나씩만 처리(위 "확정된 결정
-   사항" 표의 "이슈 동시 처리" 행 참고). 한 이슈 안에서는 라벨(`api`/`front`)에 따라
-   `dev-backend`(있으면 먼저) → `dev-front`(있으면) → `qa-backend`(있으면) → `qa-front`(있으면)
-   순으로 필요한 에이전트만 순차 호출. `dev-interview`는 이 큐잉과 무관하게 계속 다음 이슈로
-   넘어감
+   목적. 단, 이건 **interview 큐**에만 해당 — dev/qa 큐 진입은 아래 4번 조건을 따로 봄.
+4. **dev→qa 자동 구간은 한 번의 스킬 호출에서 최대 한 이슈까지만 PR 오픈으로 진행하고,
+   그 PR이 머지될 때까지 다음 이슈는 진입하지 않음**(2026-08-31 수정, 위 "확정된 결정 사항"
+   표의 "이슈 간 dev/qa 진입 조건" 행 참고 — 이전엔 "PR 오픈"만으로 슬롯이 빈다고 봐서,
+   머지 안 된 이전 이슈의 변경분을 반영 못한 채 다음 이슈 브랜치가 갈라지는 문제가 실제로
+   발생함). 여러 이슈가 동시에 `status:ready-for-dev`여도 dev/qa 큐는 맨 앞 이슈 하나만
+   처리하고, 그 이슈가 `status:in-review`(PR 오픈)에 도달하면 **이번 스킬 호출에서는 다음
+   이슈로 넘어가지 않고 멈춤** — 대기 중인 나머지 이슈들은 사람이 그 PR을 머지한 뒤 스킬을
+   다시 호출할 때 처리됨. 한 이슈 안에서는 라벨(`api`/`front`)에 따라 `dev-backend`(있으면
+   먼저) → `dev-front`(있으면) → `qa-backend`(있으면) → `qa-front`(있으면) 순으로 필요한
+   에이전트만 순차 호출. `dev-interview`는 이 게이팅과 무관하게 계속 다음 이슈로 넘어감
 5. `qa-backend`/`qa-front`가 실패를 발견하면 대응하는 `dev-backend`/`dev-front`로 반송(기본
    1회) — 재시도 후에도 실패하면 `status:blocked`로 바꾸고 스킬 호출 종료 시 사람에게 보고
-6. 한 이슈가 `status:in-review`(PR 오픈)에 도달하면 그 이슈는 이 스킬 호출의 처리 대상에서 빠짐
+6. 한 이슈가 `status:in-review`(PR 오픈)에 도달하면 그 이슈는 이 스킬 호출의 dev/qa 처리
+   대상에서 빠지고, 위 4번대로 dev/qa 큐 전체가 이번 호출에서는 거기서 멈춤. PR 머지는 항상
+   사람이 직접 승인하며(서버를 실제로 띄워 수동 테스트한 뒤), 스킬/에이전트가 대신 머지하는
+   경우는 없음
 7. 대기 중인 이슈(interview 필요/ready-for-dev 큐)가 더 없고 진행 중인 dev/qa도 없으면 스킬
    종료, 사람이 다시 호출하기 전까지 대기
 
-즉 "루프"라는 단어가 가리키는 건 (a) 한 번의 스킬 호출 안에서 이슈 백로그를 소비하는 동작이면서
-동시에 (b) **interview는 순차로 계속 앞서 나가고, dev/qa 자동 구간은 항상 하나씩만 순차 처리하는
-파이프라이닝**(interview가 사람을 기다리게 하지 않는 게 목적이지, dev/qa 처리량을 늘리는 게
-목적은 아님)을 뜻함 — 세션 간 자동 재시작(`/loop` 웨이크업)은 여전히 안 씀.
+즉 "루프"라는 단어가 가리키는 건 한 번의 스킬 호출 안에서 **interview는 순차로 계속 앞서
+나가되, dev/qa 자동 구간은 사람이 이전 PR을 머지하기 전까지 다음 이슈로 넘어가지 않는
+파이프라이닝**(interview가 사람을 기다리게 하지 않는 게 목적이지, 머지 없이 dev/qa
+처리량을 늘리는 게 목적은 아님)을 뜻함 — 세션 간 자동 재시작(`/loop` 웨이크업)은 여전히 안 씀.
 
 ## 열린 질문 (아직 결정 안 함)
 

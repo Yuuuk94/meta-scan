@@ -5,7 +5,19 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/ui/atoms/Button";
 
-export function ErrorScreen({ t }: DefaultPageProps) {
+interface ErrorScreenProps extends DefaultPageProps {
+  // Optional override for the "다시 시도" button. Defaults to
+  // `router.refresh()`, which is only a real retry when this screen is
+  // rendered from a Server Component (request-scan/page.tsx re-runs its
+  // ping fetch on refresh) — inside <ProcessScreen>, this screen renders
+  // from client-side `screenState`, which a server refresh never touches,
+  // so the button did nothing there (2026-09-02, user review: "에러 화면에
+  // 다시시도 동작해?"). <ProcessScreen> now passes its own retry handler
+  // that actually resets state and re-runs the scan.
+  onRetry?: () => void;
+}
+
+export function ErrorScreen({ t, onRetry }: ErrorScreenProps) {
   const router = useRouter();
 
   return (
@@ -25,7 +37,10 @@ export function ErrorScreen({ t }: DefaultPageProps) {
        * second — full-width stacked column at mobile, side-by-side row at desktop
        * (zine-index intake §2.4). */}
       <div className="mt-3 flex w-full max-w-xs flex-col gap-2.5 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-3">
-        <Button onClick={() => router.refresh()} className="w-full sm:w-auto">
+        <Button
+          onClick={onRetry ?? (() => router.refresh())}
+          className="w-full sm:w-auto"
+        >
           {t.retryButton}
         </Button>
         <Button

@@ -48,12 +48,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=build /deploy/meta-scan-api ./
 
-# Cloud Run 기본 포트
-ENV PORT=8080
-ENV NODE_ENV=production
-ENV PUBLIC_URL=https://meta-scan-api-752797429874.us-central1.run.app
-ENV FRONT_URL=https://meta-scan.vercel.app
-ENV FRONT_TEST_URL=https://meta-scan.vercel.app
 # chrome-launcher(Lighthouse)가 사용할 경로 지정 (배포 이미지 내 Chromium 경로)
 ENV CHROME_PATH=/usr/bin/chromium
 # Puppeteer(scan/crawling)도 같은 apt 설치 Chromium을 쓰도록 지정 — 이게 없으면 Puppeteer는

@@ -1,13 +1,22 @@
 import { ApiError } from "@/core/http/ApiError.js";
 // NOTE(ADR-011): application importing an inbound-adapter DTO type is a known impurity this
 // migration pass didn't resolve — see docs/case-study/backend-hexagonal-architecture.md §5.
-import type { UrlBody } from "@/adapters/inbound/http/scan/dto.js";
+import type { SiteMapBody, UrlBody } from "@/adapters/inbound/http/scan/dto.js";
 import type {
   BrowserAutomationPort,
   PuppeteerProcess,
 } from "@/domain/ports/BrowserAutomationPort.js";
 import crypto from "node:crypto";
-import { DESC_MAX, DESC_MIN, TITLE_MAX, TITLE_MIN } from "@/constant/meta.js";
+import { buildBasicSeoChecks } from "@/domain/checks/basicSeoChecks.js";
+import {
+  buildIndexingChecksFromCrawling,
+  buildSitemapDeclaredInRobotsCheck,
+  buildSitemapExistsCheck,
+} from "@/domain/checks/indexingChecks.js";
+import { buildPreviewsChecksFromCrawling } from "@/domain/checks/previewsChecks.js";
+import { buildAiSignalsChecksFromCrawling } from "@/domain/checks/aiSignalsChecks.js";
+import { buildContentChecksFromCrawling } from "@/domain/checks/contentChecks.js";
+import { buildI18nUxChecksFromCrawling } from "@/domain/checks/i18nUxChecks.js";
 
 export class ScanService {
   constructor(private readonly chrome: BrowserAutomationPort) {}
@@ -149,33 +158,52 @@ export class ScanService {
           allow,
           contents,
           sitemap,
+          checks: { indexing: [buildSitemapDeclaredInRobotsCheck(sitemap)] },
         };
       }
-      return { has };
+      return { has, checks: { indexing: [buildSitemapDeclaredInRobotsCheck([])] } };
     } catch (e) {
       throw ApiError.internal();
     }
   }
 
-  async siteMap({ url }: UrlBody) {
+  private async headCheck(url: string) {
     try {
-      const parsedUrl = new URL(url);
-      const siteMapUrl = this.getUrl(parsedUrl, "/sitemap.xml");
-      const result = await fetch(siteMapUrl, {
+      const result = await fetch(url, {
         method: "HEAD",
         signal: AbortSignal.timeout(this.timeOut),
       });
-      let has = false;
+      return result.status === 200 ? result : null;
+    } catch (e) {
+      // A single candidate failing to fetch (network error, DNS, timeout) shouldn't abort the
+      // rest of the fallback sequence — treat it the same as a non-200 response.
+      return null;
+    }
+  }
 
-      if (result.status === 200) {
-        has = true;
-        return {
-          has,
-          redirected: result.redirected,
-          url: result.url,
-        };
+  async siteMap({ url, candidateSitemaps }: SiteMapBody) {
+    try {
+      const parsedUrl = new URL(url);
+      const siteMapUrl = this.getUrl(parsedUrl, "/sitemap.xml");
+
+      let matched = await this.headCheck(siteMapUrl);
+
+      // /sitemap.xml itself 404s — fall back to robots.txt's declared sitemap locations
+      // (already fetched by the frontend, passed through as candidateSitemaps) one at a time,
+      // stopping at the first 200 (spec decision log #2/#3).
+      if (!matched && candidateSitemaps?.length) {
+        for (const candidate of candidateSitemaps) {
+          matched = await this.headCheck(candidate);
+          if (matched) break;
+        }
       }
-      return { has };
+
+      const has = matched !== null;
+      return {
+        has,
+        ...(matched ? { url: matched.url, redirected: matched.redirected } : {}),
+        checks: { indexing: [buildSitemapExistsCheck(has)] },
+      };
     } catch (e) {
       throw ApiError.internal();
     }
@@ -200,6 +228,29 @@ export class ScanService {
     };
   }
 
+  // Plain existence/byte-count fetch against `/.well-known/prompts.txt`, run in parallel with
+  // `fetchFirstHtml` from `crawling` (issue #6 ai-signals-checklist req #1) — same fetch-only
+  // pattern `robotsTxt`/`headCheck` already use, deliberately not a 5th API route (ADR-003: a new
+  // route would break ProcessScreen's 4-step composition). A failed/non-200 fetch is treated as
+  // "doesn't exist", same swallow-errors philosophy as `headCheck`.
+  private async fetchPromptsTxt(
+    url: string
+  ): Promise<{ exists: boolean; byteCount?: number }> {
+    try {
+      const parsedUrl = new URL(url);
+      const promptsTxtUrl = this.getUrl(parsedUrl, "/.well-known/prompts.txt");
+      const result = await fetch(promptsTxtUrl, {
+        method: "GET",
+        signal: AbortSignal.timeout(this.timeOut),
+      });
+      if (result.status !== 200) return { exists: false };
+      const text = await result.text();
+      return { exists: true, byteCount: Buffer.byteLength(text, "utf-8") };
+    } catch (e) {
+      return { exists: false };
+    }
+  }
+
   private async getOnloadHtml(url: string, browser: PuppeteerProcess) {
     const t0 = Date.now();
     const page = await browser.newPage();
@@ -212,7 +263,12 @@ export class ScanService {
     const finalUrl = resp?.url() || url;
 
     const html = await page.content();
-    const fs = () => {
+    // Inlined directly as the page.evaluate() argument (not assigned to a named
+    // `const` first) — see the `collectTypes` comment below for why: this avoids
+    // giving esbuild's dev-mode name-preservation transform an outer binding to wrap
+    // in a `__name(...)` call too, since that call would also end up in the
+    // toString()-serialized source Puppeteer sends into the browser context.
+    const extracted = await page.evaluate(() => {
       const metas = Array.from(document.querySelectorAll("meta"));
       const metaByName: Record<string, string> = {};
       const metaByProp: Record<string, string> = {};
@@ -241,23 +297,112 @@ export class ScanService {
         if (k.startsWith("twitter:")) tw[k] = v;
         // name=twitter:* 케이스
       }
-      const canonical =
-        document.querySelector('link[rel="canonical"]')?.getAttribute("href") ??
-        undefined;
+      // All canonical link tags, not just the first — canonicalMultiple (issue #4
+      // indexing-checklist) needs the full count regardless of href value equality.
+      const canonicalLinks = Array.from(
+        document.querySelectorAll('link[rel="canonical"]')
+      )
+        .map((el) => el.getAttribute("href") ?? "")
+        .filter(Boolean);
+      const canonical = canonicalLinks[0];
+      // issue #5 previews-checklist: only checks for the <link> tag itself, no fetch — the
+      // conventional /favicon.ico fallback (spec decision log #1) is checked afterwards by
+      // ScanService, outside page.evaluate (this callback only has DOM access, not `fetch`).
+      const hasIconLink = !!document.querySelector('link[rel~="icon"]');
+      // issue #8 i18n-ux-checklist: existence-only checks, same style as hasIconLink above —
+      // hreflang cares only about presence of at least one alternate-language link, not which
+      // locales it declares.
+      const hasHreflang = !!document.querySelector(
+        'link[rel="alternate"][hreflang]'
+      );
+      const hasViewport = !!document.querySelector('meta[name="viewport"]');
       const h1 = Array.from(document.querySelectorAll("h1"))
         .map((el) => (el.textContent || "").trim())
         .filter(Boolean);
+      // issue #7 content-stats-checklist: h2/h3 counts collected alongside h1 (spec req #1) — only
+      // counts are needed (not the text content, unlike h1 which the frontend renders directly).
+      const headings = {
+        h1: h1.length,
+        h2: document.querySelectorAll("h2").length,
+        h3: document.querySelectorAll("h3").length,
+      };
+      // Body character count (spec-fixed.md decision log #1: character count, not word count,
+      // despite the PRD's original "본문 단어 수" label — its own 600–2,000 thresholds were already
+      // in characters). `innerText` (not `textContent`) so hidden/script/style content that isn't
+      // actually rendered doesn't inflate the count.
+      const charCount = (document.body?.innerText || "").trim().length;
+      // PRD §3.5: a `[role="doc-abstract"]` element, or literal "TL;DR" text anywhere in the
+      // rendered body, counts as a TL;DR/summary block.
+      const hasTldr =
+        !!document.querySelector('[role="doc-abstract"]') ||
+        /tl;?dr/i.test(document.body?.innerText || "");
       const imgs = Array.from(document.images || []);
       const totalImgs = imgs.length;
       const altMissing = imgs.filter(
         (i) => !(i.getAttribute("alt") ?? "").trim()
       ).length;
+      // issue #6 ai-signals-checklist: deduped `@type` values across every JSON-LD script,
+      // including nested `@graph` arrays — feeds promptObject/structuredData/faqSection
+      // judgement. A malformed script just contributes no types (a dedicated parse-error
+      // judgement is PRD §3.4 scope this issue doesn't cover).
+      const structuredDataTypesSet = new Set<string>();
+      // Iterative (explicit stack), not a recursive named helper function — any named
+      // function inside this page.evaluate() callback (`const`-assigned or a `function`
+      // declaration, doesn't matter which) gets esbuild's dev-mode `__name(...)` wrapper
+      // injected around it (for stack-trace-friendly names). `page.evaluate()` serializes
+      // this whole callback via `Function.prototype.toString()` to run it inside the
+      // browser's isolated context, so that wrapper call ends up in the string too — but
+      // `__name` only exists in the Node process, not the page, so it threw
+      // `ReferenceError: __name is not defined` there (2026-09-02, found via a real manual
+      // scan — the ScanService unit tests mock `page.evaluate` entirely, so this never
+      // surfaced in Vitest). Going stack-based sidesteps the whole problem: no named
+      // function, nothing for esbuild to wrap.
+      const jsonLdStack: unknown[] = [];
+      for (const script of document.querySelectorAll(
+        'script[type="application/ld+json"]'
+      )) {
+        try {
+          jsonLdStack.push(JSON.parse(script.textContent || ""));
+        } catch {
+          // malformed JSON-LD — skip, see comment above
+        }
+      }
+      while (jsonLdStack.length > 0) {
+        const node = jsonLdStack.pop();
+        if (Array.isArray(node)) {
+          jsonLdStack.push(...node);
+          continue;
+        }
+        if (!node || typeof node !== "object") continue;
+        const obj = node as Record<string, unknown>;
+        const t = obj["@type"];
+        if (typeof t === "string") structuredDataTypesSet.add(t);
+        else if (Array.isArray(t)) {
+          t.forEach((tt) => typeof tt === "string" && structuredDataTypesSet.add(tt));
+        }
+        if (Array.isArray(obj["@graph"])) jsonLdStack.push(...obj["@graph"]);
+      }
+      const structuredDataTypes = Array.from(structuredDataTypesSet);
       return {
         title: document.title || undefined,
         description: metaByName["description"],
         keywords: metaByName["keywords"],
         canonical,
+        // Full list, alongside `canonical` (its first element, kept for backward
+        // compatibility with existing consumers of extract.canonical).
+        canonicalLinks,
+        // `<meta name="robots" content="...">` — metaByName already lower-cases the name, so
+        // this is just surfacing it under an explicit key (issue #4 indexing-checklist).
+        metaRobots: metaByName["robots"],
+        hasIconLink,
+        // issue #8 i18n-ux-checklist
+        hasHreflang,
+        hasViewport,
         h1,
+        // issue #7 content-stats-checklist
+        charCount,
+        headings,
+        hasTldr,
         images: { total: totalImgs, altMissing },
         openGraph: og,
         twitter: tw,
@@ -265,9 +410,10 @@ export class ScanService {
           metaName: Array.from(new Set(dupName)),
           metaProperty: Array.from(new Set(dupProp)),
         },
+        // issue #6 ai-signals-checklist
+        structuredDataTypes,
       };
-    };
-    const extracted = await page.evaluate(fs);
+    });
 
     await page.close();
 
@@ -280,143 +426,16 @@ export class ScanService {
     };
   }
 
-  private runChecks(
-    url: string,
-    ext: Awaited<ReturnType<typeof this.getOnloadHtml>>["extracted"]
-  ): MetaScanResult["checks"] {
-    const checks: MetaScanResult["checks"] = [];
-
-    const title = norm(ext.title);
-    const desc = norm(ext.description);
-
-    if (!title) {
-      checks.push({
-        id: "title.missing",
-        level: "error",
-        message: "title 태그가 없습니다.",
-        target: "title",
-      });
-    } else if (title.length < TITLE_MIN || title.length > TITLE_MAX) {
-      checks.push({
-        id: "title.length",
-        level: "warn",
-        message: `title 길이 비권장(${title.length}자). 권장: ${TITLE_MIN}–${TITLE_MAX}자.`,
-        target: "title",
-      });
-    }
-
-    if (!desc) {
-      checks.push({
-        id: "desc.missing",
-        level: "warn",
-        message: "meta[name=description]이 없습니다.",
-        target: "description",
-      });
-    } else if (desc.length < DESC_MIN || desc.length > DESC_MAX) {
-      checks.push({
-        id: "desc.length",
-        level: "warn",
-        message: `description 길이 비권장(${desc.length}자). 권장: ${DESC_MIN}–${DESC_MAX}자.`,
-        target: "description",
-      });
-    }
-
-    if (ext.keywords) {
-      checks.push({
-        id: "keywords.deprecated",
-        level: "info",
-        message: "meta[name=keywords]는 현대 SEO에서 비권장입니다.",
-        target: "keywords",
-      });
-    }
-
-    if (
-      !ext.openGraph["og:title"] ||
-      !ext.openGraph["og:description"] ||
-      !ext.openGraph["og:image"]
-    ) {
-      checks.push({
-        id: "og.missing_core",
-        level: "warn",
-        message:
-          "Open Graph 핵심 태그(og:title/og:description/og:image) 일부가 없습니다.",
-        target: "openGraph",
-      });
-    }
-
-    if (!ext.twitter["twitter:card"]) {
-      checks.push({
-        id: "twitter.missing_card",
-        level: "info",
-        message: "Twitter Card(twitter:card)가 없습니다.",
-        target: "twitter",
-      });
-    }
-
-    if (!ext.canonical) {
-      checks.push({
-        id: "canonical.missing",
-        level: "info",
-        message: "Canonical 링크가 없습니다.",
-        target: "canonical",
-      });
-    } else if (/^\/(?!\/)/.test(ext.canonical)) {
-      checks.push({
-        id: "canonical.relative",
-        level: "info",
-        message: "Canonical이 상대경로입니다. 절대경로를 권장합니다.",
-        target: "canonical",
-      });
-    }
-
-    if (ext.h1.length === 0) {
-      checks.push({
-        id: "h1.none",
-        level: "warn",
-        message: "H1 태그가 없습니다.",
-        target: "h1",
-      });
-    } else if (ext.h1.length > 1) {
-      checks.push({
-        id: "h1.multiple",
-        level: "info",
-        message: `H1 태그가 ${ext.h1.length}개입니다. 1개 권장(정보구조 따라 예외 가능).`,
-        target: "h1",
-      });
-    }
-
-    if (ext.images.altMissing > 0) {
-      checks.push({
-        id: "img.alt_missing",
-        level: "warn",
-        message: `ALT 누락 이미지 ${ext.images.altMissing}개.`,
-        target: "img",
-      });
-    }
-
-    if (
-      ext.duplicates.metaName.length > 0 ||
-      ext.duplicates.metaProperty.length > 0
-    ) {
-      const names = ext.duplicates.metaName.join(", ");
-      const props = ext.duplicates.metaProperty.join(", ");
-      checks.push({
-        id: "meta.duplicate",
-        level: "info",
-        message: `중복 메타 태그 감지 name[${names}] property[${props}]`,
-        target: "meta",
-      });
-    }
-
-    return checks;
-  }
-
   async crawling({ url }: UrlBody) {
     let proc: PuppeteerProcess | undefined;
     try {
       proc = await this.chrome.launch();
-      // 1) 첫 HTML
-      const first = await this.fetchFirstHtml(url);
+      // 1) 첫 HTML + prompts.txt(issue #6 ai-signals-checklist req #1) 병렬 fetch — 같은
+      // "원본 HTML을 fetch하는 지점"에서 실행, 별도 API 라우트 신설 없음(ADR-003).
+      const [first, promptsTxt] = await Promise.all([
+        this.fetchFirstHtml(url),
+        this.fetchPromptsTxt(url),
+      ]);
 
       // 2) onload 이후 HTML + 메타 추출
       const onload = await this.getOnloadHtml(first.finalUrl, proc);
@@ -438,16 +457,67 @@ export class ScanService {
           description: onload.extracted.description,
           keywords: onload.extracted.keywords,
           canonical: onload.extracted.canonical,
+          canonicalLinks: onload.extracted.canonicalLinks,
+          metaRobots: onload.extracted.metaRobots,
           h1: onload.extracted.h1,
           images: onload.extracted.images,
           openGraph: onload.extracted.openGraph,
           twitter: onload.extracted.twitter,
           duplicates: onload.extracted.duplicates,
+          structuredDataTypes: onload.extracted.structuredDataTypes,
+          promptsTxt,
         },
-        checks: [],
+        checks: {
+          basicSeo: [],
+          indexing: [],
+          previews: [],
+          aiSignals: [],
+          content: [],
+          i18nUx: [],
+        },
       };
 
-      result.checks = this.runChecks(url, onload.extracted);
+      result.checks.basicSeo = buildBasicSeoChecks(onload.extracted);
+      result.checks.indexing = buildIndexingChecksFromCrawling({
+        canonicalLinks: onload.extracted.canonicalLinks,
+        metaRobotsContent: onload.extracted.metaRobots,
+      });
+
+      // No <link rel~="icon"> tag found — fall back to a HEAD check against the conventional
+      // /favicon.ico path before judging (spec decision log #1), same network-check style as
+      // siteMap's headCheck. Skipped entirely (no extra request) when the <link> tag was already
+      // found.
+      const faviconFallbackOk = onload.extracted.hasIconLink
+        ? false
+        : (await this.headCheck(
+            this.getUrl(new URL(onload.finalUrl), "/favicon.ico")
+          )) !== null;
+
+      result.checks.previews = buildPreviewsChecksFromCrawling({
+        ogImage: onload.extracted.openGraph["og:image"],
+        hasIconLink: onload.extracted.hasIconLink,
+        faviconFallbackOk,
+        openGraph: onload.extracted.openGraph,
+        twitter: onload.extracted.twitter,
+      });
+
+      result.checks.aiSignals = buildAiSignalsChecksFromCrawling({
+        promptsTxt,
+        structuredDataTypes: onload.extracted.structuredDataTypes,
+        deltaRatio: result.html.deltaRatio,
+      });
+
+      result.checks.content = buildContentChecksFromCrawling({
+        charCount: onload.extracted.charCount,
+        headings: onload.extracted.headings,
+        hasTldr: onload.extracted.hasTldr,
+      });
+
+      result.checks.i18nUx = buildI18nUxChecksFromCrawling({
+        hasHreflang: onload.extracted.hasHreflang,
+        hasViewport: onload.extracted.hasViewport,
+      });
+
       return result;
     } catch (e) {
       throw ApiError.internal();
@@ -481,10 +551,6 @@ function patternToRegex(pattern: string) {
 
 function sha1(s: string) {
   return crypto.createHash("sha1").update(s).digest("hex");
-}
-
-function norm(s?: string | null) {
-  return (s ?? "").trim().replace(/\s+/g, " ");
 }
 
 function ratio(a: number, b: number) {

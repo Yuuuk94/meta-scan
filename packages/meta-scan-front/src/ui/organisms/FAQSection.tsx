@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/ui/molecules/Accordion";
 import { Bot, HelpCircle } from "lucide-react";
+import { heroUrlInputId } from "@/constans";
 
 export const FAQSection = ({ t }: DefaultPageProps) => {
   const faqs = [
@@ -19,16 +20,33 @@ export const FAQSection = ({ t }: DefaultPageProps) => {
     { id: "faq6", q: t.faq6Q, a: t.faq6A },
   ];
 
+  // Scrolls back to the Hero section and focuses its URL input, so the CTA
+  // re-engages the same input the user already saw at the top instead of
+  // doing nothing (issue #15). FAQSection/HeroSection are rendered as
+  // siblings in app/[lang]/page.tsx with no shared context/store, so we
+  // reach across via the shared heroUrlInputId DOM id.
+  //
+  // `focus({ preventScroll: true })` matters here — a plain `.focus()`
+  // makes the browser instantly scroll-into-view the focused element on
+  // its own, which cuts the smooth scrollTo above short (verified: without
+  // this, scrollY jumps straight to 0 with no animated frames at all).
+  const handleScanNowClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.getElementById(heroUrlInputId)?.focus({ preventScroll: true });
+  };
+
   return (
     <section className="py-24">
       <div className="content-frame">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-12 text-center">
-            <h2 className="mb-3 font-display text-3xl font-extrabold text-foreground">
-              {t.faqTitle}
-            </h2>
-            <p className="text-foreground-secondary">{t.faqSubtitle}</p>
-          </div>
+        <div className="max-w-3xl">
+          {/* Left-aligned, no subtitle — matches the rest of the page (Hero/
+           * ProcessSection have no centering either) and the design intake
+           * spec's explicit "headline + subtitle-less accordion" (§3.1 item
+           * 4), 2026-09-02 user correction from the earlier centered
+           * headline + subtitle version. */}
+          <h2 className="mb-12 font-display text-3xl font-extrabold text-foreground">
+            {t.faqTitle}
+          </h2>
 
           {/* Uses the shared Accordion primitive (molecules/Accordion.tsx)
            * instead of hand-rolled open/close state, so this list picks up
@@ -58,7 +76,7 @@ export const FAQSection = ({ t }: DefaultPageProps) => {
           <Card className="mt-10 text-center">
             <CardContent className="py-8">
               <p className="mb-4 text-foreground-secondary">{t.faqCtaText}</p>
-              <Button variant="accent">
+              <Button variant="accent" onClick={handleScanNowClick}>
                 <Bot className="h-4 w-4" />
                 {t.faqCtaButton}
               </Button>

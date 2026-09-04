@@ -66,14 +66,19 @@ function AccordionContent({
 }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
   return (
     // No open/close animation — instant transition, per design-system.md
-    // §4 ("애니메이션 없이 즉시 전환"). bg-card lifts the expanded panel off
-    // the page background, same §4 rule. At mobile widths the expanded panel
-    // bleeds edge-to-edge past the page's 20px gutter (max-sm:-mx-5, matching
+    // §4 ("애니메이션 없이 즉시 전환"). Hardcoded #fff9f0 (not `bg-card`,
+    // 2026-09-02) lifts the expanded panel off the page background, same §4
+    // rule — the design intake spec (zine-index §3.1) pins this exact value
+    // ("pushes the #FFF9F0 highlight background past the page's 20px
+    // gutters"), and `--card` itself moved to pure white for the /scan/:id
+    // result cards, so this needs its own literal value rather than
+    // following that token. At mobile widths the expanded panel bleeds
+    // edge-to-edge past the page's 20px gutter (max-sm:-mx-5, matching
     // content-frame's mobile padding) instead of staying inset like collapsed
     // items — zine-index intake §3.1.
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="overflow-hidden bg-card text-sm max-sm:-mx-5 max-sm:px-5"
+      className="overflow-hidden bg-card-paper text-sm max-sm:-mx-5 max-sm:px-5"
       {...props}
     >
       <div className={cn("px-1 pt-0 pb-4", className)}>{children}</div>

@@ -11,6 +11,34 @@ export const langKey = "lang";
 
 export const crrUrlKey = "crrUrl";
 
-export const urlPattern = /^https?:\/\/.+\..+/;
+// Protocol is optional (issue #34 url-input-protocol-ux) — HeroSection's
+// handleAnalyze auto-prepends https:// when missing before proceeding, but
+// this pattern itself also needs to accept protocol-less input directly
+// since it's reused as-is for the live useEffect revalidation. Whitespace
+// anywhere and a missing "." are still rejected (both sides of the "."
+// disallow \s so a stray space anywhere in the string can never match the
+// full anchored pattern).
+export const urlPattern = /^(https?:\/\/)?[^\s]+\.[^\s]+$/;
 
 export const okStatus = "ok";
+
+// Shared DOM id so FAQSection's "지금 스캔하기" CTA (issue #15) can locate and
+// focus HeroSection's URL input across sibling organisms without a shared
+// context/store — same "read via DOM, no Context" style as the cookie helpers.
+export const heroUrlInputId = "hero-url-input";
+
+// meta-scan's own site URL (own sitemap.xml/robots.txt, issue #10) —
+// distinct from a scanned target's URL. Same placeholder domain
+// RootLayout's openGraph metadata already hardcodes; kept here as a single
+// source of truth for the sitemap/robots routes.
+export const siteUrl = process.env.NEXT_PUBLIC_META_SCAN_URL;
+
+// Real routes that get indexed per-locale in sitemap.xml. `/scan/:id` is a
+// personalized result page (pipe-connection, issue #2) and intentionally
+// excluded.
+export const siteRoutes = ["", "/request-scan", "/scan", "/privacy", "/terms"];
+
+// localStorage key for the GA4 cookie-consent decision (issue #19
+// analytics-integration). Distinct namespace prefix (`ms_`) since this is
+// localStorage, not one of the `document.cookie` keys above.
+export const analyticsConsentKey = "ms_analytics_consent";

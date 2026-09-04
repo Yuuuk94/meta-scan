@@ -60,9 +60,15 @@ pnpm --filter meta-scan-front build       # next build
 pnpm -r lint                              # 모든 패키지 lint
 pnpm --filter meta-scan-front lint        # eslint (next/core-web-vitals, next/typescript)
 pnpm --filter meta-scan-api typecheck     # tsc --noEmit
+
+pnpm test                                 # 모든 패키지 테스트 (api: Vitest, front: Jest)
+pnpm test:api                             # meta-scan-api만 (vitest run)
+pnpm test:front                           # meta-scan-front만 (jest)
 ```
 
-두 패키지 모두 테스트 스크립트가 없습니다 — 테스트 러너가 있다고 가정하지 마세요.
+2026-08-31, ADR-012 러너 선택(front=Jest, api=Vitest)이 실제로 두 패키지 다 부트스트랩됐습니다
+(`meta-scan-api`는 아직 실제 스펙 파일이 없어 `vitest run`이 "No test files found"로 통과만
+하는 상태 — `vitest.config.ts`의 `passWithNoTests: true` 참고, 첫 스펙이 생기면 제거해도 됨).
 
 ```bash
 pnpm --filter meta-scan-api build:docker  # Docker 이미지 빌드 (컨텍스트 = 레포 루트,
@@ -94,6 +100,27 @@ Chromium 다운로드)이 조용히 스킵되지 않습니다.
 
 이 컨벤션은 이 훅이 도입된 시점(2026-08) 이후 커밋부터 적용됩니다 — 그 이전 히스토리는 형식이
 자유롭습니다.
+
+### 브랜치 사용 원칙 (Claude Code 세션 필수 준수, 2026-08-31)
+
+**새 작업을 지시받으면, 그 작업이 지금 체크아웃된 브랜치의 원래 목적과 다르면 절대 그 브랜치에
+이어서 작업하지 않습니다.** `docs/case-study/git-branching-strategy.md`의 Git Flow에 따라 새
+브랜치를 만들어서 작업하고, 그 브랜치에서 커밋합니다 — 브랜치 타입은 성격에 맞게 고릅니다:
+일반 기능/문서/하네스 작업은 `dev`에서 딴 `feat/*`, 프로덕션에 이미 배포된 버그의 긴급 수정은
+`main`에서 직접 딴 `hotfix/*`(완료 후 `main`+`dev` 양쪽 백머지 필수 — 브랜치 종류별 상세는
+`docs/case-study/git-branching-strategy.md` 표 참고). 예: 이슈 #2
+파이프 연결 작업 중이던 `feat/2-pipe-connection` 브랜치에 머물러 있는 상태에서 TDD 이슈 루프
+하네스 문서를 고쳐달라는, 성격이 다른 요청을 받으면 그 자리에서 커밋하지 말고 `dev`에서
+`feat/*` 새 브랜치부터 판 뒤 거기서 진행·커밋합니다. 같은 기능/이슈의 후속 작업(예: 리뷰 반영,
+같은 이슈의 추가 커밋)은 그 브랜치를 계속 써도 됩니다 — 기준은 "지금 브랜치가 이 작업을 위해
+만들어졌는가"입니다.
+
+이유: 2026-08-21 세션에서 무관한 작업(블로그 스킬 추가)을 엉뚱한 이름의 기존 브랜치
+(`feat/fsd-lite-code-migration`)에 그대로 커밋했다가 git-surgery로 되돌린 적이 있고,
+2026-08-31에도 이슈 #3의 dev 작업이 이슈 #2 PR이 머지되기 전에 브랜치를 파면서(`dev`가 아니라
+`feat/2-pipe-connection` 시점 근처에서 갈라짐) 브랜치 발산 문제가 실제로 재발했습니다
+(`docs/harness/tdd-issue-loop.md`의 2026-08-31 항목 참고). 커밋/푸시 자체의 승인 여부와는
+별개 규칙이며, 커밋을 승인받았다고 해서 브랜치를 골라 쓸 재량까지 생기는 건 아닙니다.
 
 ## 아키텍처
 

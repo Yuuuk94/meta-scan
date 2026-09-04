@@ -14,9 +14,11 @@ pnpm dev:front                              # next dev, :3000
 pnpm --filter meta-scan-front build         # next build
 pnpm --filter meta-scan-front start         # next start (프로덕션 빌드 서빙)
 pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next/typescript)
+pnpm --filter meta-scan-front test          # jest (또는 루트에서 pnpm test:front)
 ```
 
-테스트 스크립트는 없습니다 — 테스트 러너가 있다고 가정하지 마세요.
+ADR-012에 따라 Jest + Testing Library가 부트스트랩돼 있습니다(`jest.config`, `jest.setup` 등 —
+`@testing-library/jest-dom`/`@testing-library/react` 포함).
 
 로컬 개발 시 `packages/meta-scan-front/.env.local`에
 `NEXT_PUBLIC_META_SCAN_API=http://localhost:8080`(또는 `meta-scan-api`가 실행 중인 위치)이
@@ -140,7 +142,47 @@ pnpm --filter meta-scan-front lint          # eslint (next/core-web-vitals, next
   `ProcessScreen.tsx`의 지역 변수 `promistList`(promise의 오타). 새 코드에서 따라 하지 말고, 기존
   것을 고칠 땐 이름 변경이 import 경로 등 다른 곳에 영향을 주는 리네임 범위인지 먼저 확인하세요.
 
+### 스타일/색상 변경 시 필수 확인 순서 (2026-09-02 반복 실수로 추가)
+
+Claude Code 세션에서 색상/레이아웃 관련 요청을 받으면 감으로 고치지 말고 **항상 이 순서**를
+지키세요 — 한 세션에서 같은 종류의 되돌림을 여러 번 반복하고 나서 정리된 규칙입니다:
+
+1. **먼저 디자인 스펙을 grep**: `docs/design/intake/*/spec.md`에 해당 색상/레이아웃 값이 이미
+   명시돼 있는지 확인(예: 이 프로젝트의 "Card Paper" 배경은 스펙에 `#FFF9F0`로 못박혀 있음). 스펙에
+   있으면 그 값을 그대로 쓰고, 사용자의 "이렇게 해줘"가 스펙과 다르면 상충한다고 짚은 뒤 진행하세요.
+2. **공유 CSS 변수(`src/css/globals.css`의 `--card` 등)를 바꾸기 전엔 반드시
+   `grep -rn "bg-card\b"` 같은 걸로 그 변수를 쓰는 모든 파일을 먼저 나열**하세요. 결과 화면 카드
+   하나만 고치려다 메인 페이지의 다른 섹션(예: `ProcessSection`/`Accordion`)까지 같이 바뀌는 걸
+   나중에야 알아차리는 게 반복됐습니다. 여러 화면에서 다른 색이 필요하면 토큰을 하나 더 만드세요
+   (예: `--card` vs `--card-paper` — 이름은 실제 쓰임에 맞게, 디자인 스펙에 있는 이름이 있으면
+   그 이름을 그대로 씁니다).
+3. **"기존 X랑 통일해줘/맞춰줘" 요청을 받으면 새 스타일을 발명하지 말고 X의 실제 구현
+   (className/변형)을 그대로 재사용**하세요. 예: `StatusBadge`가 이미 있는데 그 위에 다른 색
+   조합을 새로 시도하지 말고, `StatusBadge`의 `info`/`pass`/`warning` variant 클래스를 그대로
+   가져다 씁니다.
+
 ## 환경 변수
 
 `NEXT_PUBLIC_META_SCAN_API` — `meta-scan-api`의 base URL. 로컬 개발 시 `.env.local`에 설정해야
 하고(위 명령어 섹션 참고), 프로덕션(Vercel)에서는 빌드/배포 시점 환경변수로 설정합니다.
+
+`NEXT_PUBLIC_ADSENSE_CLIENT_ID`(이슈 #18) — Google 애드센스 client ID. `/scan/:id` 결과 페이지
+최하단 `AdSlot`(`src/ui/organisms/AdSlot.tsx`)이 이 값의 존재 여부만으로 렌더 여부를 게이팅합니다
+— 미설정(undefined/빈 문자열)이면 스크립트 태그도 `<ins>` 마크업도 전혀 렌더하지 않아, 애드센스
+승인 전에도 안전하게 배포할 수 있습니다. 승인 후 이 값만 채우면 자동 활성화되며, 코드 변경은
+필요 없습니다. `ads.txt`·실제 광고 단위(slot) ID 발급은 이번 스코프 밖(별도 이슈).
+
+`NEXT_PUBLIC_CONTACT_EMAIL` — `/privacy`, `/terms` 페이지 하단 문의 이메일. 미설정 시 코드
+기본값(`yuuuk94@gmail.com`)으로 폴백하므로 로컬에선 없어도 되지만, 실제 배포(Vercel)에서
+다른 연락처로 바꾸려면 여기서 설정합니다.
+
+`NEXT_PUBLIC_GA_MEASUREMENT_ID`(이슈 #19) — Google Analytics 4(GA4) 측정 ID. 루트 레이아웃에
+붙는 `AnalyticsGate`(`src/ui/organisms/AnalyticsGate.tsx`)가 `AdSlot`과 동일한 패턴으로 이 값의
+존재 여부만으로 전체 기능(쿠키 동의 배너 + GA4 스크립트 로딩)을 게이팅합니다 — `.env.local`에는
+설정하지 않고 Vercel 프로덕션 배포 환경변수에만 설정하므로, 로컬 개발에서는 동의 여부와 무관하게
+GA4가 항상 완전히 비활성화됩니다. 값이 있어도 사용자가 동의 배너에서 "동의"를 누르기 전까지는
+GA4 스크립트가 로드되지 않으며(쿠키 기반이라 동의가 로드의 전제조건), 동의/거부 여부는
+`localStorage`(`analyticsConsentKey`, `@/constans`)에 저장되어 재방문 시 배너가 다시 뜨지
+않습니다. 커스텀 이벤트(`scan_requested`/`scan_completed`/`robots_blocked`)는
+`@/services/analyticsEvents`의 `trackEvent`가 `window.gtag`가 정의돼 있을 때만(=GA4가 실제로
+로드된 상태일 때만) 전송하고, 그 외에는 조용히 no-op합니다.
