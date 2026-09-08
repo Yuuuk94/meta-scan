@@ -4,7 +4,7 @@ import { ServiceStatus } from "./ServiceStatus";
 import Link from "next/link";
 
 interface RootHeaderProps extends DefaultProps {
-  ready: boolean;
+  ready: ServiceReadyStatus;
 }
 
 export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
