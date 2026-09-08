@@ -1,6 +1,6 @@
 ---
 name: tdd-issue-loop
-description: Process meta-scan's GitHub Issues backlog through the issue-based TDD loop — dev-interview → (dev-backend/dev-front as needed) → (qa-backend/qa-front as needed) → PR. Interview stages run fully sequentially with a human confirmation gate each time; once an issue's spec is confirmed, its dev/qa automatic stages run in the background (no gate) while the skill immediately starts interviewing the next issue. The dev/qa queue itself processes at most one issue to PR-open per invocation and will not start a second issue's dev/qa until the first issue's PR is actually merged by the user (not just opened) — see docs/harness/tdd-issue-loop.md's 2026-08-31 update. Use when the user says things like "이슈 처리해줘", "TDD 루프 돌려", "백로그 인터뷰하자", or names a specific issue number to push through the pipeline. One-shot per invocation — does not use /loop or any polling; consumes whatever's in the queue right now and stops.
+description: Process meta-scan's GitHub Issues backlog through the issue-based TDD loop — dev-interview → (dev-backend/dev-front as needed) → (qa-backend/qa-front as needed) → PR. Also accepts a fresh problem/feature description with no issue yet — dev-interview creates the issue itself as step 0, then proceeds the same way. Interview stages run fully sequentially with a human confirmation gate each time; once an issue's spec is confirmed, its dev/qa automatic stages run in the background (no gate) while the skill immediately starts interviewing the next issue. dev-interview also asks every time whether the issue is an urgent production fix (type:hotfix label) — this routes the branch to hotfix/* off main instead of feat/* off dev throughout dev/qa. Once a PR opens, the skill itself checks out the branch in the main working directory, runs the local dev server(s) and test suite, and runs a code review before reporting to the user — it still never merges. The dev/qa queue itself processes at most one issue to PR-open per invocation and will not start a second issue's dev/qa until the first issue's PR is actually merged by the user (not just opened) — see docs/harness/tdd-issue-loop.md's 2026-08-31 update. Actual merging to main (release or hotfix) is the separate `deploy` skill's job. Use when the user says things like "이슈 처리해줘", "TDD 루프 돌려", "백로그 인터뷰하자", describes a problem/feature directly, or names a specific issue number to push through the pipeline. One-shot per invocation — does not use /loop or any polling; consumes whatever's in the queue right now and stops.
 ---
 
 # tdd-issue-loop
@@ -30,8 +30,13 @@ Order both queues by `priority:high` → `priority:medium` → `priority:low` �
 a tier by issue number (oldest first). These are two independent queues you work concurrently
 (see below), not one merged list.
 
-If both queues are empty and nothing is mid-flight, tell the user there's nothing to process and
-stop — don't spin looking for work.
+**If the user just described a problem/feature directly instead of naming an issue or asking you
+to process the backlog**, skip the queue listing above — spawn `dev-interview` with the raw
+description instead of an issue number (it creates the issue itself as step 0), then continue
+into step 1 as normal from there.
+
+If both queues are empty, nothing was just described to turn into a new issue, and nothing is
+mid-flight, tell the user there's nothing to process and stop — don't spin looking for work.
 
 ## 1. Interview queue — fully sequential, gated
 
@@ -61,7 +66,8 @@ still running, it waits its turn (still priority-ordered).
 
 **Before spawning `dev-backend`/`dev-front` for a new issue, check that no PR from this pipeline
 is still open/unmerged** (`gh pr list --state open --json headRefName,title` — anything whose
-branch is `feat/<n>-*`). If one is, **stop the dev/qa queue here for this invocation** — do not
+branch matches `feat/<n>-*` **or** `hotfix/<n>-*`, since a hotfix issue's branch is this pipeline's
+too). If one is, **stop the dev/qa queue here for this invocation** — do not
 branch the next issue yet, even if its spec is `status:ready-for-dev`. Report to the user which
 issue is waiting and why (previous PR not yet merged), and let the interview queue keep going
 independently. This exists because starting a new branch before the prior one is merged forks it
@@ -90,6 +96,28 @@ has front label? → spawn qa-front(n) → wait for report
   - report says "PR opened" → this issue is done; dev/qa queue stops here for this invocation (see below — don't start the next issue)
 ```
 
+### After the PR opens
+
+Once `qa-backend`/`qa-front` reports "PR opened", **you (the main session) verify it yourself
+before reporting to the user** — this replaces just reminding the user to test it later:
+
+1. `git fetch origin && git checkout <feat-or-hotfix>/<n>-<short-slug>` in the **main working
+   directory** (not a subagent) — do this same-turn, don't defer it to "I'll check it later."
+2. Start the affected package's dev server(s) (`pnpm dev:front` and/or `pnpm dev:api`, based on
+   the issue's `front`/`api` labels — both if the issue touches both, since front needs a live
+   api to hit) in the background, wait for them to actually serve (poll the port, don't `sleep`),
+   and give the user the local URL(s) so they can look themselves.
+3. Re-run the test suite(s) directly (`pnpm --filter meta-scan-front exec jest` and/or
+   `pnpm --filter meta-scan-api exec vitest run`, matching the issue's package labels) — qa already
+   ran these on the branch, but re-running in the main directory is the same verification the user
+   would otherwise have to do by hand.
+4. Run a code review on the diff (invoke the `code-review` skill against this branch, or review it
+   yourself if that skill isn't appropriate here) and fold any real findings into your report.
+5. Report all of this plus the PR link to the user, and stop — same as before, **you never merge
+   the PR yourself**, and the dev/qa queue still doesn't advance to a second issue until this PR is
+   actually merged. Actually merging (to `main`) is the `deploy` skill's job, invoked separately by
+   the user once they're satisfied.
+
 **Do not loop back to pull a second issue into this queue in the same invocation** — whether the
 outcome was `blocked` or `PR opened`, the dev/qa queue's job for this invocation ends with this
 one issue. A `blocked` issue still has an incomplete branch sitting unmerged, and a `PR opened`
@@ -114,14 +142,12 @@ above, don't start a different issue's dev/qa in its place either.
 
 When the interview queue is empty and no issue is left waiting/running in the dev/qa queue, stop
 and report a summary: issues interviewed and their confirmed scope, issues that reached PR (link
-each), issues that hit `status:blocked` (and why, from their last comment), issues still mid-chain
-if you're stopping early for any reason, and any `status:ready-for-dev` issues still waiting
-because a prior PR from this pipeline isn't merged yet. **Never merge a PR yourself** — that's
-always the user's call, and always tell them explicitly (don't assume it's implied) that before
-merging they should run the affected package's dev server (`pnpm dev:front` / `pnpm dev:api`)
-and test the change themselves — the automated qa stage only runs Jest/Vitest + lint/typecheck,
-it doesn't verify actual behavior in the running app. Remind them that the next issue's dev/qa
-won't start until this PR is merged.
+each, plus what you found running the server/tests/code review — see "After the PR opens" above),
+issues that hit `status:blocked` (and why, from their last comment), issues still mid-chain if
+you're stopping early for any reason, and any `status:ready-for-dev` issues still waiting because a
+prior PR from this pipeline isn't merged yet. **Never merge a PR yourself** — that's always the
+user's call (and, once they're ready, the separate `deploy` skill's job, not this one's). Remind
+them that the next issue's dev/qa won't start until this PR is merged.
 
 **Don't close the issue when its PR merges into `dev`, even though `status:done` goes on at that
 point** — GitHub's `Closes #<n>` in the PR body only auto-closes on merge into the repo's
@@ -130,9 +156,14 @@ point** — GitHub's `Closes #<n>` in the PR body only auto-closes on merge into
 it lands in `dev` (2026-08-31, user correction — a first pass closed issues #2/#3/#4 right after
 their `dev` merge, which was wrong and got reverted). So: set `status:done` right after the `dev`
 merge as usual, but leave the GitHub issue open — don't call `gh issue close` at this point. There
-is no release process yet (see `docs/case-study/git-branching-strategy.md`'s open items), so
-`status:done`-but-open issues piling up is expected for now, not a bug to "fix" by closing them
-early.
+is no automatic release process yet (see `docs/case-study/git-branching-strategy.md`'s open items;
+the `deploy` skill drives it manually when invoked), so `status:done`-but-open issues piling up
+between deploys is expected, not a bug to "fix" by closing them early.
+
+**Exception: `type:hotfix` issues.** Their PR targets `main` directly (not `dev`), so `Closes #<n>`
+*will* auto-close the issue the moment the `deploy` skill merges it — that's correct here, not a
+bug, since merging to `main` really is the deploy. Still set `status:done` when the PR opens/merges
+as usual; don't fight GitHub's auto-close on this path.
 
 ## Re-running a stuck issue
 
