@@ -1,42 +1,32 @@
-# Meta-scan
+# meta-scan-front
 
-Based url, meta tag scanner, seo checker
+`meta-scan`(모노레포 루트 [`README.md`](../../README.md) 참고)의 프론트엔드. Next.js 15
+(App Router)로 `meta-scan-api`를 호출해 스캔 결과를 pass/warning/fail/info 체크리스트로
+렌더링합니다.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 아키텍처
 
-## Getting Started
+`src/app/[lang]/` 아래 로케일 프리픽스 라우팅 + Atomic Design 5계층
+(`src/ui/atoms|molecules|organisms|templates`) + `api/services/hooks` 기능 분리
+([ADR-010](../../docs/adr/index.html#adr-010)). 상세는 [`CLAUDE.md`](CLAUDE.md)와
+[`docs/case-study/frontend-atomic-architecture.md`](../../docs/case-study/frontend-atomic-architecture.md)
+참고.
 
-First, run the development server:
+## 개발
+
+레포 루트에서 실행하세요 (pnpm workspace):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev:front                # next dev, :3000
+pnpm --filter meta-scan-front build
+pnpm --filter meta-scan-front lint
+pnpm test:front                # Jest
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+로컬 개발 시 `packages/meta-scan-front/.env.local`에
+`NEXT_PUBLIC_META_SCAN_API=http://localhost:8080`(또는 `meta-scan-api`가 실행 중인 위치)이
+필요합니다 — gitignore 대상이며 자동으로 생성되지 않습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-> > > > > > > 67feadc (first commit)
+환경 변수 전체 목록, 배포(Vercel) 관련 사항은 [`CLAUDE.md`](CLAUDE.md)와 레포 루트
+[`CLAUDE.md`](../../CLAUDE.md)를 참고하세요.
