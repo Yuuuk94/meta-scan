@@ -1,6 +1,6 @@
 ---
 name: qa-front
-description: Use as the frontend verification stage of meta-scan's issue-based TDD loop (docs/harness/tdd-issue-loop.md) — invoked after dev-front reports done on an issue's feat/* branch (and, if the issue also carries api, after qa-backend already passed). Runs the full meta-scan-front test suite (Jest) + lint + typecheck; on failure, sends exactly one retry to dev-front (tracked via the retry:used label) before status:blocked; on success, pushes and opens the PR (base dev) — this is always the last stage for an issue, since backend runs and gets verified first when both packages are involved. Read-only against packages/meta-scan-front source — it never edits code itself.
+description: Use as the frontend verification stage of meta-scan's issue-based TDD loop (docs/harness/tdd-issue-loop.md) — invoked after dev-front reports done on an issue's feat/* branch (or hotfix/* if the issue carries type:hotfix) (and, if the issue also carries api, after qa-backend already passed). Runs the full meta-scan-front test suite (Jest) + lint + typecheck; on failure, sends exactly one retry to dev-front (tracked via the retry:used label) before status:blocked; on success, pushes and opens the PR (base dev, or main for type:hotfix) — this is always the last stage for an issue, since backend runs and gets verified first when both packages are involved. Read-only against packages/meta-scan-front source — it never edits code itself.
 tools: Read, Bash, Grep, Glob
 model: sonnet
 ---
@@ -12,13 +12,15 @@ rediscover it — but you don't touch `packages/**` yourself.
 
 ## Input
 
-An issue number, given to you by the orchestrating skill, whose `feat/<n>-*` branch already has
-`dev-front`'s commits pushed (and, if the issue carries `api`, `qa-backend` already reported the
-backend side green).
+An issue number, given to you by the orchestrating skill, whose branch already has `dev-front`'s
+commits pushed (and, if the issue carries `api`, `qa-backend` already reported the backend side
+green) — `feat/<n>-*` off `dev` normally, or `hotfix/<n>-*` off `main` if the issue carries
+`type:hotfix`.
 
 ```
 gh issue view <n> --json title,body,labels,comments
-git fetch origin && git checkout feat/<n>-<short-slug>
+git fetch origin
+git checkout $(git branch -r --list "origin/feat/<n>-*" "origin/hotfix/<n>-*" | sed 's#.*origin/##' | head -1)
 ```
 
 ## What you check
@@ -60,14 +62,19 @@ gh issue edit <n> --remove-label "retry:used"   # no-op if it wasn't set
 ```
 
 You're always the last stage for an issue that reaches you (backend, if any, is already verified
-by `qa-backend` before you run). Push (if not already pushed by `dev-front`) and open the PR:
+by `qa-backend` before you run). Push (if not already pushed by `dev-front`) and open the PR. Base
+is `main` if the issue carries `type:hotfix`, otherwise `dev` (the branch name/prefix you checked
+out above already tells you which):
 
 ```
-gh pr create --base dev --head feat/<n>-<short-slug> \
+gh pr create --base <dev-or-main> --head <feat-or-hotfix>/<n>-<short-slug> \
   --title "<conventional-commit-style title>" \
   --body "Closes #<n>
 
-<short summary of what was implemented + acceptance criteria covered, both packages if applicable>"
+<short summary of what was implemented + acceptance criteria covered, both packages if applicable>
+
+[if type:hotfix] Hotfix — after merging to main, back-merge main into dev (the deploy skill
+handles this)."
 gh issue edit <n> --remove-label "status:in-test" --add-label "status:in-review"
 ```
 

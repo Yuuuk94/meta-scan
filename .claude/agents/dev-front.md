@@ -1,6 +1,6 @@
 ---
 name: dev-front
-description: Use as the frontend implementation stage of meta-scan's issue-based TDD loop (docs/harness/tdd-issue-loop.md) — only invoked on an issue labeled status:ready-for-dev (or status:in-dev) with the front label. Implements the confirmed spec from the issue's comments into packages/meta-scan-front via strict red→green→refactor TDD on Jest, on the issue's feat/* branch. If the issue also carries the api label, dev-backend already ran first and created the branch — this stage continues on it, not a fresh one. Commits and pushes but never opens the PR — that's qa-front's job, invoked by the orchestrating skill after this stage reports done.
+description: Use as the frontend implementation stage of meta-scan's issue-based TDD loop (docs/harness/tdd-issue-loop.md) — only invoked on an issue labeled status:ready-for-dev (or status:in-dev) with the front label. Implements the confirmed spec from the issue's comments into packages/meta-scan-front via strict red→green→refactor TDD on Jest, on the issue's feat/* branch off dev (or, if the issue carries type:hotfix, a hotfix/* branch off main). If the issue also carries the api label, dev-backend already ran first and created the branch — this stage continues on it, not a fresh one. Commits and pushes but never opens the PR — that's qa-front's job, invoked by the orchestrating skill after this stage reports done.
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: sonnet
 ---
@@ -51,22 +51,31 @@ re-implement from scratch or touch code the failure report didn't flag.
 
 ## Branch
 
-If the issue also carries `api`, `dev-backend` already created `feat/<n>-<short-slug>` and pushed
-its commits — check it out, don't create a new branch:
+**First check the issue's labels for `type:hotfix`** (`gh issue view <n> --json labels`) — this
+decides both the branch prefix and base, per the repo's git-flow (`docs/case-study/
+git-branching-strategy.md`):
+
+- Carries `type:hotfix` → prefix `hotfix`, base `main`
+- Otherwise (default) → prefix `feat`, base `dev`
+
+If the issue also carries `api`, `dev-backend` already created the branch (`<prefix>/<n>-
+<short-slug>`) and pushed its commits — don't reconstruct the name from the label, find the branch
+that actually exists and check it out:
 
 ```
-git fetch origin && git checkout feat/<n>-<short-slug>
+git fetch origin
+git checkout $(git branch -r --list "origin/feat/<n>-*" "origin/hotfix/<n>-*" | sed 's#.*origin/##' | head -1)
 ```
 
 If `front` is the only package label (no `api`), you're the first dev stage — create the branch
 yourself:
 
 ```
-git checkout dev && git pull
-git checkout -b feat/<n>-<short-slug>
+git checkout <base> && git pull
+git checkout -b <prefix>/<n>-<short-slug>
 ```
 
-If you're a retry, check out the existing branch (it already exists either way).
+If you're a retry, check out the existing branch the same way (it already exists either way).
 
 ## TDD loop
 
@@ -92,7 +101,7 @@ pnpm --filter meta-scan-front exec tsc --noEmit -p tsconfig.json
 All three must pass locally before you hand off. Then push:
 
 ```
-git push -u origin feat/<n>-<short-slug>
+git push -u origin <prefix>/<n>-<short-slug>
 ```
 (or plain `git push` if `dev-backend` already set the upstream).
 
