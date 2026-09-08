@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Big_Shoulders, IBM_Plex_Sans } from "next/font/google";
-import { okStatus, pageTitle } from "@/constans";
+import { pageTitle } from "@/constans";
 import { RootHeader } from "@/ui/organisms/RootHeader";
 import { RootFooter } from "@/ui/organisms/RootFooter";
 import { AnalyticsGate } from "@/ui/organisms/AnalyticsGate";
 import { Loading } from "@/ui/atoms/Loading";
 import { getSiteSetting } from "@/utils/siteSetting";
-import { pingApi } from "@/api/statusApi";
+import { resolvePingStatus } from "@/services/resolvePingStatus";
 import { getDictionary } from "@/dictionaries";
 
 import "@/css/globals.css";
@@ -53,12 +53,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { theme, lang } = await getSiteSetting();
-  const ready = await pingApi()
-    .then((res) => res.data.status === okStatus)
-    .catch((e) => {
-      console.log(e);
-      return false;
-    });
+  // 이슈 #44 root-ping-cold-start — meta-scan-api 콜드스타트로 pingApi가
+  // 느려져도 이 await이 사이트 전체 첫 로딩을 막지 않도록 300ms 타임아웃과
+  // race시킨다. 못 받으면 "pending"으로 즉시 렌더하고, <ServiceStatus>가
+  // 클라이언트에서 1회 재시도해 확정한다.
+  const ready = await resolvePingStatus();
   const cookieConsentT = (await getDictionary(lang)).cookieConsent;
   return (
     <html lang={lang} data-theme={theme} suppressHydrationWarning>

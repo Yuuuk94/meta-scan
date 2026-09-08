@@ -3,7 +3,7 @@ import { getDictionary } from "@/dictionaries";
 import { ServiceStatus } from "./ServiceStatus";
 
 interface RootFooterProps extends DefaultProps {
-  ready: boolean;
+  ready: ServiceReadyStatus;
 }
 
 export const RootFooter = async ({ lang, ready }: RootFooterProps) => {
