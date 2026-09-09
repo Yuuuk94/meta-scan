@@ -29,7 +29,7 @@ GitHub Issues 기반으로 **인터뷰 → TDD 개발 → 테스트 → PR**을 
 
 ## 지금 상태
 
-아직 완성된 제품이 아니라 **진행 중인 프로젝트**입니다. 개별 스캔 API(ping/robots.txt/sitemap/
+개별 스캔 API(ping/robots.txt/sitemap/
 crawling/Lighthouse)는 각각 정상 동작하고, 결과 화면(`/scan`) UI도 이미 그려져 있지만, 아직
 그 화면이 실제 스캔 결과가 아니라 목업 데이터를 보여주는 상태입니다 — 지금은 그 파이프를 실제로
 연결하고, AI 신호/AEO 체크 항목을 백엔드에 채워 넣는 작업을 진행 중입니다. 자세한 현황은
