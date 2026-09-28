@@ -15,6 +15,7 @@ export const getContent = (
         body: [
           "스캔 결과는 데이터베이스에 저장하지 않는 무상태 방식으로 처리되며, 수집한 정보를 광고·마케팅 목적으로 제3자에게 판매하지 않습니다.",
           "다만 방문자가 이 사이트를 어떻게 이용하는지 파악하기 위해 Google Analytics(GA4)를 사용하며, 이 경우 개인을 식별하지 않는 익명화된 집계 데이터가 Google에 전달됩니다. 이 데이터 수집은 화면 하단의 쿠키 동의 배너를 통해 언제든 동의하거나 거부(옵트인/옵트아웃)할 수 있으며, 거부하면 Google Analytics 스크립트 자체가 로드되지 않습니다.",
+          "또한 이 사이트는 Google 애드센스(AdSense)를 통해 광고를 게재하며, Google을 포함한 제3자가 광고 개인화를 위해 쿠키를 사용할 수 있습니다. 맞춤 광고 수신을 원하지 않으면 Google 광고 설정(https://adssettings.google.com)에서 언제든 거부(옵트아웃)할 수 있습니다.",
         ],
       },
       {
@@ -39,6 +40,7 @@ export const getContent = (
         body: [
           "Scan results are processed statelessly and aren't written to a database, and we don't sell collected information to third parties for advertising or marketing.",
           "We do use Google Analytics (GA4) to understand how visitors use this site; this shares anonymized, aggregate data with Google, without identifying you personally. You can opt in or opt out of this at any time via the cookie consent banner at the bottom of the page — declining means the Google Analytics script never loads at all.",
+          "This site also serves ads through Google AdSense, and third parties, including Google, may use cookies for ad personalization. If you'd rather not receive personalized ads, you can opt out at any time via Google's Ad Settings (https://adssettings.google.com).",
         ],
       },
       {
