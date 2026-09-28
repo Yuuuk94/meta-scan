@@ -166,11 +166,16 @@ Claude Code 세션에서 색상/레이아웃 관련 요청을 받으면 감으�
 `NEXT_PUBLIC_META_SCAN_API` — `meta-scan-api`의 base URL. 로컬 개발 시 `.env.local`에 설정해야
 하고(위 명령어 섹션 참고), 프로덕션(Vercel)에서는 빌드/배포 시점 환경변수로 설정합니다.
 
-`NEXT_PUBLIC_ADSENSE_CLIENT_ID`(이슈 #18) — Google 애드센스 client ID. `/scan/:id` 결과 페이지
-최하단 `AdSlot`(`src/ui/organisms/AdSlot.tsx`)이 이 값의 존재 여부만으로 렌더 여부를 게이팅합니다
-— 미설정(undefined/빈 문자열)이면 스크립트 태그도 `<ins>` 마크업도 전혀 렌더하지 않아, 애드센스
-승인 전에도 안전하게 배포할 수 있습니다. 승인 후 이 값만 채우면 자동 활성화되며, 코드 변경은
-필요 없습니다. `ads.txt`·실제 광고 단위(slot) ID 발급은 이번 스코프 밖(별도 이슈).
+`NEXT_PUBLIC_ADSENSE_CLIENT_ID`(이슈 #18, 이슈 #48에서 Auto Ads로 전환) — Google 애드센스
+client ID. 루트 레이아웃(`src/app/[lang]/layout.tsx`)의 `AutoAdsScript`
+(`src/ui/organisms/AutoAdsScript.tsx`, Google Auto Ads 전역 로더 스크립트, 모든 라우트에 1회만
+삽입)와 `google-adsense-account` 검증 메타 태그, `/ads.txt`(`src/app/ads.txt/route.ts` — 이 값에서
+`pub-<id>`를 파생해 `google.com, pub-<id>, DIRECT, f08c47fec0942fa0` 한 줄을 응답, 하드코딩 아님)가
+전부 이 값의 존재 여부만으로 게이팅됩니다 — 미설정(undefined/빈 문자열)이면 스크립트도 메타 태그도
+전혀 렌더하지 않고 `ads.txt`도 빈 본문을 응답해, 애드센스 승인 전에도 안전하게 배포할 수 있습니다.
+승인 후 이 값만 채우면 자동 활성화되며, 코드 변경은 필요 없습니다. 이슈 #18의 수동 `<ins>` 슬롯
+(`AdSlot.tsx`, `ScanResultScreen` 전용)은 이슈 #48에서 완전히 제거됐습니다 — Auto Ads와 수동 슬롯은
+병행하지 않는다는 Google 권장사항 때문입니다.
 
 `NEXT_PUBLIC_CONTACT_EMAIL` — `/privacy`, `/terms` 페이지 하단 문의 이메일. 미설정 시 코드
 기본값(`yuuuk94@gmail.com`)으로 폴백하므로 로컬에선 없어도 되지만, 실제 배포(Vercel)에서
