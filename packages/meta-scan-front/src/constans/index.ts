@@ -1,4 +1,4 @@
-export const pageTitle = "META_SCAN.LAB";
+export const pageTitle = "META_SCAN.BIZ";
 
 export const allowLanguages = ["en", "ko"];
 export const allowTheme = ["dark", "light"];

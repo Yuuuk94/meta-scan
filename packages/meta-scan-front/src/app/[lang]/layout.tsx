@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   openGraph: {
     ...meta,
     url: siteUrl,
-    siteName: "meta scan lab",
+    siteName: "meta scan biz",
     images: [{ url: `${siteUrl}/og.png` }],
   },
   ...(adsenseClientId
