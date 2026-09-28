@@ -1,10 +1,11 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Big_Shoulders, IBM_Plex_Sans } from "next/font/google";
-import { pageTitle } from "@/constans";
+import { pageTitle, siteUrl } from "@/constans";
 import { RootHeader } from "@/ui/organisms/RootHeader";
 import { RootFooter } from "@/ui/organisms/RootFooter";
 import { AnalyticsGate } from "@/ui/organisms/AnalyticsGate";
+import { AutoAdsScript } from "@/ui/organisms/AutoAdsScript";
 import { Loading } from "@/ui/atoms/Loading";
 import { getSiteSetting } from "@/utils/siteSetting";
 import { resolvePingStatus } from "@/services/resolvePingStatus";
@@ -37,14 +38,29 @@ const meta = {
   description: "Based url, meta tag scanner, seo checker",
 };
 
+// issue #48 domain-migration — these used to be hardcoded to
+// `https://example.com`, which never followed the real deployed domain
+// (withmay.com -> meta-scan.biz) and never will as it changes again. Now
+// sourced from the same `siteUrl` constant (`NEXT_PUBLIC_META_SCAN_URL`)
+// robots.ts/sitemap.ts already use — no domain string hardcoded here.
+//
+// `google-adsense-account` (also issue #48) is one of the site-ownership
+// verification signals AdSense's review can check; gated on
+// `NEXT_PUBLIC_ADSENSE_CLIENT_ID` the same way AutoAdsScript/AdSlot are —
+// unset renders no meta tag at all rather than one with an empty content.
+const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+
 export const metadata: Metadata = {
   ...meta,
   openGraph: {
     ...meta,
-    url: "https://example.com",
+    url: siteUrl,
     siteName: "meta scan lab",
-    images: [{ url: "https://example.com/og.png" }],
+    images: [{ url: `${siteUrl}/og.png` }],
   },
+  ...(adsenseClientId
+    ? { other: { "google-adsense-account": adsenseClientId } }
+    : {}),
 };
 
 export default async function RootLayout({
@@ -74,6 +90,11 @@ export default async function RootLayout({
            * NEXT_PUBLIC_GA_MEASUREMENT_ID + user consent. Mounted at the
            * root layout so it covers every route, not just the scan flow. */}
           <AnalyticsGate theme={theme} lang={lang} t={cookieConsentT} />
+          {/* issue #48 domain-migration — Google Auto Ads global loader,
+           * replacing the old per-page manual AdSlot (issue #18). Gated on
+           * NEXT_PUBLIC_ADSENSE_CLIENT_ID, mounted exactly once here so
+           * every route gets it (not just /scan/:id). */}
+          <AutoAdsScript />
         </div>
       </body>
     </html>
