@@ -39,7 +39,11 @@ export function middleware(req: NextRequest) {
   }
 
   const hasLocalePrefix = allowLanguages.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    (locale) =>
+      !pathname ||
+      pathname === "/" ||
+      pathname.startsWith(`/${locale}/`) ||
+      pathname === `/${locale}`,
   );
 
   if (!hasLocalePrefix) {

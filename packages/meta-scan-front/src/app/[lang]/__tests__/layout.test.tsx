@@ -8,18 +8,18 @@ import { siteUrl } from "@/constans";
 // AdSense "site not found" review failure.
 describe("RootLayout metadata (issue #48)", () => {
   it("uses siteUrl (not a hardcoded example.com) for the Open Graph url", async () => {
-    const { metadata } = await import("@/app/[lang]/layout");
+    const { metadata } = await import("@/app/layout");
 
     expect(metadata.openGraph?.url).toBe(siteUrl);
   });
 
   it("uses siteUrl (not a hardcoded example.com) for the Open Graph image url", async () => {
-    const { metadata } = await import("@/app/[lang]/layout");
+    const { metadata } = await import("@/app/layout");
 
     const images = metadata.openGraph?.images;
     const first = Array.isArray(images) ? images[0] : images;
     expect(first).toEqual(
-      expect.objectContaining({ url: `${siteUrl}/og.png` })
+      expect.objectContaining({ url: `${siteUrl}/og.png` }),
     );
   });
 
@@ -39,12 +39,12 @@ describe("RootLayout metadata (issue #48)", () => {
       process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-9590914027828852";
       jest.resetModules();
 
-      const { metadata } = await import("@/app/[lang]/layout");
+      const { metadata } = await import("@/app/layout");
 
       expect(metadata.other).toEqual(
         expect.objectContaining({
           "google-adsense-account": "ca-pub-9590914027828852",
-        })
+        }),
       );
     });
 
@@ -52,7 +52,7 @@ describe("RootLayout metadata (issue #48)", () => {
       delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
       jest.resetModules();
 
-      const { metadata } = await import("@/app/[lang]/layout");
+      const { metadata } = await import("@/app/layout");
 
       expect(metadata.other).toBeUndefined();
     });

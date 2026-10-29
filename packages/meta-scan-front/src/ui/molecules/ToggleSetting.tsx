@@ -25,7 +25,11 @@ export const ToggleSetting = ({ theme, lang, t }: DefaultPageProps) => {
     const segments = pathname.split("/");
     segments[1] = next;
     router.push(segments.join("/") + `?${searchParams}`);
+    router.refresh();
   };
+
+  if (pathname.includes("/request")) return;
+
   return (
     <>
       <Button

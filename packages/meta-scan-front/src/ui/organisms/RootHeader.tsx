@@ -25,7 +25,7 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
          * placeholder is on the opposite (right) side of the header, unrelated
          * to the logo, and isn't a real feature yet (no user accounts) — not
          * fabricated here. */}
-        <Link href={`/${lang}`}>
+        <Link href={`/`}>
           <p className="font-display text-base font-black uppercase leading-none tracking-tight text-foreground sm:text-lg">
             {t.title}
           </p>
