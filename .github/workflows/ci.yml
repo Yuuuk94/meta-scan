@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      # 단위 테스트는 실제 브라우저를 띄우지 않음 — Chromium 다운로드 생략
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # 버전은 package.json의 packageManager를 따름
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22 # 로컬과 동일 — jest.config.ts를 네이티브로 읽으려면 22+ 필요, 20은 EOL
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck (api)
+        run: pnpm --filter meta-scan-api typecheck
+
+      - name: Typecheck (front)
+        run: pnpm --filter meta-scan-front exec tsc --noEmit -p tsconfig.json
+
+      - name: Test
+        run: pnpm test
