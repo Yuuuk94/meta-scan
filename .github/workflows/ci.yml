@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20 # dockerfile 런타임과 동일
+          node-version: 22 # 로컬과 동일 — jest.config.ts를 네이티브로 읽으려면 22+ 필요, 20은 EOL
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
