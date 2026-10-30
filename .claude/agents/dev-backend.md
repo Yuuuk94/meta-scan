@@ -87,6 +87,12 @@ Commit as you go with Conventional Commits (`commitlint` enforces this): `feat(a
 `fix(api): ...` / `test(api): ...` as appropriate. Small, real commits — not one giant commit at
 the end.
 
+**The red step is its own commit**: `test(api): ...` containing only `*.test.ts` files, committed
+while the test is still failing, then the implementation in a separate commit. `qa-backend` runs
+`.claude/scripts/check-tdd-red.mjs`, which checks out each test-only commit and requires the test
+to fail there — a branch with no such commit, or one whose test already passes at that commit
+(test written after the code), gets blocked for a human, not retried.
+
 ## Before you finish
 
 ```

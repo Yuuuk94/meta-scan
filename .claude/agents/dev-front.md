@@ -90,6 +90,12 @@ For each frontend-verifiable acceptance criterion:
 Commit as you go with Conventional Commits: `feat(front): ...` / `fix(front): ...` /
 `test(front): ...`.
 
+**The red step is its own commit**: `test(front): ...` containing only `*.test.ts(x)` files,
+committed while the test is still failing, then the implementation in a separate commit.
+`qa-front` runs `.claude/scripts/check-tdd-red.mjs`, which checks out each test-only commit and
+requires the test to fail there — a branch with no such commit, or one whose test already passes
+at that commit (test written after the code), gets blocked for a human, not retried.
+
 ## Before you finish
 
 ```
