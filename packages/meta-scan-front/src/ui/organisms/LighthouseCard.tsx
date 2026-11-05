@@ -87,20 +87,12 @@ export const LighthouseCard = ({ t, lighthouse }: LighthouseCardProps) => {
        * — matches ScanZine.dc.html (separate "Lighthouse 점수" section
        * above a standalone "Lighthouse 개선 제안" card, not one combined
        * card) and reinforces req #2 (visually distinct from our own
-       * judgement) with a thick top rule marking a real section break,
-       * same weight as the header/footer rules (design-system.md §5).
+       * judgement). The thick full-bleed top rule that used to sit above this section was
+       * removed on 2026-11-05 at the user's request.
        * Cells are literal white regardless of theme — this is Lighthouse's
        * own visual identity being surfaced as-is (req #3: no re-judging),
        * not this app's card/popover tokens, which are identical to each
        * other in dark mode and wouldn't read as "a different source." */}
-      {/* The thick rule itself is full-bleed (edge-to-edge of the viewport),
-       * split out from the content below it (which stays inside
-       * content-frame like everything else) — `border-t-[5px]` on a div
-       * that's still constrained to content-frame's max-width read as
-       * "cut off" rather than a real section break (2026-09-02 user
-       * review). `w-screen` + the left-1/2/-translate-x-1/2 pair is the
-       * standard Tailwind full-bleed-inside-a-centered-container trick. */}
-      <div className="relative left-1/2 mt-8 w-screen -translate-x-1/2 border-t-[5px] border-foreground" />
       <div className="pt-8">
         <h3 className="font-display text-[15px] font-extrabold text-foreground">
           {t.lighthouseScores}
