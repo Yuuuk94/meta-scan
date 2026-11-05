@@ -1,5 +1,6 @@
 import { getDictionary } from "@/dictionaries";
 import { ToggleSetting } from "@/ui/molecules/ToggleSetting";
+import { DonateButton } from "@/ui/molecules/DonateButton";
 import { ServiceStatus } from "./ServiceStatus";
 import Link from "next/link";
 
@@ -35,6 +36,7 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
         <div className="flex items-center gap-2">
           <ToggleSetting theme={theme} lang={lang} t={t} />
           <ServiceStatus ready={ready} />
+          <DonateButton label={t.donate} ariaLabel={t.donateAriaLabel} />
         </div>
       </div>
     </header>

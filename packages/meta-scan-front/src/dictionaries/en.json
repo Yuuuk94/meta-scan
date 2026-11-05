@@ -2,7 +2,9 @@
   "head": {
     "title": "Meta-Scan",
     "subtitle": "AI-Friendly AEO & GEO & SEO Analyzer",
-    "toggleLanguage": "한국어"
+    "toggleLanguage": "한국어",
+    "donate": "Support",
+    "donateAriaLabel": "Support on Ko-fi"
   },
   "footer": {
     "copyright": "© 2026 Meta-Scan. All rights reserved.",
@@ -96,6 +98,10 @@
     "title": "Meta-Scan",
     "subtitle": "AI-Friendly SEO Analyzer",
     "analyzedAt": "Analyzed at",
+    "supportEyebrow": "SUPPORT",
+    "supportTitle": "Found this scan useful?",
+    "supportBody": "meta-scan is free to use. If it helped, you can buy us a coffee on Ko-fi to help cover server costs.",
+    "supportButton": "Support on Ko-fi",
     "aiSignals": "AI SIGNALS",
     "aiSignalsPromptsTxtLabel": "prompts.txt",
     "aiSignalsPromptObjectLabel": "PromptObject",

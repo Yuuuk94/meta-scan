@@ -12,4 +12,13 @@ describe("Button", () => {
       "cursor-pointer"
     );
   });
+
+  it("support variant에는 hover 클래스가 없다 (#63)", () => {
+    render(<Button variant="support">후원</Button>);
+
+    const cls = screen.getByRole("button", { name: "후원" }).className;
+    expect(cls).toContain("bg-primary");
+    expect(cls).toContain("dark:bg-accent/50");
+    expect(cls).not.toMatch(/hover:/);
+  });
 });

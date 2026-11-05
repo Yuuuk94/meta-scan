@@ -181,6 +181,13 @@ client ID. 루트 레이아웃(`src/app/[lang]/layout.tsx`)의 `AutoAdsScript`
 기본값(`yuuuk94@gmail.com`)으로 폴백하므로 로컬에선 없어도 되지만, 실제 배포(Vercel)에서
 다른 연락처로 바꾸려면 여기서 설정합니다.
 
+`NEXT_PUBLIC_KOFI_URL`(이슈 #63) — Ko-fi 후원 페이지 URL. 헤더의 `DonateButton`
+(`src/ui/molecules/DonateButton.tsx`)과 결과 화면 하단 `SupportBlock`
+(`src/ui/organisms/SupportBlock.tsx`)이 이 값의 존재 여부만으로 게이팅됩니다 — 미설정(undefined/빈
+문자열)이면 두 곳 모두 아예 렌더하지 않으므로 Ko-fi 페이지가 생기기 전에도 안전하게 배포할 수
+있습니다. 링크는 `target="_blank" rel="noopener noreferrer"` 새 탭으로 열리고 GA4 클릭 이벤트는
+없습니다. 버튼은 `Button`의 `support` variant(호버 변화 없음)를 씁니다.
+
 `NEXT_PUBLIC_GA_MEASUREMENT_ID`(이슈 #19) — Google Analytics 4(GA4) 측정 ID. 루트 레이아웃에
 붙는 `AnalyticsGate`(`src/ui/organisms/AnalyticsGate.tsx`)가 `AdSlot`과 동일한 패턴으로 이 값의
 존재 여부만으로 전체 기능(쿠키 동의 배너 + GA4 스크립트 로딩)을 게이팅합니다 — `.env.local`에는
