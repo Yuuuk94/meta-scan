@@ -38,6 +38,7 @@ const t = {
   accessibility: "Accessibility",
   bestPractices: "Best Practices",
   lighthouseSuggestions: "Lighthouse 개선 제안",
+  resultPageTitle: "META_SCAN.BIZ - {url} 분석 결과",
 };
 
 const combined: CombinedScanResult = {
@@ -97,6 +98,18 @@ describe("ScanResultScreen", () => {
 
     expect(screen.getByText("https://example.com")).toBeInTheDocument();
     expect(screen.getByText("지금까지 확인한 항목에서 심각한 문제가 없습니다")).toBeInTheDocument();
+  });
+
+  it("sets the document title to the scanned url (issue #64)", () => {
+    const id = useScanStore.getState().saveScanResult({
+      url: "https://example.com",
+      raw: { robotsTxt: null, siteMap: null, crawling: null, lighthouse: null },
+      combined,
+    });
+
+    render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
+
+    expect(document.title).toBe("META_SCAN.BIZ - https://example.com 분석 결과");
   });
 
   it("renders the 기본 SEO card from combined.checks.basicSeo when present", () => {
