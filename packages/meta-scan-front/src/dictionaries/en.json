@@ -97,6 +97,7 @@
   "scan": {
     "title": "Meta-Scan",
     "subtitle": "AI-Friendly SEO Analyzer",
+    "resultPageTitle": "META_SCAN.BIZ - {url} Analysis Results",
     "analyzedAt": "Analyzed at",
     "supportEyebrow": "SUPPORT",
     "supportTitle": "Found this scan useful?",
@@ -193,19 +194,19 @@
       "description": "Free SEO/AEO/GEO checker. Enter one URL to see if your site is ready for Google and AI search, from meta tags to AI signals, as a pass/warning/fail checklist."
     },
     "seoRequestScan": {
-      "title": "Scanning your site | META_SCAN.BIZ",
+      "title": "META_SCAN.BIZ - Analyzing your site",
       "description": "Your URL is being scanned for meta tags, robots.txt, sitemap and Lighthouse results. The checklist appears as soon as every step finishes."
     },
     "seoScan": {
-      "title": "SEO/AEO/GEO Check Results | META_SCAN.BIZ",
+      "title": "META_SCAN.BIZ - Analysis Results",
       "description": "See your SEO, AEO and GEO checklist results with pass, warning, fail and info items, plus Lighthouse scores and improvement suggestions."
     },
     "seoPrivacy": {
-      "title": "Privacy Policy | META_SCAN.BIZ",
+      "title": "META_SCAN.BIZ - Privacy Policy",
       "description": "How META_SCAN.BIZ handles the URLs you scan, cookies, analytics and advertising, and what data is or is not stored."
     },
     "seoTerms": {
-      "title": "Terms of Service | META_SCAN.BIZ",
+      "title": "META_SCAN.BIZ - Terms of Service",
       "description": "The terms for using META_SCAN.BIZ, a free SEO, AEO and GEO scanning tool, including acceptable use and limits of the results."
     }
   }
