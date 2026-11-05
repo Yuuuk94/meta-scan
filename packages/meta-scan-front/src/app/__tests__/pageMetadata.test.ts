@@ -26,7 +26,7 @@ const pages = [
 describe("per-page locale metadata (issue #64)", () => {
   describe.each([["en", en], ["ko", ko]] as const)("%s", (lang, dict) => {
     it.each(pages)("%s has dictionary-sourced title/desc + canonical", async (_n, gen, key, path) => {
-      const entry = (dict.seo as Record<string, { title: string; description: string }>)[key];
+      const entry = (dict.seo as unknown as Record<string, { title: string; description: string }>)[key];
       const m = await gen(params(lang));
       expect(m.title).toBe(entry.title);
       expect(m.description).toBe(entry.description);
@@ -37,7 +37,7 @@ describe("per-page locale metadata (issue #64)", () => {
   });
 
   it("titles are unique per page within a locale", () => {
-    const titles = pages.map(([, , key]) => (en.seo as Record<string, { title: string }>)[key].title);
+    const titles = pages.map(([, , key]) => (en.seo as unknown as Record<string, { title: string }>)[key].title);
     expect(new Set(titles).size).toBe(titles.length);
   });
 

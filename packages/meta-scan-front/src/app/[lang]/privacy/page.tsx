@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { getPageMetadata } from "@/services/getPageMetadata";
 import { getDictionary } from "@/dictionaries";
 import { getSiteSetting } from "@/utils/siteSetting";
 import { NumberLabel } from "@/ui/atoms/NumberLabel";
@@ -5,6 +7,15 @@ import { getContent } from "./content";
 
 const lastUpdated = "2026-08-13";
 const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "yuuuk94@gmail.com";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  return getPageMetadata(lang, "seoPrivacy", "/privacy");
+}
 
 export default async function PrivacyPage() {
   const { lang } = await getSiteSetting();

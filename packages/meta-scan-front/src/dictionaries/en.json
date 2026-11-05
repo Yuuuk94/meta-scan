@@ -185,5 +185,28 @@
     "notFoundTitle": "No result to show",
     "notFoundDescription": "The scan result you requested wasn't found or has expired — results are only kept for 10 minutes.",
     "notFoundAction": "Back to home"
+  },
+  "seo": {
+    "siteName": "META_SCAN.BIZ",
+    "seoHome": {
+      "title": "META_SCAN.BIZ - Free SEO, AEO & GEO Checklist for Any URL",
+      "description": "Enter one URL and get a pass/warning/fail checklist covering meta tags, robots.txt, sitemap, Lighthouse, AI Signals, AEO and GEO readiness. Free site checker."
+    },
+    "seoRequestScan": {
+      "title": "Scanning your site | META_SCAN.BIZ",
+      "description": "Your URL is being scanned for meta tags, robots.txt, sitemap and Lighthouse results. The checklist appears as soon as every step finishes."
+    },
+    "seoScan": {
+      "title": "Scan Results | META_SCAN.BIZ",
+      "description": "See your SEO, AEO and GEO checklist results with pass, warning, fail and info items, plus Lighthouse scores and improvement suggestions."
+    },
+    "seoPrivacy": {
+      "title": "Privacy Policy | META_SCAN.BIZ",
+      "description": "How META_SCAN.BIZ handles the URLs you scan, cookies, analytics and advertising, and what data is or is not stored."
+    },
+    "seoTerms": {
+      "title": "Terms of Service | META_SCAN.BIZ",
+      "description": "The terms for using META_SCAN.BIZ, a free SEO, AEO and GEO scanning tool, including acceptable use and limits of the results."
+    }
   }
 }

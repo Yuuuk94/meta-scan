@@ -185,5 +185,28 @@
     "notFoundTitle": "표시할 결과가 없습니다",
     "notFoundDescription": "요청한 스캔 결과를 찾을 수 없거나 만료됐습니다 — 스캔 결과는 10분간만 유지됩니다.",
     "notFoundAction": "홈으로"
+  },
+  "seo": {
+    "siteName": "META_SCAN.BIZ",
+    "seoHome": {
+      "title": "META_SCAN.BIZ - URL 하나로 SEO・AEO・GEO 무료 체크리스트",
+      "description": "URL 하나만 입력하면 메타 태그, robots.txt, 사이트맵, Lighthouse는 물론 AI Signals, AEO, GEO 준비도까지 통과・경고・실패・정보로 항목별 점검해 드리는 무료 사이트 진단 도구입니다. 구조화 데이터와 AI 신호도 확인하세요."
+    },
+    "seoRequestScan": {
+      "title": "사이트 스캔 중 | META_SCAN.BIZ",
+      "description": "입력한 URL의 메타 태그, robots.txt, 사이트맵, Lighthouse 결과를 스캔하고 있습니다. 모든 단계가 끝나면 체크리스트가 바로 표시됩니다."
+    },
+    "seoScan": {
+      "title": "스캔 결과 | META_SCAN.BIZ",
+      "description": "SEO, AEO, GEO 체크리스트 결과를 통과, 경고, 실패, 정보 항목으로 확인하고 Lighthouse 점수와 개선 제안까지 살펴보세요."
+    },
+    "seoPrivacy": {
+      "title": "개인정보처리방침 | META_SCAN.BIZ",
+      "description": "META_SCAN.BIZ가 스캔한 URL, 쿠키, 분석 도구, 광고를 어떻게 다루는지와 어떤 데이터를 저장하거나 저장하지 않는지 안내합니다."
+    },
+    "seoTerms": {
+      "title": "이용약관 | META_SCAN.BIZ",
+      "description": "무료 SEO, AEO, GEO 스캔 도구 META_SCAN.BIZ의 이용 조건과 허용되는 사용 범위, 결과의 한계에 대한 약관을 안내합니다."
+    }
   }
 }
