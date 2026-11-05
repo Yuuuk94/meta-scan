@@ -12,6 +12,7 @@ import { I18nUxCard } from "@/ui/organisms/I18nUxCard";
 import { IndexingCard } from "@/ui/organisms/IndexingCard";
 import { LighthouseCard } from "@/ui/organisms/LighthouseCard";
 import { PreviewsCard } from "@/ui/organisms/PreviewsCard";
+import { SupportBlock } from "@/ui/organisms/SupportBlock";
 import { ScanHero } from "@/ui/organisms/ScanHero";
 import { mockScanResultEntry } from "@/mocks/mockScanResult";
 
@@ -219,6 +220,10 @@ export function ScanResultScreen({
           }
         }
       />
+
+      {/* Ko-fi support block (issue #63) — hidden when NEXT_PUBLIC_KOFI_URL
+       * is unset. Real result view only (not the not-found branch above). */}
+      <SupportBlock t={t} />
     </div>
   );
 }

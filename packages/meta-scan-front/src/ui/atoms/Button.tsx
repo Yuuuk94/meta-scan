@@ -17,6 +17,11 @@ const buttonVariants = cva(
         // Brand-accent CTA (Signal Orange) — for the single highest-emphasis
         // action on a screen, per design-system.md §2 ("CTA 배경... 강조").
         accent: "bg-accent text-accent-foreground hover:bg-accent/90",
+        // Donation CTA (issue #63). Light = same as default; dark = Paper text on
+        // accent/50 (default inverts to Paper bg in dark, which the design
+        // doesn't want). Intentionally NO hover class in either theme.
+        support:
+          "bg-primary text-primary-foreground dark:bg-accent/50 dark:text-foreground",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
