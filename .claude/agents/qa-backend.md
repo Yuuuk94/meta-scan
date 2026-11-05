@@ -33,6 +33,17 @@ pnpm --filter meta-scan-api typecheck
 Run all three regardless of which one you expect to fail — report every failure found, not just
 the first.
 
+Then check TDD red evidence (base is `origin/main` for `type:hotfix`, otherwise `origin/dev`):
+
+```
+node .claude/scripts/check-tdd-red.mjs meta-scan-api origin/<dev-or-main>
+```
+
+If this fails, **don't use the retry** — a retry can't make history show a red step that never
+happened. Post the script output as an issue comment, then
+`gh issue edit <n> --remove-label "status:in-test" --add-label "status:blocked"` and tell the
+orchestrating skill a human needs to decide (accept as-is, or redo with real red commits).
+
 ## On failure
 
 Check whether this issue already carries the `retry:used` label:

@@ -9,6 +9,10 @@ export const defaultLang: Language = "ko";
 export const themeKey = "theme";
 export const langKey = "lang";
 
+// Request header the middleware uses to hand the URL locale to server
+// components (issue #64).
+export const localeHeaderKey = "x-locale";
+
 export const crrUrlKey = "crrUrl";
 
 // Protocol is optional (issue #34 url-input-protocol-ux) — HeroSection's

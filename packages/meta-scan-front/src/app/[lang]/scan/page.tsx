@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { getPageMetadata } from "@/services/getPageMetadata";
 import { getDictionary } from "@/dictionaries";
 import { getSiteSetting } from "@/utils/siteSetting";
 import { ScanResultScreen } from "@/ui/organisms/ScanResultScreen";
@@ -7,6 +9,15 @@ import { ScanResultScreen } from "@/ui/organisms/ScanResultScreen";
 // /scan/:id, not a silent redirect. Results now live at /scan/:id
 // (spec-fixed.md "라우팅/스토어 구조 변경"); this route no longer renders
 // mock data.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  return getPageMetadata(lang, "seoScan", "/scan");
+}
+
 export default async function ScanPage() {
   const { theme, lang } = await getSiteSetting();
   const t = (await getDictionary(lang)).scan;
