@@ -189,15 +189,15 @@
   "seo": {
     "siteName": "META_SCAN.BIZ",
     "seoHome": {
-      "title": "META_SCAN.BIZ - Free SEO, AEO & GEO Checklist for Any URL",
-      "description": "Enter one URL and get a pass/warning/fail checklist covering meta tags, robots.txt, sitemap, Lighthouse, AI Signals, AEO and GEO readiness. Free site checker."
+      "title": "Free SEO Checker & AEO/GEO Audit | META_SCAN.BIZ",
+      "description": "Free SEO check for any URL. Audit meta tags, robots.txt, sitemap and Lighthouse, plus AI search readiness (AEO, GEO), in one pass/fail checklist."
     },
     "seoRequestScan": {
       "title": "Scanning your site | META_SCAN.BIZ",
       "description": "Your URL is being scanned for meta tags, robots.txt, sitemap and Lighthouse results. The checklist appears as soon as every step finishes."
     },
     "seoScan": {
-      "title": "Scan Results | META_SCAN.BIZ",
+      "title": "SEO Check Results | META_SCAN.BIZ",
       "description": "See your SEO, AEO and GEO checklist results with pass, warning, fail and info items, plus Lighthouse scores and improvement suggestions."
     },
     "seoPrivacy": {
