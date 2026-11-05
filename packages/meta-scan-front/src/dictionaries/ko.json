@@ -97,6 +97,7 @@
   "scan": {
     "title": "Meta-Scan",
     "subtitle": "AI 친화 SEO 분석기",
+    "resultPageTitle": "META_SCAN.BIZ - {url} 분석 결과",
     "analyzedAt": "분석 시각",
     "supportEyebrow": "SUPPORT",
     "supportTitle": "진단이 도움이 되셨다면",
@@ -185,5 +186,28 @@
     "notFoundTitle": "표시할 결과가 없습니다",
     "notFoundDescription": "요청한 스캔 결과를 찾을 수 없거나 만료됐습니다 — 스캔 결과는 10분간만 유지됩니다.",
     "notFoundAction": "홈으로"
+  },
+  "seo": {
+    "siteName": "META_SCAN.BIZ",
+    "seoHome": {
+      "title": "META_SCAN.BIZ - SEO/AEO/GEO 분석기",
+      "description": "URL만 넣으면 내 사이트의 SEO/AEO/GEO 상태를 무료로 분석해 드립니다. 구글 검색은 물론 ChatGPT 같은 AI 검색에도 잘 잡히는지 메타 태그, robots.txt, 사이트맵, 구조화 데이터, AI 신호까지 항목별로 확인해 보세요."
+    },
+    "seoRequestScan": {
+      "title": "META_SCAN.BIZ - 사이트 분석 중",
+      "description": "입력한 URL의 메타 태그, robots.txt, 사이트맵, Lighthouse 결과를 스캔하고 있습니다. 모든 단계가 끝나면 체크리스트가 바로 표시됩니다."
+    },
+    "seoScan": {
+      "title": "META_SCAN.BIZ - 분석 결과",
+      "description": "SEO, AEO, GEO 체크리스트 결과를 통과, 경고, 실패, 정보 항목으로 확인하고 Lighthouse 점수와 개선 제안까지 살펴보세요."
+    },
+    "seoPrivacy": {
+      "title": "META_SCAN.BIZ - 개인정보처리방침",
+      "description": "META_SCAN.BIZ가 스캔한 URL, 쿠키, 분석 도구, 광고를 어떻게 다루는지와 어떤 데이터를 저장하거나 저장하지 않는지 안내합니다."
+    },
+    "seoTerms": {
+      "title": "META_SCAN.BIZ - 이용약관",
+      "description": "무료 SEO, AEO, GEO 스캔 도구 META_SCAN.BIZ의 이용 조건과 허용되는 사용 범위, 결과의 한계에 대한 약관을 안내합니다."
+    }
   }
 }

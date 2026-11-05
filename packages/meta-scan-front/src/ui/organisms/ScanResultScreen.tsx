@@ -67,6 +67,17 @@ export function ScanResultScreen({
     setEntry(found);
   }, [id, getScanResult]);
 
+  // issue #64 — result data lives only in the client store, so the scanned
+  // url can't go into server metadata; set the tab title once it's known.
+  useEffect(() => {
+    if (entry && typeof t.resultPageTitle === "string") {
+      document.title = t.resultPageTitle.replace(
+        "{url}",
+        entry.url.replace(/^https?:\/\//, ""),
+      );
+    }
+  }, [entry, t.resultPageTitle]);
+
   if (entry === undefined) return null;
 
   if (!entry) {
