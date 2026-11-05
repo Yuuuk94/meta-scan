@@ -4,7 +4,7 @@
 #   docker build -f packages/meta-scan-api/dockerfile -t meta-scan-api .   # from repo root
 
 # ---- build stage ----
-FROM node:20-slim AS build
+FROM node:22-slim AS build
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -35,7 +35,7 @@ RUN pnpm --filter meta-scan-api build
 RUN pnpm --filter meta-scan-api deploy --prod --legacy /deploy/meta-scan-api
 
 # ---- runtime stage ----
-FROM node:20-slim
+FROM node:22-slim
 WORKDIR /app
 
 # Chromium & 폰트 설치 (Lighthouse/Chrome 의존성)
