@@ -71,7 +71,10 @@ export function ScanResultScreen({
   // url can't go into server metadata; set the tab title once it's known.
   useEffect(() => {
     if (entry && typeof t.resultPageTitle === "string") {
-      document.title = t.resultPageTitle.replace("{url}", entry.url);
+      document.title = t.resultPageTitle.replace(
+        "{url}",
+        entry.url.replace(/^https?:\/\//, ""),
+      );
     }
   }, [entry, t.resultPageTitle]);
 

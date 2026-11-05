@@ -109,7 +109,7 @@ describe("ScanResultScreen", () => {
 
     render(<ScanResultScreen lang="ko" theme="dark" t={t} id={id} />);
 
-    expect(document.title).toBe("META_SCAN.BIZ - https://example.com 분석 결과");
+    expect(document.title).toBe("META_SCAN.BIZ - example.com 분석 결과");
   });
 
   it("renders the 기본 SEO card from combined.checks.basicSeo when present", () => {
