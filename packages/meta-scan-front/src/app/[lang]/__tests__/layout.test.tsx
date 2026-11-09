@@ -54,7 +54,15 @@ describe("RootLayout metadata (issue #48)", () => {
 
       const { metadata } = await import("@/app/layout");
 
-      expect(metadata.other).toBeUndefined();
+      expect(metadata.other?.["google-adsense-account"]).toBeUndefined();
     });
+  });
+
+  it("always includes the Naver site verification meta tag", async () => {
+    const { metadata } = await import("@/app/layout");
+
+    expect(metadata.other?.["naver-site-verification"]).toBe(
+      "e9053dabe6509257898e2669916eb487e16e6f5b",
+    );
   });
 });

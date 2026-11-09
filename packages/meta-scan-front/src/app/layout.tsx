@@ -58,9 +58,10 @@ export const metadata: Metadata = {
     siteName: "meta scan biz",
     images: [{ url: `${siteUrl}/og.png` }],
   },
-  ...(adsenseClientId
-    ? { other: { "google-adsense-account": adsenseClientId } }
-    : {}),
+  other: {
+    "naver-site-verification": "e9053dabe6509257898e2669916eb487e16e6f5b",
+    ...(adsenseClientId ? { "google-adsense-account": adsenseClientId } : {}),
+  },
 };
 
 export default async function RootLayout({
