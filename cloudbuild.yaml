@@ -18,3 +18,9 @@ steps:
 
 images:
   - "gcr.io/$PROJECT_ID/github.com/yuuuk94/meta-scan:$COMMIT_SHA"
+
+# The trigger runs with a user-specified service account, which Cloud Build
+# rejects unless logs go somewhere explicit — without this every build failed
+# with "if 'build.service_account' is specified, the build must either ...".
+options:
+  logging: CLOUD_LOGGING_ONLY
