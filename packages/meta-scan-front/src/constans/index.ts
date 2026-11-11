@@ -37,10 +37,14 @@ export const heroUrlInputId = "hero-url-input";
 // source of truth for the sitemap/robots routes.
 export const siteUrl = process.env.NEXT_PUBLIC_META_SCAN_URL;
 
-// Real routes that get indexed per-locale in sitemap.xml. `/scan/:id` is a
-// personalized result page (pipe-connection, issue #2) and intentionally
-// excluded.
-export const siteRoutes = ["", "/request-scan", "/scan", "/privacy", "/terms"];
+// Real routes that get indexed per-locale in sitemap.xml. Tool screens
+// (`/scan`, `/request-scan`, `/scan/:id`) are noindex and excluded (issue
+// #76 — AdSense low-value-content rejection); blog posts are added
+// separately from the post registry.
+export const siteRoutes = ["", "/about", "/privacy", "/terms"];
+
+// Site blog author (issue #76) — shown in the author box and Article JSON-LD.
+export const blogAuthorName = "Yuuuk94";
 
 // localStorage key for the GA4 cookie-consent decision (issue #19
 // analytics-integration). Distinct namespace prefix (`ms_`) since this is
