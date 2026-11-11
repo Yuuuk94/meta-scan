@@ -4,6 +4,8 @@ import { generateMetadata as requestScan } from "@/app/[lang]/request-scan/page"
 import { generateMetadata as scan } from "@/app/[lang]/scan/page";
 import { generateMetadata as privacy } from "@/app/[lang]/privacy/page";
 import { generateMetadata as terms } from "@/app/[lang]/terms/page";
+import { generateMetadata as about } from "@/app/[lang]/about/page";
+import { generateMetadata as blog } from "@/app/[lang]/blog/page";
 import en from "@/dictionaries/en.json";
 import ko from "@/dictionaries/ko.json";
 
@@ -35,6 +37,23 @@ describe("per-page locale metadata (issue #64)", () => {
       expect(m.twitter).toEqual(expect.objectContaining({ card: "summary_large_image" }));
     });
   });
+
+  it.each([["request-scan", requestScan], ["scan", scan]] as const)(
+    "%s is noindex (issue #76 thin tool screen)",
+    async (_n, gen) => {
+      const m = await gen(params("ko"));
+      expect(m.robots).toEqual({ index: false, follow: true });
+    },
+  );
+
+  it.each([["about", about, "seoAbout", "/about"], ["blog", blog, "seoBlog", "/blog"]] as const)(
+    "%s has its own ko metadata (issue #76)",
+    async (_n, gen, key, path) => {
+      const m = await gen(params("ko"));
+      expect(m.title).toBe((ko.seo as unknown as Record<string, { title: string }>)[key].title);
+      expect(m.alternates?.canonical).toBe(`${siteUrl}/ko${path}`);
+    },
+  );
 
   it("titles are unique per page within a locale", () => {
     const titles = pages.map(([, , key]) => (en.seo as unknown as Record<string, { title: string }>)[key].title);

@@ -8,7 +8,12 @@ export type SeoPageKey =
   | "seoRequestScan"
   | "seoScan"
   | "seoPrivacy"
-  | "seoTerms";
+  | "seoTerms"
+  | "seoAbout"
+  | "seoBlog";
+
+// issue #76 — tool screens with no standalone content stay out of the index.
+const noindexKeys: SeoPageKey[] = ["seoRequestScan", "seoScan"];
 
 // issue #64 — shared by every page's generateMetadata: resolves the locale
 // from the route param (URL is the source of truth), pulls copy from the
@@ -27,5 +32,6 @@ export async function getPageMetadata(
     path,
     seo: { ...seo[key], siteName: seo.siteName },
     siteUrl,
+    noindex: noindexKeys.includes(key),
   });
 }

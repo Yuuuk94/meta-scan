@@ -20,6 +20,12 @@ export const RootFooter = async ({ lang, ready }: RootFooterProps) => {
 
         <div className="flex items-center gap-6">
           <nav className="flex items-center gap-4 text-xs text-muted-foreground">
+            <Link href={`/${lang}/blog`} className="hover:text-accent">
+              {t.blog}
+            </Link>
+            <Link href={`/${lang}/about`} className="hover:text-accent">
+              {t.about}
+            </Link>
             <Link href={`/${lang}/privacy`} className="hover:text-accent">
               {t.privacy}
             </Link>

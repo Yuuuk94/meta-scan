@@ -15,6 +15,11 @@ interface Input {
   path: string;
   seo: PageSeo;
   siteUrl: string | undefined;
+  /** Locales this page exists in (default: all). Issue #76 — Korean-only posts. */
+  languages?: Language[];
+  /** Thin tool screens are kept out of the index (issue #76). */
+  noindex?: boolean;
+  ogType?: "website" | "article";
 }
 
 const ogLocale: Record<Language, string> = { ko: "ko_KR", en: "en_US" };
@@ -27,16 +32,21 @@ export function buildPageMetadata({
   path,
   seo,
   siteUrl,
+  languages: available = allowLanguages as Language[],
+  noindex = false,
+  ogType = "website",
 }: Input): Metadata {
   const { title, description, siteName } = seo;
   const image = `${siteUrl}/og.png`;
   const languages: Record<string, string> = {};
-  for (const l of allowLanguages) languages[l] = `${siteUrl}/${l}${path}`;
-  languages["x-default"] = `${siteUrl}/${defaultLang}${path}`;
+  for (const l of available) languages[l] = `${siteUrl}/${l}${path}`;
+  const xDefault = available.includes(defaultLang) ? defaultLang : available[0];
+  languages["x-default"] = `${siteUrl}/${xDefault}${path}`;
 
   return {
     title,
     description,
+    ...(noindex ? { robots: { index: false, follow: true } } : {}),
     alternates: { canonical: `${siteUrl}/${canonicalLang}${path}`, languages },
     openGraph: {
       title,
@@ -44,7 +54,7 @@ export function buildPageMetadata({
       url: `${siteUrl}/${lang}${path}`,
       locale: ogLocale[lang],
       siteName,
-      type: "website",
+      type: ogType,
       images: [{ url: image }],
     },
     twitter: {
