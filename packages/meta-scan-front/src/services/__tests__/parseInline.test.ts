@@ -15,4 +15,12 @@ describe("parseInline", () => {
       { type: "text", value: " now" },
     ]);
   });
+
+  it("parses **bold**", () => {
+    expect(parseInline("a **b** c")).toEqual([
+      { type: "text", value: "a " },
+      { type: "bold", value: "b" },
+      { type: "text", value: " c" },
+    ]);
+  });
 });

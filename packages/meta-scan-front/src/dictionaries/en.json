@@ -4,12 +4,15 @@
     "subtitle": "AI-Friendly AEO & GEO & SEO Analyzer",
     "toggleLanguage": "한국어",
     "donate": "Support",
-    "donateAriaLabel": "Support on Ko-fi"
+    "donateAriaLabel": "Support on Ko-fi",
+    "blog": "Blog"
   },
   "footer": {
     "copyright": "© 2026 Meta-Scan. All rights reserved.",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "blog": "Blog",
+    "about": "About"
   },
   "cookieConsent": {
     "message": "We use Google Analytics to understand how visitors use this site. You can accept or decline anonymous analytics cookies.",
@@ -71,7 +74,25 @@
     "faq6Q": "Are results saved anywhere?",
     "faq6A": "No. Scan results are currently processed statelessly and aren't written to a database — each scan is only visible on that results screen.",
     "faqCtaText": "Still have questions? Run the SEO・AEO・GEO checklist on your site.",
-    "faqCtaButton": "Scan now"
+    "faqCtaButton": "Scan now",
+    "latestPostsTitle": "Latest guides",
+    "latestPostsMore": "View all",
+    "checkGroupsTitle": "What we check",
+    "checkGroupsLink": "Read the guide",
+    "checkGroup1Title": "Basic SEO",
+    "checkGroup1Body": "Presence and length of the title and meta description, and image alt coverage: the basics that decide how you look in search results.",
+    "checkGroup2Title": "Indexing",
+    "checkGroup2Body": "Whether robots.txt blocks crawlers, whether sitemap.xml exists, and whether canonical and noindex are set as intended. The first place to look if you don't show up at all.",
+    "checkGroup3Title": "Previews",
+    "checkGroup3Body": "Open Graph and Twitter card tags and og:image size, which build the card people see when your link is shared in chat apps and social feeds.",
+    "checkGroup4Title": "AI signals",
+    "checkGroup4Body": "Whether AI search like ChatGPT and Perplexity can read and cite the page: structured data (JSON-LD), FAQ, AI guidance files and JavaScript rendering dependence.",
+    "checkGroup5Title": "Content",
+    "checkGroup5Body": "Body length and heading structure: the skeleton people and search engines need to understand what the page is about.",
+    "checkGroup6Title": "i18n & UX",
+    "checkGroup6Body": "For multilingual sites, whether hreflang links language versions, and whether a viewport is set so the page works on mobile.",
+    "checkGroup7Title": "Lighthouse",
+    "checkGroup7Body": "Google's own Performance, SEO, Accessibility and Best Practices scores, with its improvement suggestions as-is."
   },
   "requestScan": {
     "title": "Meta-Scan",
@@ -208,6 +229,73 @@
     "seoTerms": {
       "title": "META_SCAN.BIZ - Terms of Service",
       "description": "The terms for using META_SCAN.BIZ, a free SEO, AEO and GEO scanning tool, including acceptable use and limits of the results."
+    },
+    "seoAbout": {
+      "title": "META_SCAN.BIZ - About",
+      "description": "A frontend developer who grew a product's MAU by 350% using SEO and Lighthouse as the yardstick turned that checklist into a free SEO/AEO/GEO checker. Why it exists and how to reach us."
+    },
+    "seoBlog": {
+      "title": "META_SCAN.BIZ - Blog",
+      "description": "Practical guides on getting your site found in search and AI search: robots.txt, sitemaps, OG tags, structured data, llms.txt and Lighthouse, one check at a time."
     }
+  },
+  "blog": {
+    "title": "Blog",
+    "intro": "What to check, and in what order, when your site doesn't show up in Google or AI search — the same checks I used while fixing a real product. Every post links straight to a META_SCAN check.",
+    "empty": "There are no posts in this language yet.",
+    "emptyLink": "See the Korean posts",
+    "breadcrumbHome": "Home",
+    "published": "Published",
+    "updated": "Updated",
+    "summary": "Summary",
+    "faqTitle": "FAQ",
+    "relatedTitle": "Related reading",
+    "referencesTitle": "References",
+    "ctaTitle": "How does your site do?",
+    "ctaBody": "Enter one URL to run the free SEO/AEO/GEO checklist, including everything covered in this post.",
+    "ctaButton": "Check for free",
+    "authorTitle": "Author",
+    "authorBio": "Frontend developer who grew a product's MAU by 350% using SEO and Lighthouse as the yardstick, then turned that checklist into META_SCAN.",
+    "authorLink": "More about me",
+    "hubs": {
+      "basics": "Basics",
+      "basicSeo": "Basic SEO",
+      "indexing": "Indexing",
+      "previews": "Previews",
+      "aiSignals": "AI signals",
+      "content": "Content",
+      "i18n": "i18n",
+      "lighthouse": "Lighthouse"
+    }
+  },
+  "about": {
+    "title": "About",
+    "lead": "META_SCAN.BIZ is a free SEO/AEO/GEO checker: enter one URL to see whether your site is easy to find in Google and in AI search.",
+    "sections": [
+      {
+        "heading": "Who builds it",
+        "body": [
+          "I'm a frontend developer. At a previous job I improved a product using SEO work and Lighthouse metrics as the yardstick, and grew its MAU by 350%.",
+          "The lesson was that fundamentals come before tricks: crawlers not blocked, a unique title and description on every page, link previews that actually render, and Lighthouse issues fixed one by one."
+        ]
+      },
+      {
+        "heading": "Why it exists",
+        "body": [
+          "Back then I checked all of this by hand, hopping between dev tools and a handful of websites. Seeing it in one place would have been much faster, so I built META_SCAN.",
+          "People now ask ChatGPT or Perplexity before they search Google. So on top of classic SEO checks, META_SCAN also checks AEO/GEO signals: whether AI can read and cite your page."
+        ]
+      },
+      {
+        "heading": "What's different",
+        "body": [
+          "No single blended score. Each check is pass, warning, fail or info, so you know what to fix first. The only numeric scores are Google's own four Lighthouse scores, shown as-is.",
+          "It's free with no sign-up, and scan results aren't stored on the server. The blog explains why each check matters and how to fix it."
+        ]
+      }
+    ],
+    "contactTitle": "Contact",
+    "emailLabel": "Email",
+    "blogLink": "Read the blog"
   }
 }

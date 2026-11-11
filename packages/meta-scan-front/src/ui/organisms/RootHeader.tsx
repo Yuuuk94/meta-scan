@@ -34,6 +34,13 @@ export const RootHeader = async ({ theme, lang, ready }: RootHeaderProps) => {
         </Link>
 
         <div className="flex items-center gap-2">
+          {/* issue #76 — site blog entry point (crawl path + readers). */}
+          <Link
+            href={`/${lang}/blog`}
+            className="mr-2 hidden text-sm font-bold text-foreground hover:text-accent sm:inline"
+          >
+            {t.blog}
+          </Link>
           <ToggleSetting theme={theme} lang={lang} t={t} />
           <ServiceStatus ready={ready} />
           <DonateButton label={t.donate} ariaLabel={t.donateAriaLabel} />
