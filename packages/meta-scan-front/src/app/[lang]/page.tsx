@@ -38,7 +38,7 @@ export default async function HomePage() {
   };
 
   // issue #76 — each check group links to its hub guide when it exists.
-  const hubSlugs = ["title-description", "site-not-on-google", "og-tags-preview", "ai-search-citation", "", "hreflang", "lighthouse-score"];
+  const hubSlugs = ["title-description", "site-not-on-google", "og-tags-preview", "ai-search-citation", "heading-structure", "hreflang", "lighthouse-score"];
   const checkGroups = hubSlugs.map((slug, i) => ({
     title: (t as Record<string, string>)[`checkGroup${i + 1}Title`],
     body: (t as Record<string, string>)[`checkGroup${i + 1}Body`],
