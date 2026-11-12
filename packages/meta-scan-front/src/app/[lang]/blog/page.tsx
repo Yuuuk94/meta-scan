@@ -57,8 +57,13 @@ export default async function BlogIndexPage({
         </p>
       ) : (
         <ul className="mt-10 grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground md:grid-cols-2">
-          {posts.map((p) => (
-            <li key={p.slug} className="flex flex-col bg-background p-6">
+          {posts.map((p, i) => (
+            <li
+              key={p.slug}
+              className={`flex flex-col bg-background p-6 ${
+                posts.length % 2 === 1 && i === posts.length - 1 ? "md:col-span-2" : ""
+              }`}
+            >
               <p className="text-xs text-muted-foreground">
                 <span className="font-bold text-accent">{hubs[p.hub]}</span>
                 <span className="mx-2">·</span>
