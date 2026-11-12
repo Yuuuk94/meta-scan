@@ -29,7 +29,15 @@ describe("blogPosts", () => {
     expect(getPostLanguages("no-such-post")).toEqual([]);
   });
 
-  describe.each(ko.map((p) => [p.slug, p] as const))("%s", (_slug, post) => {
+  // issue #82 — every Korean post ships with an English version under the
+  // same slug, so hreflang pairs are complete in both directions.
+  it("every ko post has an en version with the same slug", () => {
+    for (const p of ko) expect(getPostLanguages(p.slug)).toEqual(["ko", "en"]);
+    expect(getPosts("en").length).toBe(ko.length);
+  });
+
+  const all = [...ko, ...getPosts("en")];
+  describe.each(all.map((p) => [`${p.lang}/${p.slug}`, p] as const))("%s", (_slug, post) => {
     it("meets the content bar (2,500+ chars of body text)", () => {
       expect(postTextLength(post)).toBeGreaterThanOrEqual(2500);
     });
