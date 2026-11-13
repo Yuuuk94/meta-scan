@@ -19,6 +19,7 @@ describe("buildLlmsTxt", () => {
     expect(txt).toContain("(https://meta-scan.biz/ko)");
     expect(txt).toContain("(https://meta-scan.biz/en)");
     expect(txt).toContain("(https://meta-scan.biz/ko/about)");
+    expect(txt).toContain("(https://meta-scan.biz/en/about)");
     expect(txt).toContain("- [robots.txt 확인하는 법](https://meta-scan.biz/ko/blog/robots-txt): 설명");
   });
 });
