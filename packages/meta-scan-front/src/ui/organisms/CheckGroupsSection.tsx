@@ -16,7 +16,12 @@ export function CheckGroupsSection({ title, linkLabel, groups }: CheckGroupsSect
         <h2 className="mb-10 font-display text-3xl font-extrabold text-foreground">{title}</h2>
         <ol className="grid grid-cols-1 gap-px border-[1.5px] border-foreground bg-foreground sm:grid-cols-2">
           {groups.map((g, i) => (
-            <li key={g.title} className="flex gap-4 bg-background p-6">
+            <li
+              key={g.title}
+              className={`flex gap-4 bg-background p-6 ${
+                groups.length % 2 === 1 && i === groups.length - 1 ? "sm:col-span-2" : ""
+              }`}
+            >
               <NumberLabel value={i + 1} className="w-9 shrink-0 text-2xl" />
               <div>
                 <h3 className="font-display text-lg font-bold text-foreground">{g.title}</h3>
