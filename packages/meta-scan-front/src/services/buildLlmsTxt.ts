@@ -17,6 +17,7 @@ export function buildLlmsTxt({ siteUrl, posts }: Input): string {
     `- [META_SCAN.BIZ (Korean)](${siteUrl}/ko): SEO/AEO/GEO 분석기`,
     `- [META_SCAN.BIZ (English)](${siteUrl}/en): SEO/AEO/GEO checker`,
     `- [About (Korean)](${siteUrl}/ko/about): who builds it and why`,
+    `- [About (English)](${siteUrl}/en/about): who builds it and why`,
     "",
     "## Blog",
     "",
